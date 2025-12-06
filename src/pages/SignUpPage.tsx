@@ -1,0 +1,163 @@
+import React, {useState } from 'react';
+import { useForm, FormProvider, useFormContext } from 'react-hook-form';
+import ManhChatImage from '../assets/ManhChat.png';
+import type { UserSignUpInfo } from '@/lib/const';
+import { signUpSchema } from '@/lib/inputSchema';
+import {zodResolver} from "@hookform/resolvers/zod"
+import { inputFormConfig } from '@/lib/const';
+type FieldDef = {
+    name: keyof FormData;
+    id: string;
+    label: string;
+    type?: string;
+    placeholder?: string;
+};
+  const InputField: React.FC<{ field: FieldDef }> = ({ field }) => {
+    const { register, formState: { errors }} = useFormContext<FormData>();
+    const error = errors[field.name as keyof typeof errors] as any | undefined;
+
+    // special-case validation for confirmPassword to compare with password
+
+
+    return (
+      <div className="mb-6" >
+        <label htmlFor={field.id} className="block text-sm font-semibold text-green-800 mb-2">
+          {field.label}
+        </label>
+        <input
+          id={field.id}
+          type={field.type || 'text'}
+          placeholder={field.placeholder}
+          {...register(field.name)}
+          className={`w-full px-4 py-3 border-2 rounded-lg text-base font-normal bg-white text-gray-900 placeholder-gray-400 outline-none transition-all
+          }`}
+        />
+        {error && (
+          <div className="text-red-600 text-sm mt-1.5 font-medium">
+            {error.message}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+
+
+interface FormData{
+    name:string;
+    address:string;
+    email:string;
+    phonenumber:string;
+    birthday:string;
+    password: string;
+    confirmPassword: string;
+};
+
+const SignUpPage: React.FC = () => {
+  const [signUpData, setSignUpData]= useState<UserSignUpInfo>()
+  const methods = useForm<FormData>({
+    mode: 'onSubmit',
+    resolver:zodResolver(signUpSchema),
+    defaultValues: {
+      name: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      phonenumber: '',
+      address: '',
+      birthday: '',
+    },
+  });
+
+  const { handleSubmit, reset } = methods;
+  const [showSuccess, setShowSuccess] = useState(false);
+  console.log(signUpData);
+
+  const onSubmit = (data: FormData) => {
+    setSignUpData({...data, profilePic: "", id:""});
+    setShowSuccess(true);
+    reset();
+    setTimeout(() => {
+      setShowSuccess(false);
+    }, 3000);
+  };
+
+  const handleSignIn = () => {
+    // Navigate to sign in page
+    window.location.href = '/signin';
+  };
+
+  // Reusable input field that pulls methods from FormProvider via useFormContext
+
+
+
+  const fields: FieldDef[] = [
+    { name: 'name', id: 'name', label: inputFormConfig.name_label, placeholder: 'Enter your name' },
+    { name: 'email', id: 'email', label: inputFormConfig.email_label, type: 'email', placeholder: 'Enter your email' },
+    { name: 'password', id: 'password', label: inputFormConfig.password_label, type: 'password', placeholder: 'Enter your password' },
+    { name: 'confirmPassword', id: 'confirmPassword', label: inputFormConfig.confirm_password_label, type: 'password', placeholder: 'Confirm your password' },
+    { name: 'address', id: 'address', label: inputFormConfig.address_label, placeholder: 'Enter your address' },
+    { name: 'phonenumber', id: 'phonenumber', label: inputFormConfig.phone_number_label, placeholder: 'Enter your phone number' },
+    { name: 'birthday', id: 'birthday', label: inputFormConfig.birthday_label, type: 'date' },
+  ];
+
+  return (
+    <div className="min-h-screen w-full bg-white flex items-center justify-center px-5 py-10">
+      <main className="w-full max-w-md">
+        {/* Header */}
+        <div className="text-center mb-10">
+          <div className="w-32 h-32 mx-auto mb-6">
+            <img
+              src={ManhChatImage}
+              alt="ManhChat Logo"
+              className="w-full h-full object-contain"
+            />
+          </div>
+          <h1 className="text-4xl font-semibold text-gray-900 mb-2">
+            Create Account
+          </h1>
+          <p className="text-base text-gray-500">Join us today!</p>
+        </div>
+
+        {/* Success Message */}
+        {showSuccess && (
+          <div className="bg-green-50 border-2 border-green-500 rounded-lg p-4 mb-4 text-green-800 font-medium text-center">
+            Account created successfully!
+          </div>
+        )}
+
+        {/* Sign Up Form - uses FormProvider to share methods with InputField */}
+        <div className="bg-green-50 border-2 border-green-300 rounded-2xl p-8 mb-6">
+          <FormProvider {...methods}>
+            <form onSubmit={handleSubmit(onSubmit)} noValidate>
+              {fields.map(f => (
+                <InputField key={String(f.name)} field={f} />
+              ))}
+
+              {/* Submit Button */}
+              <button
+                type="submit"
+                className="w-full py-3.5 bg-green-500 text-white rounded-lg text-base font-semibold cursor-pointer border-none transition-all hover:bg-green-600 hover:-translate-y-px hover:shadow-lg active:translate-y-0 disabled:bg-green-300 disabled:cursor-not-allowed disabled:shadow-none"
+              >
+                {inputFormConfig.submit_button}
+              </button>
+            </form>
+          </FormProvider>
+        </div>
+
+        {/* Links */}
+        <div className="text-center text-sm text-gray-500">
+          <button
+            type="button"
+            className="bg-none border-none text-green-500 font-semibold cursor-pointer underline text-sm font-inherit hover:text-green-600"
+            onClick={handleSignIn}
+          >
+            {inputFormConfig.signin_text}
+          </button>
+        </div>
+      </main>
+    </div>
+  );
+};
+
+export default SignUpPage;
