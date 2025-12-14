@@ -1,22 +1,46 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { RootState } from "./store";
 import type { UserDefaultInfo } from "@/lib/const";
-const initialState: UserDefaultInfo[]= []
+import { getFriendList } from "@/lib/services/friendService";
+import FriendList from "@/components/FriendList";
+const initialState: {
+  friendList:UserDefaultInfo[],
+  error:any, 
+  status:string}= {
+    friendList:[],
+    error:"",
+    status:"completed"
+  }
 export const friendListSlice=createSlice({
     name:"error",
     initialState,
     reducers:{
-      getFriendList:(state,action: PayloadAction<string>)=>{
-        return initialState
-      },
-      addFriend:(state, action: PayloadAction<UserDefaultInfo>)=>{
-        
-      },
-      removeFriend:(state, action: PayloadAction<string>)=>{
-        
-      },
+      
+    },
+    extraReducers:(builder)=>{
+      builder
+      .addAsyncThunk(getFriendList,{
+        fulfilled:(state,action)=>{
+          state.error="",
+          state.friendList= action.payload,
+          state.status="completed"
+        },
+         pending:(state)=>{
+          state.status= "pending"
+        },
+        rejected:(state, action)=>{
+          state.error= action.payload || "unknown error"
+          state.friendList=[]
+          state.status="failed"
+        }
+      })
+    },
+    selectors:{
+      selectFriendList: (state)=>state
+      
     }
+
 })
-export const {getFriendList,addFriend, removeFriend} = friendListSlice.actions;
-export const currentFriendList= (state:RootState)=>state.friendList;
+export const {} = friendListSlice.actions;
+export const {selectFriendList}= friendListSlice.selectors
 export default friendListSlice.reducer

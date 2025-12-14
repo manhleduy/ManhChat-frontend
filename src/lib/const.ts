@@ -1,20 +1,18 @@
 
 // chat between two users interfaces
-export interface ChatConnect{
-    chatConnectId: string,
-    userId:string,
-    contactUserId:string,
-    isRead: boolean;
-}
-export interface ChatBlockInfo extends ChatConnect{
-    chatBlockId:string;
+
+export interface ChatBlockInfo{
+    id:number;
     content:string;
     likeNum:number;
-    timestamp:string;
+    senderId:string;
+    receiverId:string;
+    isRead: boolean;
+    createdAt:string;
 }
 //individual interfaces 
 export interface UserDefaultInfo{
-    id:string;
+    id:number;
     name:string;
     address:string;
     email:string;
@@ -56,7 +54,6 @@ export interface GroupChatBlock extends GroupChatConnect{
 }
 export interface GroupChatInfo extends DefaultGroupChatInfo{
     groupName: string;
-    memberNumber: number;
     createdAt:string;
 
 }
@@ -66,9 +63,10 @@ export interface PostConnect{
     userId: string;
 }
 export interface PostInfo extends PostConnect{
+    postId:string;
     content: string;
     likeNumber: number;
-    timestamp: string;
+    createdAt: string;
 }
 //invitation interfaces
 export interface InvitationDefaultInfo{

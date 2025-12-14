@@ -1,10 +1,9 @@
 import React, {useState } from 'react';
 import { useForm, FormProvider, useFormContext } from 'react-hook-form';
-import ManhChatImage from '../assets/ManhChat.png';
 import { inviteSchema, type InviteSchema } from '@/lib/inputSchema';
 import {zodResolver} from "@hookform/resolvers/zod"
 import { inputFormConfig } from '@/lib/const';
-import { ChevronLeft, XIcon } from 'lucide-react';
+import { XIcon } from 'lucide-react';
 type FieldDef = {
     name: keyof InviteSchema;
     id: string;
@@ -43,7 +42,7 @@ type FieldDef = {
 
 
 const InvitationForm = ({setOpenInviteForm}:any) => {
-    const [inviteInfor, setInviteInfor]= useState<InviteSchema>();
+    //const [inviteInfor, setInviteInfor]= useState<InviteSchema>();
     const methods = useForm<InviteSchema>({
         mode: 'onSubmit',
         resolver:zodResolver(inviteSchema),

@@ -1,4 +1,3 @@
-import React from 'react'
 
 const FriendCard = ({friend, setOpenPage, handleSelect, config, activeId}: any) => {
   return (
