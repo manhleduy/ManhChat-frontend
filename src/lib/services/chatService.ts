@@ -1,5 +1,22 @@
-import { createAsyncThunk } from "@reduxjs/toolkit";
 import { api } from "../axios";
+
+export const getAllChat = async (
+  senderId: number,
+  receiverId: number,
+  setError?: (error: any) => void,
+  setLoading?: (loading: boolean) => void
+) => {
+  try {
+    setLoading?.(true);
+    const res = await api.get(`/api/chat/all?senderId=${senderId}&receiverId=${receiverId}`);
+    setLoading?.(false);
+    return res.data.chatBlocks;
+  } catch (e: any) {
+    setLoading?.(false);
+    setError?.(e.response?.data?.message || e.message || 'An error occurred');
+    throw e;
+  }
+};
 
 export const createChat = async (
   data: { content: string; file?: string; senderId: string; receiverId: string },
@@ -65,16 +82,3 @@ export const markAsRead = async (
   }
 };
 
-
-// Keeping the existing thunk for now, but you can remove if not needed
-export const GetAllChat = createAsyncThunk(
-  'fetch/chat',
-  async ({ info }: any, { rejectWithValue }) => {
-    try {
-      const res = await api.post('/api/chat', info);
-      return res.data.chatblocks;
-    } catch (e: any) {
-      return rejectWithValue(e.response.data);
-    }
-  }
-);

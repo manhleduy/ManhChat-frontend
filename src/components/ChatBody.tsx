@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import ChatBlock from './ChatBlock';
-import {ChevronLeft} from 'lucide-react'
+import { ChevronLeft } from 'lucide-react';
+import { useAppSelector } from '@/redux/reduxHook';
+import { getAllChat } from '@/lib/services/chatService';
+import { selectUserInfo } from '@/redux/userSlice';
 
 type Message = {
   id: number;
@@ -10,65 +13,42 @@ type Message = {
   isSent: boolean;
 };
 
-const defaultConfig = {
-  chat_title: 'Team Chat',
-  user1_name: 'Sarah',
-  user1_message: "Hey everyone! How's the project coming along?",
-  user2_name: 'Mike',
-  user2_message: 'Going great! Just finished the design mockups. Ready to review?',
-  user3_name: 'Emma',
-  user3_message: "Perfect timing! I'll take a look now and give you my feedback 👍",
-};
-
-const ChatBody= ({onlyMode, setOpenPage}:{onlyMode:boolean, setOpenPage: any}) => {
-  const [messages, setMessages] = useState<Message[]>([
-    { id: 1, username: defaultConfig.user1_name, message: defaultConfig.user1_message, timestamp: '10:30 AM', isSent: false },
-    { id: 2, username: defaultConfig.user2_name, message: defaultConfig.user2_message, timestamp: '10:32 AM', isSent: true },
-    { id: 3, username: defaultConfig.user3_name, message: defaultConfig.user3_message, timestamp: '10:35 AM', isSent: false },
-  ]);
+const ChatBody = ({ onlyMode, setOpenPage, setCurrentChat, currentChat }: { onlyMode: boolean; setOpenPage: any; setCurrentChat: any; currentChat: any }) => {
+  const initialChat = {
+    id: 0,
+    name: "",
+    address: "",
+    email: "",
+    profilePic: "",
+    phonenumber: "",
+    birthday: ""
+  };
+  const currentUser = useAppSelector(selectUserInfo).info;
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [inputValue, setInputValue] = useState('');
-  const [config, setConfig] = useState<typeof defaultConfig>(defaultConfig);
 
   useEffect(() => {
-    const sdk = (window as any).elementSdk;
-    if (!sdk) return;
-
-    const onConfigChange = (newConfig: any) => {
-      setConfig(prev => ({ ...prev, ...newConfig }));
-      // Update messages with new config
-      setMessages(prev => [
-        { ...prev[0], username: newConfig.user1_name || defaultConfig.user1_name, message: newConfig.user1_message || defaultConfig.user1_message },
-        { ...prev[1], username: newConfig.user2_name || defaultConfig.user2_name, message: newConfig.user2_message || defaultConfig.user2_message },
-        { ...prev[2], username: newConfig.user3_name || defaultConfig.user3_name, message: newConfig.user3_message || defaultConfig.user3_message },
-      ]);
+    const fetchChats = async () => {
+      if (currentChat.id !== 0 && currentUser.id !== -1) {
+        try {
+          const chatBlocks = await getAllChat(currentUser.id, currentChat.id, setError, setLoading);
+          const newMessages = chatBlocks.map((block: any) => ({
+            id: block.id,
+            username: block.senderId === currentUser.id ? 'You' : currentChat.name,
+            message: block.content,
+            timestamp: new Date(block.createdAt).toLocaleTimeString(),
+            isSent: block.senderId === currentUser.id,
+          }));
+          setMessages(newMessages);
+        } catch (err) {
+          // Error is set by setError
+        }
+      }
     };
-
-    try {
-      sdk.init({
-        defaultConfig,
-        onConfigChange,
-        mapToCapabilities: () => ({
-          recolorables: [],
-          borderables: [],
-          fontEditable: undefined,
-          fontSizeable: undefined,
-        }),
-        mapToEditPanelValues: (cfg: any) =>
-          new Map([
-            ['chat_title', cfg.chat_title || defaultConfig.chat_title],
-            ['user1_name', cfg.user1_name || defaultConfig.user1_name],
-            ['user1_message', cfg.user1_message || defaultConfig.user1_message],
-            ['user2_name', cfg.user2_name || defaultConfig.user2_name],
-            ['user2_message', cfg.user2_message || defaultConfig.user2_message],
-            ['user3_name', cfg.user3_name || defaultConfig.user3_name],
-            ['user3_message', cfg.user3_message || defaultConfig.user3_message],
-          ]),
-      });
-    } catch (err) {
-      // eslint-disable-next-line no-console
-      console.warn('elementSdk init failed', err);
-    }
-  }, []);
+    fetchChats();
+  }, [currentChat.id, currentUser.id]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,14 +56,15 @@ const ChatBody= ({onlyMode, setOpenPage}:{onlyMode:boolean, setOpenPage: any}) =
       const now = new Date();
       const timeString = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
       const newMessage: Message = {
-        id: messages.length + 1,
+        id: Date.now(),
         username: 'You',
         message: inputValue,
         timestamp: timeString,
         isSent: true,
       };
-      setMessages([...messages, newMessage]);
+      setMessages(prev => [...prev, newMessage]);
       setInputValue('');
+      // TODO: call createChat API
       // Scroll to bottom
       setTimeout(() => {
         const messagesContainer = document.getElementById('chatMessages');
@@ -100,11 +81,11 @@ const ChatBody= ({onlyMode, setOpenPage}:{onlyMode:boolean, setOpenPage: any}) =
       <header className="px-6 py-6 border-b border-gray-200 bg-gray-50">
         <h1 className=" flex text-2xl font-semibold text-gray-900" id="chatTitle">
           {onlyMode
-          ?<div onClick={() => setOpenPage("FriendList")}>
+          ?<div onClick={() => {setOpenPage("FriendList"); setCurrentChat(initialChat);}}>
           <ChevronLeft className="inline-block mr-4 cursor-pointer hover:text-gray-600 transition-colors"  height={30} width={30}/>
           </div>
           : null}
-          {config.chat_title}
+          {currentChat.name}
         </h1>
       </header>
 
@@ -113,15 +94,40 @@ const ChatBody= ({onlyMode, setOpenPage}:{onlyMode:boolean, setOpenPage: any}) =
         id="chatMessages"
         className="flex-1 overflow-y-auto px-6 py-6 flex flex-col gap-4 scroll-smooth"
       >
-        {messages.map(msg => (
-          <ChatBlock
-            key={msg.id}
-            username={msg.username}
-            message={msg.message}
-            timestamp={msg.timestamp}
-            isSent={msg.isSent}
-          />
-        ))}
+        {error ? (
+          <div className="flex-1 flex items-center justify-center text-center text-red-500">
+            <div>
+              <div className="text-4xl mb-4">❌</div>
+              <h3 className="text-lg font-semibold mb-2">Error loading messages</h3>
+              <p>{error}</p>
+            </div>
+          </div>
+        ) : loading ? (
+          <div className="flex-1 flex items-center justify-center text-center text-gray-500">
+            <div>
+              <div className="animate-spin text-4xl mb-4">⏳</div>
+              <p>Loading messages...</p>
+            </div>
+          </div>
+        ) : messages.length === 0 ? (
+          <div className="flex-1 flex items-center justify-center text-center text-gray-500">
+            <div>
+              <div className="text-4xl mb-4">💬</div>
+              <h3 className="text-lg font-semibold mb-2">No messages yet</h3>
+              <p>Start the conversation with {currentChat.name}!</p>
+            </div>
+          </div>
+        ) : (
+          messages.map(msg => (
+            <ChatBlock
+              key={msg.id}
+              username={msg.username}
+              message={msg.message}
+              timestamp={msg.timestamp}
+              isSent={msg.isSent}
+            />
+          ))
+        )}
       </main>
 
       {/* Input Area */}

@@ -1,8 +1,6 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type { RootState } from "./store";
 import type { UserDefaultInfo } from "@/lib/const";
 import { getFriendList } from "@/lib/services/friendService";
-import FriendList from "@/components/FriendList";
 const initialState: {
   friendList:UserDefaultInfo[],
   error:any, 
@@ -12,7 +10,7 @@ const initialState: {
     status:"completed"
   }
 export const friendListSlice=createSlice({
-    name:"error",
+    name:"friendList",
     initialState,
     reducers:{
       
@@ -42,5 +40,5 @@ export const friendListSlice=createSlice({
 
 })
 export const {} = friendListSlice.actions;
-export const {selectFriendList}= friendListSlice.selectors
+export const {selectFriendList}= friendListSlice.selectors;
 export default friendListSlice.reducer

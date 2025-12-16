@@ -16,6 +16,7 @@ export const Login = createAsyncThunk(
     }
 );
 
+
 export const signUp = async (
     data: UserSignUpInfo,
     setError: any,
@@ -60,21 +61,7 @@ export const getUserInfo = async (
     }
 };
 
-export const getAllFriend = async (
-    id: string,
-    setError: any,
-    setLoading: any
-) => {
-    try {
-        setLoading(true);
-        const res = await api.get(`/api/user/friend/${id}`);
-        setLoading(false);
-        return res.data.friendList;
-    } catch (e: any) {
-        setLoading(false);
-        setError(e.response?.data?.message || e.message || 'An error occurred');
-    }
-};
+
 
 export const getAllGroup = async (
     id: string,

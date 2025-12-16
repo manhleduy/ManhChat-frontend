@@ -60,3 +60,10 @@ export const inviteSchema= z.object({
 
 })
 export type InviteSchema= z.infer<typeof inviteSchema>;
+
+export const otpSchema = z.object({
+    otp: z
+        .string()
+        .regex(/^\d{6}$/, "OTP must be exactly 6 digits")
+});
+export type OTPSchema = z.infer<typeof otpSchema>;
