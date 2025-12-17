@@ -16,8 +16,6 @@ type FieldDef = {
     const { register, formState: { errors }} = useFormContext<FormData>();
     const error = errors[field.name as keyof typeof errors] as any | undefined;
 
-    // special-case validation for confirmPassword to compare with password
-
 
     return (
       <div className="mb-6" >

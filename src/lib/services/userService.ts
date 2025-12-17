@@ -16,7 +16,6 @@ export const Login = createAsyncThunk(
     }
 );
 
-
 export const signUp = async (
     data: UserSignUpInfo,
     setError: any,

@@ -4,84 +4,60 @@ import { ChevronLeft } from 'lucide-react';
 import { useAppSelector } from '@/redux/reduxHook';
 import { getAllChat } from '@/lib/services/chatService';
 import { selectUserInfo } from '@/redux/userSlice';
+import type { ChatBlockInfo } from '@/lib/const';
+import { useAppDispatch } from '@/redux/reduxHook';
+import { Login } from '@/lib/services/userService';
+import { createChat } from '@/lib/services/chatService';
+import type { UserLoginInfo } from '@/lib/const';
+interface Response{
+  message:string,
+  status: number
+}
 
-type Message = {
-  id: number;
-  username: string;
-  message: string;
-  timestamp: string;
-  isSent: boolean;
-};
 
-const ChatBody = ({ onlyMode, setOpenPage, setCurrentChat, currentChat }: { onlyMode: boolean; setOpenPage: any; setCurrentChat: any; currentChat: any }) => {
-  const initialChat = {
-    id: 0,
-    name: "",
-    address: "",
-    email: "",
-    profilePic: "",
-    phonenumber: "",
-    birthday: ""
-  };
+const ChatBody = (
+  
+  { onlyMode, setOpenPage, currentChat }: 
+  { onlyMode: boolean; setOpenPage: any; currentChat: any }) => {
+  
   const currentUser = useAppSelector(selectUserInfo).info;
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<ChatBlockInfo[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [inputValue, setInputValue] = useState('');
-
+  const [response, setResponse]= useState<Response>({message:"", status:0});
+  const [inputValue, setInputValue] = useState<string>('');
+  const [file, setFile]= useState<string>('');
+  
+  const handleSubmit =async (e: React.FormEvent) => {
+      e.preventDefault();
+      if (inputValue || inputValue.length<=250) { 
+        const newMessage :ChatBlockInfo  = {
+          content: inputValue,
+          senderId: currentUser.id,
+          receiverId: currentChat.id
+        };
+        await createChat(newMessage,setResponse, setLoading);
+        setInputValue('');
+    }
+  };
+  
   useEffect(() => {
     const fetchChats = async () => {
-      if (currentChat.id !== 0 && currentUser.id !== -1) {
-        try {
-          const chatBlocks = await getAllChat(currentUser.id, currentChat.id, setError, setLoading);
-          const newMessages = chatBlocks.map((block: any) => ({
-            id: block.id,
-            username: block.senderId === currentUser.id ? 'You' : currentChat.name,
-            message: block.content,
-            timestamp: new Date(block.createdAt).toLocaleTimeString(),
-            isSent: block.senderId === currentUser.id,
-          }));
-          setMessages(newMessages);
-        } catch (err) {
-          // Error is set by setError
-        }
+      if (currentChat.id >0) {
+        const chatBlocks = await getAllChat(currentUser.id, currentChat.id, setResponse, setLoading);
+        setMessages(chatBlocks);
       }
     };
     fetchChats();
   }, [currentChat.id, currentUser.id]);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (inputValue.trim()) {
-      const now = new Date();
-      const timeString = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-      const newMessage: Message = {
-        id: Date.now(),
-        username: 'You',
-        message: inputValue,
-        timestamp: timeString,
-        isSent: true,
-      };
-      setMessages(prev => [...prev, newMessage]);
-      setInputValue('');
-      // TODO: call createChat API
-      // Scroll to bottom
-      setTimeout(() => {
-        const messagesContainer = document.getElementById('chatMessages');
-        if (messagesContainer) {
-          messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
-      }, 0);
-    }
-  };
-
+  console.log(messages);
+  console.log(currentUser);
   return (
     <div className={`w-full h-full flex flex-col  overflow-hidden`} >
       {/* Header */}
       <header className="px-6 py-6 border-b border-gray-200 bg-gray-50">
         <h1 className=" flex text-2xl font-semibold text-gray-900" id="chatTitle">
           {onlyMode
-          ?<div onClick={() => {setOpenPage("FriendList"); setCurrentChat(initialChat);}}>
+          ?<div onClick={() => {setOpenPage("FriendList"); }}>
           <ChevronLeft className="inline-block mr-4 cursor-pointer hover:text-gray-600 transition-colors"  height={30} width={30}/>
           </div>
           : null}
@@ -94,12 +70,12 @@ const ChatBody = ({ onlyMode, setOpenPage, setCurrentChat, currentChat }: { only
         id="chatMessages"
         className="flex-1 overflow-y-auto px-6 py-6 flex flex-col gap-4 scroll-smooth"
       >
-        {error ? (
+        {response.status>=400 ? (
           <div className="flex-1 flex items-center justify-center text-center text-red-500">
             <div>
               <div className="text-4xl mb-4">❌</div>
               <h3 className="text-lg font-semibold mb-2">Error loading messages</h3>
-              <p>{error}</p>
+              <p>{response.message}</p>
             </div>
           </div>
         ) : loading ? (
@@ -119,13 +95,30 @@ const ChatBody = ({ onlyMode, setOpenPage, setCurrentChat, currentChat }: { only
           </div>
         ) : (
           messages.map(msg => (
-            <ChatBlock
-              key={msg.id}
-              username={msg.username}
-              message={msg.message}
-              timestamp={msg.timestamp}
-              isSent={msg.isSent}
-            />
+            
+              msg.senderId!==currentUser.id ?(
+              <div className='flex justify-start'>
+                <ChatBlock
+                  key={msg.id}
+                  username={currentUser.name}
+                  message={msg.content}
+                  timestamp={msg.createdAt|| ""}
+                  isSent={msg.isRead|| false}
+                />
+              </div>
+              ):(
+              <div className='flex justify-end'>
+                <ChatBlock
+                  key={msg.id}
+                  username={currentChat.name}
+                  message={msg.content}
+                  timestamp={msg.createdAt|| ""}
+                  isSent={msg.isRead|| false}
+                />
+              </div>
+              )
+              
+              
           ))
         )}
       </main>

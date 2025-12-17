@@ -8,9 +8,9 @@ export const getAllChat = async (
 ) => {
   try {
     setLoading?.(true);
-    const res = await api.get(`/api/chat/all?senderId=${senderId}&receiverId=${receiverId}`);
+    const res = await api.post(`/api/chat/${senderId}`, {receiverId:receiverId});
     setLoading?.(false);
-    return res.data.chatBlocks;
+    return res.data.chatblocks;
   } catch (e: any) {
     setLoading?.(false);
     setError?.(e.response?.data?.message || e.message || 'An error occurred');
@@ -19,19 +19,25 @@ export const getAllChat = async (
 };
 
 export const createChat = async (
-  data: { content: string; file?: string; senderId: string; receiverId: string },
-  setError: (error: any) => void,
+  data: { content: string; file?: string; senderId: number; receiverId: number },
+  setResponse: (error: any) => void,
   setLoading: (loading: boolean) => void
 ) => {
   try {
     setLoading(true);
-    const res = await api.post('/api/chat/create', data);
+    const res = await api.post(`/api/chat/create/${data.senderId}`, data);
     setLoading(false);
-    return res.data;
+    setResponse({
+      message: res.data,
+      status: res.status,
+    })
   } catch (e: any) {
     setLoading(false);
-    setError(e.response?.data?.message || e.message || 'An error occurred');
-  }
+    setResponse({
+      message: e.response?.data?.message || e.message || 'An error occurred',
+      status: e.response?.status || 500
+    });
+  } 
 };
 
 export const likeChat = async (

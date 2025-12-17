@@ -2,13 +2,13 @@
 // chat between two users interfaces
 
 export interface ChatBlockInfo{
-    id:number;
+    id?:number;
     content:string;
-    likeNum:number;
-    senderId:string;
-    receiverId:string;
-    isRead: boolean;
-    createdAt:string;
+    likeNum?:number;
+    senderId:number;
+    receiverId:number;
+    isRead?: boolean;
+    createdAt?:string;
 }
 //individual interfaces 
 export interface UserDefaultInfo{
@@ -27,7 +27,7 @@ export interface UpdateUserInfo extends UserDefaultInfo{
     updateAt: string;
 }
 export interface UserLoginInfo{
-    name:string;
+    email:string;
     password:string;
 }
 export interface UserActivity{

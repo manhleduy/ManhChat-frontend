@@ -4,6 +4,9 @@ import type { UserDefaultInfo } from '@/lib/const';
 import { useAppDispatch, useAppSelector } from '@/redux/reduxHook';
 import { getFriendList } from '@/lib/services/friendService';
 import { selectFriendList } from '@/redux/FriendListSlice';
+import { selectUserInfo } from '@/redux/userSlice';
+import { Login } from '@/lib/services/userService';
+import type { UserLoginInfo } from '@/lib/const';
 interface Friend extends UserDefaultInfo{
   lastMessage: string;
   time: string;
@@ -15,14 +18,20 @@ const COLOR=['#ff6b9d', '#4a90e2', '#f39c12', '#9b59b6', '#e74c3c', '#1abc9c', '
 
 
 const FriendList= ({onlyMode, setOpenPage, setCurrentChat}:{onlyMode:boolean, setOpenPage:any, setCurrentChat: any}) => {
-  const dispatch= useAppDispatch();
+
   const friendList= useAppSelector(selectFriendList).friendList;
+  const currentUser= useAppSelector(selectUserInfo).info;
   const [activeId, setActiveId] = useState<number | null>(null);
   const [query, setQuery] = useState<string>('');
+
+  const dispatch= useAppDispatch()
+     
+  
+ 
   useEffect(()=>{
-    dispatch(getFriendList(1));
+      dispatch(getFriendList(currentUser.id));
   },[])
-  console.log(friendList);
+  
   
   const displayedFriends= friendList.map((item)=>{
     return {
