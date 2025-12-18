@@ -5,12 +5,7 @@ import ProfilePage from "./pages/ProfilePage"
 import Contacts from "./pages/Contacts"
 import LoginPage from "./pages/Login" 
 import SignUpPage from "./pages/SignUpPage"
-import { useAppDispatch } from "./redux/reduxHook"
-import type { UserLoginInfo } from "./lib/const"
-import { Login } from "./lib/services/userService"
-import { use, useEffect } from "react"
-import { useAppSelector } from "./redux/reduxHook"
-import { selectUserInfo } from "./redux/userSlice"
+
 
 function App() {
   

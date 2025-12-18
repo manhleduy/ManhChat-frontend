@@ -1,5 +1,8 @@
-import React from 'react';
+import React, { use } from 'react';
 import { Search } from 'lucide-react';
+import { selectUserInfo } from '@/redux/userSlice';
+import { useAppSelector } from '@/redux/reduxHook';
+import { selectFriendList } from '@/redux/FriendListSlice';
 import {
   Select,
   SelectContent,
@@ -8,13 +11,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-type Friend = {
-  id: number;
-  name: string;
-  initial: string;
-  status: 'Online' | 'Offline';
-  color: string;
-};
 const COLORS = [
   '#22c55e', '#10b981',  // Green
   '#3b82f6', '#0ea5e9',  // Blue
@@ -25,7 +21,15 @@ const COLORS = [
   '#6366f1', '#818cf8',  // Indigo
 ];
 
-const friends: Friend[] = [
+type Friend = {
+  id: number;
+  name: string;
+  initial: string;
+  status: 'Online' | 'Offline';
+  color: string;
+};
+
+/*const friends: Friend[] = [
   { id: 1, name: 'Alice Johnson', initial: 'A', status: 'Online', color: COLORS[0] },
   { id: 2, name: 'Andrew Smith', initial: 'A', status: 'Offline', color: COLORS[2] },
   { id: 3, name: 'Benjamin Lee', initial: 'B', status: 'Online', color: COLORS[4] },
@@ -33,7 +37,7 @@ const friends: Friend[] = [
   { id: 5, name: 'Chris Wilson', initial: 'C', status: 'Offline', color: COLORS[8] },
   { id: 6, name: 'David Martinez', initial: 'D', status: 'Online', color: COLORS[10] },
   { id: 7, name: 'Emily Davis', initial: 'E', status: 'Offline', color: COLORS[12] },
-];
+];*/
 
 const defaultConfig = {
   page_title: 'Friend List',
@@ -45,7 +49,19 @@ const FriendContactList= () => {
   const [searchQuery, setSearchQuery] = React.useState('');
   const [selectedCategory, setSelectedCategory] = React.useState('All');
   const [sortOrder, setSortOrder] = React.useState<'a-z' | 'z-a'>('a-z');
+  const friendList  = useAppSelector(selectFriendList).friendList;
+  const currentUser= useAppSelector(selectUserInfo).info;
+  console.log(currentUser);
+  const friends: Friend[] = friendList.map(friend => ({
+    id: friend.id,
+    name: friend.name,
+    initial: friend.name.charAt(0).toUpperCase(),
+    status: 'Online',
+    color: COLORS[Math.floor(Math.random() * COLORS.length)],
+  }));
+  console.log(friendList);
 
+  
   // group friends by initial
   const groupedFriends = React.useMemo(() => {
     return friends.reduce((acc, friend) => {
@@ -89,7 +105,6 @@ const FriendContactList= () => {
           >
             {sortOrder === 'a-z' ? 'A-Z' : 'Z-A'}
           </button>
-
           <Select value={selectedCategory} onValueChange={setSelectedCategory}>
             <SelectTrigger className="w-40 border-2 border-green-500 text-gray-800 text-sm font-medium hover:border-green-600">
               <SelectValue placeholder="Select category" />
@@ -103,7 +118,6 @@ const FriendContactList= () => {
               <SelectItem value="Pioneer">Pioneer</SelectItem>
             </SelectContent>
           </Select>
-
           <div className="relative flex-1">
             <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input

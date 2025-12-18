@@ -13,8 +13,6 @@ interface Response{
   message:string,
   status: number
 }
-
-
 const ChatBody = (
   
   { onlyMode, setOpenPage, currentChat }: 
@@ -48,7 +46,7 @@ const ChatBody = (
       }
     };
     fetchChats();
-  }, [currentChat.id, currentUser.id]);
+  }, [currentChat.id, currentUser.id,]);
   console.log(messages);
   console.log(currentUser);
   return (
@@ -95,31 +93,12 @@ const ChatBody = (
           </div>
         ) : (
           messages.map(msg => (
-            
-              msg.senderId!==currentUser.id ?(
-              <div className='flex justify-start'>
-                <ChatBlock
-                  key={msg.id}
-                  username={currentUser.name}
-                  message={msg.content}
-                  timestamp={msg.createdAt|| ""}
-                  isSent={msg.isRead|| false}
-                />
-              </div>
-              ):(
-              <div className='flex justify-end'>
-                <ChatBlock
-                  key={msg.id}
-                  username={currentChat.name}
-                  message={msg.content}
-                  timestamp={msg.createdAt|| ""}
-                  isSent={msg.isRead|| false}
-                />
-              </div>
-              )
-              
-              
-          ))
+          <ChatBlock 
+            chatBlockInfo={msg} 
+            currentChat={currentChat} 
+            setLoading={setLoading}
+            setResponse={setResponse}
+          />))
         )}
       </main>
 

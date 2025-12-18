@@ -25,10 +25,12 @@ const ChatPage = () => {
   const [openPage, setOpenPage]=useState<string>("FriendList");
   const [currentChat, setCurrentChat]= useState<UserDefaultInfo>(initialChat);
   const currentUser= useAppSelector(selectUserInfo).info;
+
   const dispatch= useAppDispatch()
   useEffect(()=>{
     dispatch(Login(defaultuser));
   },[])
+  
   if(currentUser.id===-1) return <div>Loading...</div>
   return (
     <div className="flex w-full h-full" data-theme="dark" >

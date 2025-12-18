@@ -1,3 +1,4 @@
+import { set } from "zod";
 import { api } from "../axios";
 
 export const getAllChat = async (
@@ -39,52 +40,73 @@ export const createChat = async (
     });
   } 
 };
+export const recallChat = async (
+  data: { userId: number; chatblockId: number},
+  setResponse: any,
+  setLoading: (loading: boolean) => void
+) => {
+  try {
+    setLoading(true);
+    const res = await api.delete(`/api/chat/recall/${data.userId}`, { data });
+    setResponse({
+      message: res.data,
+      status: res.status,
+    })
+    setLoading(false)
+    
+  } catch (e: any) {
+    setLoading(false);
+    setResponse({
+      message:e.response?.data?.message || e.message || 'An error occurred',
+      status:e.response?.status || 500
+  });
+  }
+};
 
 export const likeChat = async (
-  chatblockId: string,
-  setError: (error: any) => void,
+  chatblockId: number,
+  setResponse: (error: any) => void,
   setLoading: (loading: boolean) => void
 ) => {
   try {
     setLoading(true);
     const res = await api.put(`/api/chat/like/${chatblockId}`);
+    setResponse({
+      message: res.data,
+      status: res.status,
+    })
     setLoading(false);
-    return res.data;
+    
   } catch (e: any) {
     setLoading(false);
-    setError(e.response?.data?.message || e.message || 'An error occurred');
+    setResponse({
+      status:e.response?.status || 500,
+      message:e.response?.data?.message || e.message || 'An error occurred'
+  });
   }
 };
 
-export const recallChat = async (
-  data: { userId: string; chatblockId: string },
-  setError: (error: any) => void,
-  setLoading: (loading: boolean) => void
-) => {
-  try {
-    setLoading(true);
-    const res = await api.delete('/api/chat/recall', { data });
-    setLoading(false);
-    return res.data;
-  } catch (e: any) {
-    setLoading(false);
-    setError(e.response?.data?.message || e.message || 'An error occurred');
-  }
-};
+
 
 export const markAsRead = async (
-  data: { userId: string; chatblockId: string },
-  setError: (error: any) => void,
+  data: { userId: number; chatblockId: string },
+  setResponse: (error: any) => void,
   setLoading: (loading: boolean) => void
 ) => {
   try {
     setLoading(true);
-    const res = await api.put('/api/chat/read', data);
+    const res = await api.put(`/api/chat/read/${data.chatblockId}`, data);
     setLoading(false);
-    return res.data;
+    setResponse({
+      message: res.data,
+      status: res.status,
+    })
   } catch (e: any) {
     setLoading(false);
-    setError(e.response?.data?.message || e.message || 'An error occurred');
+    setResponse({
+      status:e.response?.status || 500,
+      message:e.response?.data?.message || e.message || 'An error occurred'
+    });
   }
 };
 

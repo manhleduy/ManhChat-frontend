@@ -24,7 +24,7 @@ type SidebarTab = 'friends' | 'groupsCommunities' | 'friendRequests' | 'groupReq
 const Contacts: React.FC = () => {
   const [activeTab, setActiveTab] = useState<SidebarTab>('friends');
   const [openPage, setOpenPage]= useState<string>("Aside")
-
+  
   return (
     <div className="flex h-full w-full bg-gray-100">
       <AsideBar/>
@@ -71,7 +71,7 @@ const Contacts: React.FC = () => {
       {
         (() => {
           const Page = pageComponents[activeTab];
-          return <Page/>;
+          return <Page  />;
         })()
       }
       </div>
