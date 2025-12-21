@@ -1,4 +1,4 @@
-import type { ChatBlockInfo, UserDefaultInfo } from '@/lib/const';
+import type { MessageType} from '@/lib/const';
 import { useAppSelector } from '@/redux/reduxHook';
 import { selectUserInfo } from '@/redux/userSlice';
 import { Share, TrashIcon } from 'lucide-react';
@@ -8,25 +8,22 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuGroup,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useState } from 'react';
-import { likeChat, recallChat } from '@/lib/services/chatService';
-import { set } from 'zod';
+import {  likeChat, recallChat } from '@/lib/services/chatService';
+import { useEffect, useState } from 'react';
 
-
-
-
-const ChatBlock = ({chatBlockInfo, currentChat,setLoading,setResponse}: {chatBlockInfo: ChatBlockInfo, currentChat: UserDefaultInfo,setLoading:any,setResponse:any}) => {
-  const { senderId, receiverId, content, createdAt, likeNum, isRead, id } = chatBlockInfo;
-  const {profilePic, name }= currentChat;
+const ChatBlock = ({chatBlockInfo}:any) => {
+  const { senderId, content, createdAt, likeNum, id, isRead, profilePic, name } = chatBlockInfo as MessageType;
+  const [error, setError]= useState<string>("")
+  const [loading, setLoading]= useState<boolean>(false);
   
+  
+ 
   const DeleteMessage=async()=>{
     try{
-     await recallChat({chatblockId:id||0, userId:currentUser.id},setResponse,setLoading );
+     await recallChat({chatblockId:id||0, userId:currentUser.id},setError,setLoading );
   
     } catch(e:any){
       toast.error(e.message);
@@ -36,14 +33,14 @@ const ChatBlock = ({chatBlockInfo, currentChat,setLoading,setResponse}: {chatBlo
   }
   const LikeMessage= async()=>{
     try{
-      await likeChat(id||0, setResponse, setLoading)
+      await likeChat(id||0, setError, setLoading)
     }catch(e:any){
       toast.error(e.message);
     }finally{
-    
+      
     }
   }
-
+  
   const currentUser = useAppSelector(selectUserInfo).info;
 
   if(senderId===currentUser.id)return (

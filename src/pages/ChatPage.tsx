@@ -1,4 +1,4 @@
-import FriendList from "@/components/FriendList"
+import ChatList from "@/components/ChatList"
 import ChatBody from "@/components/ChatBody"
 import AsideBar from "@/components/AsideBar"
 import { useEffect, useState } from "react"
@@ -7,14 +7,26 @@ import InitialChatBody from "@/components/InitialChatBody"
 import { useAppDispatch, useAppSelector } from "@/redux/reduxHook"
 import { Login } from "@/lib/services/userService"
 import { selectUserInfo } from "@/redux/userSlice"
-const initialChat: UserDefaultInfo={
+import type { GroupDefaultInfo } from "@/lib/const"
+
+const initialFriendChat: UserDefaultInfo={
   id: 0,
   name: "",
-  address:"", 
+  address:"",
   email:"",
-  profilePic:"",
   phonenumber:"",
+  profilePic:"",
   birthday:""
+
+}
+const initialGroupchat :GroupDefaultInfo={
+  id:0,
+  detail:"",
+  groupName:"",
+  adminId:0,
+  createdAt:"",
+  isRestricted:false
+
 }
 const defaultuser={
   email:"mle529189@gmail.com",
@@ -23,9 +35,8 @@ const defaultuser={
 const ChatPage = () => {
 
   const [openPage, setOpenPage]=useState<string>("FriendList");
-  const [currentChat, setCurrentChat]= useState<UserDefaultInfo>(initialChat);
+  const [currentChat, setCurrentChat]= useState<UserDefaultInfo | GroupDefaultInfo>();
   const currentUser= useAppSelector(selectUserInfo).info;
-
   const dispatch= useAppDispatch()
   useEffect(()=>{
     dispatch(Login(defaultuser));
@@ -37,19 +48,19 @@ const ChatPage = () => {
       
       <AsideBar/>
       <div className="flex sm:hidden w-full">
-        {openPage === "ChatBody" && currentChat.id !== 0 
+        {openPage === "ChatBody" && currentChat && currentChat.id !== 0 
         ? <ChatBody onlyMode={true} setOpenPage={setOpenPage} currentChat={currentChat}/> 
         : openPage === "FriendList" 
-        ? <FriendList onlyMode={true} setOpenPage={setOpenPage} setCurrentChat={setCurrentChat}/>
+        ? <ChatList onlyMode={true} setOpenPage={setOpenPage} setCurrentChat={setCurrentChat}/>
         : <InitialChatBody/>
         }
       </div>
       {/* present only FriendList and Chatbody when the screen is large*/}
       <div className="flex max-sm:hidden w-full">
-        <FriendList onlyMode={false} setOpenPage={null} setCurrentChat={setCurrentChat}/>
-        {currentChat.id===0
-        ? <InitialChatBody/>
-        : <ChatBody onlyMode={false} setOpenPage={null}  currentChat={currentChat}/>
+        <ChatList onlyMode={false} setOpenPage={null} setCurrentChat={setCurrentChat}/>
+        {currentChat && currentChat.id!==0 
+        ? <ChatBody onlyMode={false} setOpenPage={null}  currentChat={currentChat}/>
+        : <InitialChatBody/>
         }
       </div>
     </div>

@@ -29,7 +29,7 @@ const Contacts: React.FC = () => {
     <div className="flex h-full w-full bg-gray-100">
       <AsideBar/>
       {/* Sidebar */}
-      <div className={`w-1/4 max-sm:${openPage==="Aside"?"w-full":"hidden"} min-w-45 bg-white border-r-2 border-gray-200 flex flex-col`}>
+      <div className={`w-1/4 min-w-45 max-sm:${openPage==="Aside"?"min-w-full":"hidden"}  bg-white border-r-2 border-gray-200 flex flex-col`}>
         {sidebarItems.map(item => {
           const Icon = item.icon;
           return (
@@ -59,6 +59,7 @@ const Contacts: React.FC = () => {
           );
         })}
       </div>
+      {/*Functional Page*/}
       <div className={`max-sm:${openPage!=="Functional"? "hidden":""} w-full`}>
         <button 
         className='absolute top-9 sm:hidden z-1000'

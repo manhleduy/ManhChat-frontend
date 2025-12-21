@@ -7,6 +7,10 @@ import { selectFriendList } from '@/redux/FriendListSlice';
 import { selectUserInfo } from '@/redux/userSlice';
 import { Login } from '@/lib/services/userService';
 import type { UserLoginInfo } from '@/lib/const';
+import { getAllChat } from '@/lib/services/chatService';
+import { getAllGroup } from '@/lib/services/groupService';
+import { selectGroupList } from '@/redux/GroupListSlice';
+import { ArrowDown, ArrowUp } from 'lucide-react';
 interface Friend extends UserDefaultInfo{
   lastMessage: string;
   time: string;
@@ -20,18 +24,23 @@ const COLOR=['#ff6b9d', '#4a90e2', '#f39c12', '#9b59b6', '#e74c3c', '#1abc9c', '
 const FriendList= ({onlyMode, setOpenPage, setCurrentChat}:{onlyMode:boolean, setOpenPage:any, setCurrentChat: any}) => {
 
   const friendList= useAppSelector(selectFriendList).friendList;
+  const groupList= useAppSelector(selectGroupList).groupList;
   const currentUser= useAppSelector(selectUserInfo).info;
-  const [activeId, setActiveId] = useState<number | null>(null);
+  const [activeUserId, setActiveUserId] = useState<number | null>(null);
+  const [activeGroupId, setActiveGroupId] = useState<number | null>(null);
   const [query, setQuery] = useState<string>('');
-
+  const [openFriendList, setOpenFriendList]=useState(true);
+  const [openGroupList, setOpenGroupList]= useState(false);
   const dispatch= useAppDispatch()
      
   
  
   useEffect(()=>{
       dispatch(getFriendList(currentUser.id));
+      dispatch(getAllGroup(currentUser.id))
   },[])
   
+
   
   const displayedFriends= friendList.map((item)=>{
     return {
@@ -42,13 +51,27 @@ const FriendList= ({onlyMode, setOpenPage, setCurrentChat}:{onlyMode:boolean, se
        online: false
        }
   })
+  const displayedGroups= groupList.map((item)=>{
+    return {
+      ...item,
+      lastMessage:"con me may",
+      time:"26/10",
+      unread:1,
+      online:false
+    }
+  })
 
     
     
-  const handleSelect = (id: number) => {
-    setActiveId(id);
-    
+  const handleSelectUser = (id: number) => {
+    setActiveUserId(id);
+    setActiveGroupId(null);
   };
+  const handleSelectGroup=(id:number)=>{
+    setActiveGroupId(id)
+    setActiveUserId(null);
+
+  }
 
   
 
@@ -72,8 +95,16 @@ const FriendList= ({onlyMode, setOpenPage, setCurrentChat}:{onlyMode:boolean, se
       </header>
 
       <main className="flex-1 overflow-auto" role="main" aria-label="Friends list">
+        
         <div className="py-2">
-          {displayedFriends.map((friend,index) => (
+          {/*list of friend*/}
+          <button 
+          onClick={()=>{setOpenFriendList(!openFriendList)}}
+          className=' flex justify-between w-full text-black p-2 items-center'>
+            <div>Friends</div>
+            {openFriendList?<ArrowUp height={15} width={15}/>:<ArrowDown height={15} width={15}/>}
+          </button>
+          {openFriendList? displayedFriends.map((friend,index) => (
             //friend id cha
             <div
               key={friend.id}
@@ -82,12 +113,12 @@ const FriendList= ({onlyMode, setOpenPage, setCurrentChat}:{onlyMode:boolean, se
               aria-label={`${friend.name}, ${friend.unread > 0 ? `${friend.unread} unread messages` : 'no unread messages'}`}
               onClick={() =>{
                 if(onlyMode)setOpenPage("ChatBody");
-                handleSelect(friend.id);
+                handleSelectUser(friend.id);
                 setCurrentChat(friend)
               }
               }
-              onKeyPress={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleSelect(friend.id); } }}
-              className={`flex items-center px-4 py-3 cursor-pointer hover:bg-gray-100 ${friend.id === activeId ? 'bg-sky-50' : ''} ${friend.unread > 0 ? '' : ''}`}
+              onKeyPress={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleSelectUser(friend.id); } }}
+              className={`flex items-center px-4 py-3 cursor-pointer hover:bg-gray-100 ${friend.id === activeUserId ? 'bg-sky-50' : ''} ${friend.unread > 0 ? '' : ''}`}
             >
               <div className="relative shrink-0 mr-4">
                 <div className="w-12 h-12 rounded-full flex items-center justify-center text-white font-semibold" style={{ background: COLOR[index % COLOR.length] }}>
@@ -108,7 +139,50 @@ const FriendList= ({onlyMode, setOpenPage, setCurrentChat}:{onlyMode:boolean, se
                 )}
               </div>
             </div>
-          ))}
+          )): null}
+          {/*list of group*/}
+          <button 
+          onClick={()=>{setOpenGroupList(!openGroupList)}}
+          className=' flex justify-between w-full text-black p-2 items-center'>
+            <div>Groups</div>
+            {openGroupList?<ArrowUp height={15} width={15}/>:<ArrowDown height={15} width={15}/>}
+          </button>
+          {openGroupList? displayedGroups.map((group,index) => (
+          
+            <div
+              key={group.id}
+              role="button"
+              tabIndex={0}
+              aria-label={`${group.groupName}, ${group.unread > 0 ? `${group.unread} unread messages` : 'no unread messages'}`}
+              onClick={() =>{
+                if(onlyMode)setOpenPage("ChatBody");
+                handleSelectGroup(group.id);
+                setCurrentChat(group)
+              }
+              }
+              onKeyPress={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleSelectGroup(group.id); } }}
+              className={`flex items-center px-4 py-3 cursor-pointer hover:bg-gray-100 ${group.id === activeGroupId ? 'bg-sky-50' : ''} ${group.unread > 0 ? '' : ''}`}
+            >
+              <div className="relative shrink-0 mr-4">
+                <div className="w-12 h-12 rounded-full flex items-center justify-center text-white font-semibold" style={{ background: COLOR[index % COLOR.length] }}>
+                  {group.groupName.slice(0,1)}
+                </div>
+                <span className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white ${group.online ? 'bg-green-500' : 'bg-gray-400'}`} aria-hidden />
+              </div>
+
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-gray-900 truncate">{group.groupName}</p>
+                <p className={`text-sm truncate ${group.unread > 0 ? 'text-gray-900 font-medium' : 'text-gray-500'}`}>{group.lastMessage}</p>
+              </div>
+
+              <div className="flex items-center ml-3">
+                <span className="text-xs text-gray-500 ml-2">{group.time}</span>
+                {group.unread > 0 && (
+                  <span className="w-5 h-5 rounded-full text-xs font-bold flex items-center justify-center ml-2 text-white" style={{ background: FriendListConfig.primary_color }}>{group.unread}</span>
+                )}
+              </div>
+            </div>
+          )): null}
         </div>
       </main>
     </div>

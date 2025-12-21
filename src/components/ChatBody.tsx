@@ -4,51 +4,79 @@ import { ChevronLeft } from 'lucide-react';
 import { useAppSelector } from '@/redux/reduxHook';
 import { getAllChat } from '@/lib/services/chatService';
 import { selectUserInfo } from '@/redux/userSlice';
-import type { ChatBlockInfo } from '@/lib/const';
-import { useAppDispatch } from '@/redux/reduxHook';
-import { Login } from '@/lib/services/userService';
-import { createChat } from '@/lib/services/chatService';
-import type { UserLoginInfo } from '@/lib/const';
+import type { GroupChatBlock, FriendChatBlock,ChatBlockInfo, GroupDefaultInfo, MessageType, } from '@/lib/const';
+
+import { createChat, getAllGroupChat, createGroupChat } from '@/lib/services/chatService';
+import toast from 'react-hot-toast';
 interface Response{
   message:string,
   status: number
 }
+
 const ChatBody = (
   
   { onlyMode, setOpenPage, currentChat }: 
   { onlyMode: boolean; setOpenPage: any; currentChat: any }) => {
   
   const currentUser = useAppSelector(selectUserInfo).info;
-  const [messages, setMessages] = useState<ChatBlockInfo[]>([]);
+  const [messages, setMessages] = useState<MessageType[]>([]);
   const [loading, setLoading] = useState(false);
   const [response, setResponse]= useState<Response>({message:"", status:0});
   const [inputValue, setInputValue] = useState<string>('');
   const [file, setFile]= useState<string>('');
   
+  const checkFriendChat:boolean= currentChat.name? true : false;
+  const checkGroupChat: boolean= currentChat.groupName ? true : false;
+  
+  //handle the submit with different type of Chatblock
   const handleSubmit =async (e: React.FormEvent) => {
-      e.preventDefault();
-      if (inputValue || inputValue.length<=250) { 
-        const newMessage :ChatBlockInfo  = {
+    e.preventDefault();
+    if(inputValue || inputValue.length<=250){
+      
+      if (checkFriendChat) { 
+        const newMessage :FriendChatBlock  = {
           content: inputValue,
           senderId: currentUser.id,
           receiverId: currentChat.id
+          
         };
         await createChat(newMessage,setResponse, setLoading);
         setInputValue('');
+      }else if(checkGroupChat){
+        const newMessage :GroupChatBlock  = {
+          content: inputValue,
+          senderId: currentUser.id,
+          groupId: currentChat.id
+        };
+        await createGroupChat(newMessage, setResponse, setLoading);
+        setInputValue('');
+      }else{
+        toast.error("something error in the input")
+      }
+    }else{
+      toast.error("your input is too long or empty");
     }
   };
-  
+  //handle the fetching the messages in chat 
   useEffect(() => {
     const fetchChats = async () => {
-      if (currentChat.id >0) {
+      if (currentChat.id >0 && checkFriendChat) {
         const chatBlocks = await getAllChat(currentUser.id, currentChat.id, setResponse, setLoading);
         setMessages(chatBlocks);
+      }else if(currentChat.id>0 && checkGroupChat){
+        const chatBlocks= await getAllGroupChat(currentChat.id, currentUser.id, setResponse, setLoading);
+        
+        setMessages(chatBlocks)
+      }else if(currentChat.id===0){
+        toast.error("your id can't be defined")
+      }else if(!checkFriendChat && !checkGroupChat){
+        toast.error("can't defined the id of group or user")
+      }else{
+        toast.error("unkown error")
       }
     };
     fetchChats();
-  }, [currentChat.id, currentUser.id,]);
-  console.log(messages);
-  console.log(currentUser);
+  }, [currentChat.id, currentUser.id, currentChat.groupId]);
   return (
     <div className={`w-full h-full flex flex-col  overflow-hidden`} >
       {/* Header */}
@@ -93,12 +121,8 @@ const ChatBody = (
           </div>
         ) : (
           messages.map(msg => (
-          <ChatBlock 
-            chatBlockInfo={msg} 
-            currentChat={currentChat} 
-            setLoading={setLoading}
-            setResponse={setResponse}
-          />))
+          <ChatBlock chatBlockInfo={msg}  />
+          ))
         )}
       </main>
 

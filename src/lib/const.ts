@@ -1,15 +1,25 @@
 
-// chat between two users interfaces
-
+// chat blocks
 export interface ChatBlockInfo{
     id?:number;
     content:string;
     likeNum?:number;
-    senderId:number;
-    receiverId:number;
-    isRead?: boolean;
+    file?:string;
     createdAt?:string;
+    senderId:number;
+    isRead?: boolean;
+    profilePic?:string;
+    name?:string
 }
+export interface FriendChatBlock extends ChatBlockInfo{
+    receiverId:number,
+    isRead?: boolean;
+
+}
+export interface GroupChatBlock extends ChatBlockInfo{
+    groupId:number; 
+}
+
 //individual interfaces 
 export interface UserDefaultInfo{
     id:number;
@@ -37,6 +47,15 @@ export interface UserActivity{
     onlineHours: number;
 
 }
+//group 
+export interface GroupDefaultInfo{
+    id: number,
+    detail: string,
+    adminId: number, 
+    groupName: string,
+    createdAt:string,
+    isRestricted: boolean
+}
 //group chat interfaces
 export interface DefaultGroupChatInfo{
     chatGroupId:string;
@@ -46,12 +65,7 @@ export interface GroupChatConnect extends DefaultGroupChatInfo{
     connectId: string;
     memberId:string;
 }
-export interface GroupChatBlock extends GroupChatConnect{
-    groupChatBlockId:string;
-    content: string;
-    likeNum:number;
-    timestamp:string;
-}
+
 export interface GroupChatInfo extends DefaultGroupChatInfo{
     groupName: string;
     createdAt:string;
@@ -78,6 +92,9 @@ export interface InvitationDefaultInfo{
 }   
 
 //group invitation interfaces
+
+export type MessageType= FriendChatBlock | GroupChatBlock
+//chatblock
 
 //config for FriendList
 export const FriendListConfig={
@@ -109,3 +126,4 @@ export const THEMES = [
   "light",
   "dark"
 ];
+export type TypeEquality<T,U>= keyof T extends keyof U ? (keyof U extends keyof T ? true : false) : false;
