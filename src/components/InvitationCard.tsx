@@ -1,12 +1,12 @@
 import React from 'react';
 import { MessageCircle } from 'lucide-react';
-import type { FriendRequest } from '@/lib/const';
+import type { FriendRequest, RequestType } from '@/lib/const';
 import { AVATAR_GRADIENT } from '@/lib/const';
 
 type InvitationType = 'sent' | 'received';
 
 interface InvitationCardProps {
-  card: FriendRequest;
+  card:  RequestType;
   type: InvitationType;
   onWithdraw?: (id: number) => void;
   onAccept?: (id: number) => void;
@@ -33,7 +33,7 @@ const InvitationCard: React.FC<InvitationCardProps> = ({
       {/* Card Header */}
       <div className="flex items-center gap-3 sm:gap-4 mb-4 pr-10">
         <div
-          className="w-12 h-12 sm:w-15 sm:h-15 rounded-full flex items-center justify-center text-white text-lg sm:text-2xl font-bold flex-shrink-0"
+          className="w-12 h-12 sm:w-15 sm:h-15 rounded-full flex items-center justify-center text-white text-lg sm:text-2xl font-bold shrink-0"
           style={{ background: AVATAR_GRADIENT[Math.floor(Math.random() * AVATAR_GRADIENT.length)]}}
         >
           {card.name.slice(0, 1).toUpperCase()}

@@ -2,7 +2,7 @@ import React from 'react';
 
 const InitialChatBody: React.FC = () => {
   return (
-    <div className="flex flex-col items-center justify-center h-full p-8 bg-gradient-to-br from-indigo-500 to-purple-600 text-white text-center">
+    <div className="flex flex-col items-center justify-center h-full p-8 bg-linear-to-br from-indigo-500 to-purple-600 text-white text-center">
       <div className="mb-12">
         <div className="text-6xl mb-4 animate-bounce">
           💬

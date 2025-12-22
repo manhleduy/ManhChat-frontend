@@ -8,13 +8,11 @@ import {
 } from "@/components/ui/tooltip"
 import InvitationForm from './InvitationForm';
 import { useAppDispatch } from '@/redux/reduxHook';
-import { getFriendList } from '@/lib/services/friendService';
 import { useSelector } from 'react-redux';
 import { selectFriendRequest } from '@/redux/FriendRequestSlice';
 import { selectUserInfo } from '@/redux/userSlice';
 import type { FriendRequest } from '@/lib/const';
 import { getAllRequest } from '@/lib/services/invitationService';
-import { set } from 'zod';
 
 const Invitations =() => {
   const [openInviteForm, setOpenInviteForm]=useState(false);
@@ -38,7 +36,6 @@ const Invitations =() => {
 
   const handleReject = (id: number) => {
   };
-  console.log(FriendRequests);
   return (
     <>
     {openInviteForm? <InvitationForm setOpenInviteForm={setOpenInviteForm}/> : null}

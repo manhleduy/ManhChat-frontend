@@ -88,14 +88,13 @@ export interface InvitationDefaultInfo{
     content: string;
     createdAt:string;
     id:number;
+    name: string;
 }   
 export interface FriendRequest extends InvitationDefaultInfo{
     profilePic:string;
-    name: string;
 }
 export interface GroupRequest extends InvitationDefaultInfo{
     detail: string;
-    groupName: string;
     adminId: number
 }
 

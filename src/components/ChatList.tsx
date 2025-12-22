@@ -1,23 +1,13 @@
 import { useEffect, useState } from 'react';
 import { FriendListConfig } from '@/lib/const';
-import type { UserDefaultInfo } from '@/lib/const';
 import { useAppDispatch, useAppSelector } from '@/redux/reduxHook';
 import { getFriendList } from '@/lib/services/friendService';
 import { selectFriendList } from '@/redux/FriendListSlice';
 import { selectUserInfo } from '@/redux/userSlice';
-import { Login } from '@/lib/services/userService';
-import type { UserLoginInfo } from '@/lib/const';
-import { getAllChat } from '@/lib/services/chatService';
 import { getAllGroup } from '@/lib/services/groupService';
 import { selectGroupList } from '@/redux/GroupListSlice';
 import { ArrowDown, ArrowUp } from 'lucide-react';
-interface Friend extends UserDefaultInfo{
-  lastMessage: string;
-  time: string;
-  unread: number;
-  online: boolean;
-  
-};
+
 const COLOR=['#ff6b9d', '#4a90e2', '#f39c12', '#9b59b6', '#e74c3c', '#1abc9c', '#34495e', '#e67e22', "#2ecc71", "#8e44ad"];
 
 

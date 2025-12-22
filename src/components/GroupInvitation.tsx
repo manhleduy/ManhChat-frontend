@@ -1,20 +1,26 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import InvitationCard from './InvitationCard';
+import type { GroupRequest } from '@/lib/const';
+import { useAppDispatch } from '@/redux/reduxHook';
+import { useSelector } from 'react-redux';
 
-type GroupInvitationCard = {
-  id: number;
-  name: string;
-  initial: string;
-  date: string;
-  description: string;
-  avatarGradient: string;
-};
+import { selectUserInfo } from '@/redux/userSlice';
+import { selectGroupRequest } from '@/redux/GroupRequestSlice';
+import { getAllGroupRequest } from '@/lib/services/invitationService';
 
 const GroupInvitation = () => {
-  const [sentInvitations, setSentInvitations] = useState<GroupInvitationCard[]>([]);
+  const dispatch= useAppDispatch();
+  const currentUser= useSelector(selectUserInfo).info;
+  const GroupRequests= useSelector(selectGroupRequest);
+  const [sentInvitations, setSentInvitations] = useState<GroupRequest[]>(GroupRequests.proposals||[]);
 
-  const [receivedInvitations, setReceivedInvitations] = useState<GroupInvitationCard[]>([]);
+  const [receivedInvitations, setReceivedInvitations] = useState<GroupRequest[]>(GroupRequests.invitations||[]);
 
+  useEffect(()=>{
+    dispatch(getAllGroupRequest(currentUser.id));
+    setSentInvitations(GroupRequests.proposals);
+    setReceivedInvitations(GroupRequests.invitations);
+  },[])
   const handleWithdraw = (id: number) => {
   };
 
@@ -23,7 +29,7 @@ const GroupInvitation = () => {
 
   const handleReject = (id: number) => {
   };
-
+  console.log(GroupRequests);
   return (
     <div className="h-full overflow-scroll bg-gray-100 p-4 sm:p-6 md:p-8">
       <div className="max-w-full">
@@ -58,7 +64,7 @@ const GroupInvitation = () => {
               receivedInvitations.map(item => (
                 <InvitationCard
                   key={item.id}
-                  card={card}
+                  card={item}
                   type="received"
                   onAccept={handleAccept}
                   onReject={handleReject}

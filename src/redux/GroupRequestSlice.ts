@@ -22,7 +22,7 @@ export const groupRequestSlice=createSlice({
       .addAsyncThunk(getAllGroupRequest,{
         fulfilled:(state,action)=>{
           state.error="",
-          state.invitations= action.payload.invitations,
+          state.invitations= action.payload.joinRequests,
           state.proposals= action.payload.proposals,
           state.status="completed"
         },
