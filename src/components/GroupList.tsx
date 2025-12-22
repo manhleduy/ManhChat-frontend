@@ -7,28 +7,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import type { GroupDefaultInfo } from '@/lib/const';
+import { selectGroupList } from '@/redux/GroupListSlice';
+import { useSelector } from 'react-redux';
 
-type Group = {
-  id: number;
-  name: string;
-  initial: string;
-  memberCount: number;
-  status: 'Active' | 'Inactive';
-  color: string;
-};
 
 const COLORS = [
   '#ff6b9d', '#4a90e2', '#f39c12', '#9b59b6', '#e74c3c', '#1abc9c', '#34495e', '#e67e22', '#2ecc71', '#8e44ad',
 ];
 
-const groupsData: Group[] = [
-  { id: 1, name: 'Project Alpha Team', initial: 'P', memberCount: 12, status: 'Active', color: COLORS[0] },
-  { id: 2, name: 'Project Beta Team', initial: 'P', memberCount: 8, status: 'Active', color: COLORS[1] },
-  { id: 3, name: 'Design Team', initial: 'D', memberCount: 15, status: 'Active', color: COLORS[2] },
-  { id: 4, name: 'Development Hub', initial: 'D', memberCount: 10, status: 'Inactive', color: COLORS[3] },
-  { id: 5, name: 'Marketing Circle', initial: 'M', memberCount: 5, status: 'Active', color: COLORS[4] },
-  { id: 6, name: 'Management Team', initial: 'M', memberCount: 20, status: 'Active', color: COLORS[5] },
-];
 
 const defaultConfig = {
   page_title: 'Groups',
@@ -39,26 +26,27 @@ const GroupList = () => {
   const [searchQuery, setSearchQuery] = React.useState('');
   const [selectedCategory, setSelectedCategory] = React.useState('All');
   const [sortOrder, setSortOrder] = React.useState<'a-z' | 'z-a'>('a-z');
+ const groupsData: GroupDefaultInfo[] = useSelector(selectGroupList).groupList;
 
   // group by initial
   const groupedGroups = React.useMemo(() => {
     return groupsData.reduce((acc, group) => {
-      const letter = group.initial;
+      const letter = group.groupName.slice(0, 1).toUpperCase();
       if (!acc[letter]) acc[letter] = [];
       acc[letter].push(group);
       return acc;
-    }, {} as Record<string, Group[]>);
+    }, {} as Record<string, GroupDefaultInfo[]>);
   }, []);
 
   // compute filtered and sorted groups
   const filteredGroups = React.useMemo(() => {
-    const res: Record<string, Group[]> = {};
+    const res: Record<string, GroupDefaultInfo[]> = {};
     Object.entries(groupedGroups).forEach(([letter, list]) => {
-      let filtered = list.filter(g => g.name.toLowerCase().includes(searchQuery.toLowerCase()));
+      let filtered = list.filter(g => g.groupName.toLowerCase().includes(searchQuery.toLowerCase()));
       if (filtered.length > 0) {
         filtered = filtered.sort((a, b) => {
-          const na = a.name.toLowerCase();
-          const nb = b.name.toLowerCase();
+          const na = a.groupName.toLowerCase();
+          const nb = b.groupName.toLowerCase();
           if (sortOrder === 'a-z') return na < nb ? -1 : na > nb ? 1 : 0;
           return na > nb ? -1 : na < nb ? 1 : 0;
         });
@@ -127,15 +115,15 @@ const GroupList = () => {
                 >
                   <div
                     className="w-12 h-12 rounded-full flex items-center justify-center text-white text-lg font-semibold shrink-0"
-                    style={{ background: group.color }}
+                    style={{ background: COLORS[Math.floor(Math.random() * COLORS.length)]  }}
                   >
-                    {group.initial}
+                    {group.groupName.slice(0,1).toUpperCase()}
                   </div>
 
                   <div className="flex-1">
-                    <p className="text-base font-medium text-gray-800">{group.name}</p>
-                    <p className={`text-sm ${group.status === 'Active' ? 'text-green-600' : 'text-gray-500'}`}>
-                      {group.memberCount} members • {group.status}
+                    <p className="text-base font-medium text-gray-800">{group.groupName}</p>
+                    <p className={`text-sm ${!group.isRestricted ? 'text-green-600' : 'text-gray-500'}`}>
+                       • {group.isRestricted ? 'Restricted' : 'Public'}
                     </p>
                   </div>
                 </div>

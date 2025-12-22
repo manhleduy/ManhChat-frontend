@@ -4,10 +4,14 @@ import {persistReducer, persistStore} from "redux-persist"
 import usersReducer from './userSlice'
 import friendListReducer from './FriendListSlice'
 import groupListReducer from './GroupListSlice'
+import FriendRequestReducer from './FriendRequestSlice'
+import GroupRequestReducer from './GroupRequestSlice'
 const rootReducer= combineReducers({
     users: usersReducer,
     friendList: friendListReducer,
-    groupList: groupListReducer
+    groupList: groupListReducer,
+    friendRequest: FriendRequestReducer,
+    groupRequest: GroupRequestReducer
 })
 const persistConfig={
     key:"root",

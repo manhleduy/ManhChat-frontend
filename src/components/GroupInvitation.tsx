@@ -37,10 +37,10 @@ const GroupInvitation = () => {
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {sentInvitations.length > 0 ? (
-              sentInvitations.map(card => (
+              sentInvitations.map(item => (
                 <InvitationCard
-                  key={card.id}
-                  card={card}
+                  key={item.id}
+                  card={item}
                   type="sent"
                   onWithdraw={handleWithdraw}
                 />
@@ -58,10 +58,10 @@ const GroupInvitation = () => {
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {receivedInvitations.length > 0 ? (
-              receivedInvitations.map(card => (
+              receivedInvitations.map(item => (
                 <InvitationCard
-                  key={card.id}
-                  card={card}
+                  key={item.id}
+                  card={item}
                   type="received"
                   onAccept={handleAccept}
                   onReject={handleReject}

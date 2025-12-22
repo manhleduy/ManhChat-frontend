@@ -51,7 +51,6 @@ export const usersSlice=createSlice({
           state.status="failed"
         }
       })
-    
     },
     selectors:{
       selectUserInfo:(state)=>state

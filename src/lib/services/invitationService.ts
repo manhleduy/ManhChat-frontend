@@ -1,3 +1,4 @@
+import { createAction, createAsyncThunk } from "@reduxjs/toolkit";
 import { api } from "../axios";
 
 export const sendInvitation = async (
@@ -7,17 +8,17 @@ export const sendInvitation = async (
 ) => {
     try {
         setLoading(true);
-        const res = await api.post('/api/invitation/create', data);
+        await api.post(`/api/invitation/create/${data.senderId}`, data);
         setLoading(false);
-        return res.data;
+        
     } catch (e: any) {
         setLoading(false);
         setError(e.response?.data?.message || e.message || 'An error occurred');
     }
 };
 
-export const getAllInvitation = async (
-    id: string,
+/*export const getAllRequest = async (
+    id: number,
     setError: (error: string) => void,
     setLoading: (loading: boolean) => void
 ) => {
@@ -30,55 +31,66 @@ export const getAllInvitation = async (
         setLoading(false);
         setError(e.response?.data?.message || e.message || 'An error occurred');
     }
-};
+};*/
+export const getAllRequest= createAsyncThunk(
+    "invitation/friendRequest",
+    async (id:number, {rejectWithValue})=>{
+        try{
+            const res= await api.get(`/api/invitation/${id}`)
+            return res.data.invitations;
+        }catch(e:any){
+            console.log(e);
+            rejectWithValue(e.response.data);
+        }
+    }
+    )
 
-export const sendGroupProposal = async (
+export const sendGroupRequest = async (
     data: { userId: string; adminId: string; content: string; groupId: string },
     setError: (error: string) => void,
     setLoading: (loading: boolean) => void
 ) => {
     try {
         setLoading(true);
-        const res = await api.post('/api/invitation/proposal/create', data);
+        await api.post(`/api/invitation/group/create/${data.adminId}`, data);
         setLoading(false);
-        return res.data;
+        
     } catch (e: any) {
         setLoading(false);
         setError(e.response?.data?.message || e.message || 'An error occurred');
     }
 };
 
-export const sendJoinGroupInvitation = async (
-    data: { adminId: string; content: string; groupId: string; receiverId: string },
-    setError: (error: string) => void,
-    setLoading: (loading: boolean) => void
-) => {
-    try {
-        setLoading(true);
-        const res = await api.post('/api/invitation/group/create', data);
-        setLoading(false);
-        return res.data;
-    } catch (e: any) {
-        setLoading(false);
-        setError(e.response?.data?.message || e.message || 'An error occurred');
-    }
-};
 
-export const getAllGroupProposal = async (
-    id: string,
+
+/*export const getAllGroupRequest = async (
+    id: number,
     setError: (error: string) => void,
     setLoading: (loading: boolean) => void
 ) => {
     try {
         setLoading(true);
-        const res = await api.get(`/api/invitation/group/proposal/${id}`);
+        const res = await api.get(`/api/invitation/group/${id}`);
         setLoading(false);
-        return res.data.invitations;
+        return res.data
     } catch (e: any) {
         setLoading(false);
         setError(e.response?.data?.message || e.message || 'An error occurred');
     }
-};
+};*/
+
+export const getAllGroupRequest= createAsyncThunk(
+    "invitation/groupRequest",
+    async (id: number, {rejectWithValue})=>{
+        try{
+            const res= await api.get(`/api/invitation/group/${id}`)
+            return res.data;
+        }catch(e:any){
+            console.log(e);
+            rejectWithValue(e.response.data);
+        }
+    }
+)
 
 export const deleteInvitation = async (
     id: string,

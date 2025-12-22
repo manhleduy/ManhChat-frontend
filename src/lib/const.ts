@@ -1,3 +1,4 @@
+import type { number } from "zod";
 
 // chat blocks
 export interface ChatBlockInfo{
@@ -83,13 +84,20 @@ export interface PostInfo extends PostConnect{
     createdAt: string;
 }
 //invitation interfaces
-export interface InvitationDefaultInfo{
-    invitationId: string;
-    senderId: string;
-    receiverId: string;
-    detail: string;
-    sendAt:string;
+export interface InvitationDefaultInfo{ 
+    content: string;
+    createdAt:string;
+    id:number;
 }   
+export interface FriendRequest extends InvitationDefaultInfo{
+    profilePic:string;
+    name: string;
+}
+export interface GroupRequest extends InvitationDefaultInfo{
+    detail: string;
+    groupName: string;
+    adminId: number
+}
 
 //group invitation interfaces
 
@@ -121,6 +129,15 @@ export const inputFormConfig = {
   singup_text: "haven't had an account yet? Create now!"
 };
 
+export const AVATAR_GRADIENT= [
+  'linear-gradient(135deg, #2196f3, #64b5f6)',
+  'linear-gradient(135deg, #9c27b0, #ba68c8)',
+  'linear-gradient(135deg, #ff9800, #ffb74d)',
+  'linear-gradient(135deg, #4caf50, #81c784)',
+  'linear-gradient(135deg, #f44336, #ef5350)',
+  'linear-gradient(135deg, #00bcd4, #4dd0e1)',
+  'linear-gradient(135deg, #673ab7, #9575cd)'
+]
 
 export const THEMES = [
   "light",
