@@ -16,15 +16,12 @@ const GroupInvitation = () => {
   const [receivedInvitations, setReceivedInvitations] = useState<GroupInvitationCard[]>([]);
 
   const handleWithdraw = (id: number) => {
-    setSentInvitations(sentInvitations.filter(inv => inv.id !== id));
   };
 
   const handleAccept = (id: number) => {
-    setReceivedInvitations(receivedInvitations.filter(inv => inv.id !== id));
   };
 
   const handleReject = (id: number) => {
-    setReceivedInvitations(receivedInvitations.filter(inv => inv.id !== id));
   };
 
   return (
@@ -61,7 +58,7 @@ const GroupInvitation = () => {
               receivedInvitations.map(item => (
                 <InvitationCard
                   key={item.id}
-                  card={item}
+                  card={card}
                   type="received"
                   onAccept={handleAccept}
                   onReject={handleReject}

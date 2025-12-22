@@ -1,19 +1,12 @@
 import React from 'react';
 import { MessageCircle } from 'lucide-react';
-
-type InvitationCardData = {
-  id: number;
-  name: string;
-  initial: string;
-  date: string;
-  description: string;
-  avatarGradient: string;
-};
+import type { FriendRequest } from '@/lib/const';
+import { AVATAR_GRADIENT } from '@/lib/const';
 
 type InvitationType = 'sent' | 'received';
 
 interface InvitationCardProps {
-  card: InvitationCardData;
+  card: FriendRequest;
   type: InvitationType;
   onWithdraw?: (id: number) => void;
   onAccept?: (id: number) => void;
@@ -27,6 +20,7 @@ const InvitationCard: React.FC<InvitationCardProps> = ({
   onAccept,
   onReject,
 }) => {
+  
   return (
     <div className="relative w-full  bg-white rounded-xl p-4 sm:p-6 shadow-md hover:shadow-lg transition-all hover:-translate-y-1">
       {/* Chat Icon */}
@@ -40,22 +34,22 @@ const InvitationCard: React.FC<InvitationCardProps> = ({
       <div className="flex items-center gap-3 sm:gap-4 mb-4 pr-10">
         <div
           className="w-12 h-12 sm:w-15 sm:h-15 rounded-full flex items-center justify-center text-white text-lg sm:text-2xl font-bold flex-shrink-0"
-          style={{ background: card.avatarGradient }}
+          style={{ background: AVATAR_GRADIENT[Math.floor(Math.random() * AVATAR_GRADIENT.length)]}}
         >
-          {card.initial}
+          {card.name.slice(0, 1).toUpperCase()}
         </div>
         <div className="flex-1 min-w-0">
           <h3 className="text-lg sm:text-xl font-semibold text-gray-800 truncate">
             {card.name}
           </h3>
-          <p className="text-xs sm:text-sm text-gray-500 truncate">{card.date}</p>
+          <p className="text-xs sm:text-sm text-gray-500 truncate">{card.createdAt.slice(0, 10)}</p>
         </div>
       </div>
 
       {/* Description */}
       <div className="mb-4 sm:mb-5 p-2 sm:p-3 bg-gray-50 rounded-lg border-l-4 border-green-500">
         <p className="text-xs sm:text-sm text-gray-700 leading-relaxed line-clamp-3">
-          {card.description}
+          {card.content}
         </p>
       </div>
 

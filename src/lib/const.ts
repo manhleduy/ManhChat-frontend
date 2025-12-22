@@ -102,6 +102,9 @@ export interface GroupRequest extends InvitationDefaultInfo{
 //group invitation interfaces
 
 export type MessageType= FriendChatBlock | GroupChatBlock
+
+export type RequestType= FriendRequest | GroupRequest
+
 //chatblock
 
 //config for FriendList

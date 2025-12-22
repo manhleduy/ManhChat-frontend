@@ -51,7 +51,7 @@ const FriendContactList= () => {
   const [sortOrder, setSortOrder] = React.useState<'a-z' | 'z-a'>('a-z');
   const friendList  = useAppSelector(selectFriendList).friendList;
   const currentUser= useAppSelector(selectUserInfo).info;
-  console.log(currentUser);
+  
   const friends: Friend[] = friendList.map(friend => ({
     id: friend.id,
     name: friend.name,
@@ -59,7 +59,7 @@ const FriendContactList= () => {
     status: 'Online',
     color: COLORS[Math.floor(Math.random() * COLORS.length)],
   }));
-  console.log(friendList);
+  
 
   
   // group friends by initial

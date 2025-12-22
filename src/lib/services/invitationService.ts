@@ -1,4 +1,4 @@
-import { createAction, createAsyncThunk } from "@reduxjs/toolkit";
+import { createAsyncThunk } from "@reduxjs/toolkit";
 import { api } from "../axios";
 
 export const sendInvitation = async (
@@ -37,7 +37,7 @@ export const getAllRequest= createAsyncThunk(
     async (id:number, {rejectWithValue})=>{
         try{
             const res= await api.get(`/api/invitation/${id}`)
-            return res.data.invitations;
+            return res.data;
         }catch(e:any){
             console.log(e);
             rejectWithValue(e.response.data);
