@@ -127,6 +127,9 @@ export const inputFormConfig = {
   birthday_label: 'Birthday',
   submit_button: 'Sign Up',
   to_label: "Sent invitation to",
+  group_name_label: "group name",
+  group_id_label:"group id",
+  admin_label:"name of its admin",
   content_label: "Content",
   signin_text: 'Already have an account? Sign in here',
   singup_text: "haven't had an account yet? Create now!"

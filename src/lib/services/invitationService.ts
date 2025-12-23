@@ -4,7 +4,13 @@ import { createUserConnect } from "./userService";
 import { createGroupConnect } from "./groupService";
 
 export const sendInvitation = async (
-    data: { receiverId: string; content: string; senderId: string },
+    data: { 
+        name:string,
+        phonenumber:string;
+        email:string
+        content: string;
+        senderId: number 
+    },
     setError: (error: string) => void,
     setLoading: (loading: boolean) => void
 ) => {
@@ -103,8 +109,7 @@ export const deleteGroupRequest= async(
         setLoading(false);
         setError(e.response?.data?.message || e.message || 'An error occurred');
     }
-} 
-
+}
 export const acceptGroupRequest= async(
     data: { memberId: number; adminId: number; groupId: number},
     setError:(error:string)=>void,

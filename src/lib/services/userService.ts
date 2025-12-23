@@ -144,3 +144,34 @@ export const createUserConnect = async (
     }
 };
 
+export const getUserInvitation= async(
+    data:{name: string, email?:string, phonenumber?:string},
+    setError:(error:string)=>void,
+    setLoading:(loading:boolean)=>void
+)=>{
+    try{
+        setLoading(true);
+        const res= await api.post("/api/user/invitation", data);
+        setLoading(false);
+        return res.data
+    }catch(e:any){
+        console.log(e);
+        setError(e.message);
+    }
+}
+export const findUsers=async(
+    data:{name: string, email:string, phonenumber:string},
+    setError:(error:string)=>void,
+    setLoading:(loading:boolean)=>void
+)=>{
+    try{
+        setLoading(true);
+        const res= await api.post("/api/user/getusers", data);
+        setLoading(false);
+        setError("");
+        return res.data.users;
+    }catch(e:any){
+        console.log(e);
+        setError(e.message);
+    }
+}

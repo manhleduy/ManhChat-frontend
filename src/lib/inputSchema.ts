@@ -8,6 +8,7 @@ validatePhoneNumber,
 validateAddress,
 validateContent,
 } from '@/lib/validateInput';
+//schema for sign up schema
 export const signUpSchema = z.object({
     email: z
         .email()
@@ -37,9 +38,9 @@ export const signUpSchema = z.object({
                 path:['confirmPassword']
             })
         }
-    })
+})
 export type SignUpSchema=  z.infer<typeof signUpSchema>;
-
+//schema for sign in schema
 export const signInSchema=z.object({
     email: z
         .string()
@@ -49,17 +50,39 @@ export const signInSchema=z.object({
         .refine(val=>validateName(val))
 })
 export type SignInSchema= z.infer<typeof signInSchema>;
+//schema for sending friend invite
+export const friendInviteSchema= z.object({
+    name: z
+        .string()
+        .refine(val=>validateName(val)),
+    email: z
+        .email(),
+    phonenumber:z
+        .string()
+        .refine(val=>validatePhoneNumber(val)),
+    
+    content: z
+        .string()
+        .refine(val=>validateContent(val)),
+    
 
-export const inviteSchema= z.object({
-    to: z
+})
+export type FriendInviteSchema= z.infer<typeof friendInviteSchema>;
+//schema for sending group proposal
+export const groupRequestSchema=z.object({
+    groupName: z
         .string()
         .refine(val=>validateName(val)),
     content: z
         .string()
-        .refine(val=>validateContent(val))
-
+        .refine(val=>validateContent(val)),
+    adminName:z
+        .string()
+        .refine(val=>validateName(val)),
+    groupId: z
+        .number()
 })
-export type InviteSchema= z.infer<typeof inviteSchema>;
+export type GroupRequestSchema= z.infer<typeof groupRequestSchema>;
 
 export const otpSchema = z.object({
     otp: z
