@@ -1,5 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { api } from "../axios";
+import { createUserConnect } from "./userService";
+import { createGroupConnect } from "./groupService";
 
 export const sendInvitation = async (
     data: { receiverId: string; content: string; senderId: string },
@@ -16,22 +18,21 @@ export const sendInvitation = async (
         setError(e.response?.data?.message || e.message || 'An error occurred');
     }
 };
-
-/*export const getAllRequest = async (
-    id: number,
+export const sendGroupRequest = async (
+    data: { userId: string; adminId: string; content: string; groupId:number },
     setError: (error: string) => void,
     setLoading: (loading: boolean) => void
 ) => {
     try {
         setLoading(true);
-        const res = await api.get(`/api/invitation/${id}`);
+        await api.post(`/api/invitation/group/create/${data.userId}`, data);
         setLoading(false);
-        return res.data.invitations;
+        
     } catch (e: any) {
         setLoading(false);
         setError(e.response?.data?.message || e.message || 'An error occurred');
     }
-};*/
+};
 export const getAllRequest= createAsyncThunk(
     "invitation/friendRequest",
     async (id:number, {rejectWithValue})=>{
@@ -43,42 +44,7 @@ export const getAllRequest= createAsyncThunk(
             rejectWithValue(e.response.data);
         }
     }
-    )
-
-export const sendGroupRequest = async (
-    data: { userId: string; adminId: string; content: string; groupId: string },
-    setError: (error: string) => void,
-    setLoading: (loading: boolean) => void
-) => {
-    try {
-        setLoading(true);
-        await api.post(`/api/invitation/group/create/${data.adminId}`, data);
-        setLoading(false);
-        
-    } catch (e: any) {
-        setLoading(false);
-        setError(e.response?.data?.message || e.message || 'An error occurred');
-    }
-};
-
-
-
-/*export const getAllGroupRequest = async (
-    id: number,
-    setError: (error: string) => void,
-    setLoading: (loading: boolean) => void
-) => {
-    try {
-        setLoading(true);
-        const res = await api.get(`/api/invitation/group/${id}`);
-        setLoading(false);
-        return res.data
-    } catch (e: any) {
-        setLoading(false);
-        setError(e.response?.data?.message || e.message || 'An error occurred');
-    }
-};*/
-
+)
 export const getAllGroupRequest= createAsyncThunk(
     "invitation/groupRequest",
     async (id: number, {rejectWithValue})=>{
@@ -91,19 +57,68 @@ export const getAllGroupRequest= createAsyncThunk(
         }
     }
 )
-
 export const deleteInvitation = async (
-    id: string,
+    data: { userId: number; friendId: number },
     setError: (error: string) => void,
     setLoading: (loading: boolean) => void
 ) => {
     try {
         setLoading(true);
-        const res = await api.delete(`/api/invitation/${id}`);
+        await api.delete(`/api/invitation/${data.userId}`,{data});
+        
         setLoading(false);
-        return res.data;
     } catch (e: any) {
+    
         setLoading(false);
         setError(e.response?.data?.message || e.message || 'An error occurred');
     }
 };
+export const acceptInvitation= async(
+    data: { userId: number; friendId: number },
+    setError:(error:string)=>void,
+    setLoading:(loading:boolean)=>void
+)=>{
+    try {
+        setLoading(true);
+        await deleteInvitation({userId:data.userId, friendId:data.friendId}, setError, setLoading);
+        await createUserConnect(data.userId, data.friendId, setError, setLoading);
+        setLoading(false);
+        setError("");
+        
+    } catch (e: any) { 
+        console.log(e);
+        setError(e.response?.data?.message || e.message || 'An error occurred');
+    }
+}
+export const deleteGroupRequest= async(
+    data: { userId: number; adminId: number; groupId: number },
+    setError:(error:string)=>void,
+    setLoading:(loading:boolean)=>void
+)=>{
+    try {
+        setLoading(true);
+        await api.delete(`/api/invitation/group/${data.userId}`, {data});
+        setLoading(false);   
+    } catch (e: any) {
+
+        setLoading(false);
+        setError(e.response?.data?.message || e.message || 'An error occurred');
+    }
+} 
+
+export const acceptGroupRequest= async(
+    data: { userId: number; adminId: number; groupId: number},
+    setError:(error:string)=>void,
+    setLoading:(loading:boolean)=>void
+)=>{
+    try {
+        setLoading(true);
+        await deleteGroupRequest({userId:data.userId, adminId:data.adminId, groupId:data.groupId},setError,setLoading)
+        await createGroupConnect({groupId:data.groupId, adminId:data.adminId, memberId:data.userId},setError,setLoading)
+        setLoading(false);
+        setError("");
+    } catch (e: any) { 
+        console.log(e);
+        setError(e.response?.data?.message || e.message || 'An error occurred');
+    }
+}

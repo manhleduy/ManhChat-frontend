@@ -11,30 +11,63 @@ import { useAppDispatch } from '@/redux/reduxHook';
 import { useSelector } from 'react-redux';
 import { selectFriendRequest } from '@/redux/FriendRequestSlice';
 import { selectUserInfo } from '@/redux/userSlice';
-import type { FriendRequest } from '@/lib/const';
-import { getAllRequest } from '@/lib/services/invitationService';
+import type { FriendRequest, RequestType } from '@/lib/const';
+import { acceptInvitation, deleteInvitation, getAllRequest } from '@/lib/services/invitationService';
+import toast from 'react-hot-toast';
+import { set } from 'zod';
 
 const Invitations =() => {
   const [openInviteForm, setOpenInviteForm]=useState(false);
   const currentUser= useSelector(selectUserInfo).info;
   const dispatch= useAppDispatch();
   const FriendRequests= useSelector(selectFriendRequest);
-  const [sentInvitations, setSentInvitations] = useState<FriendRequest[]>(FriendRequests.proposals ||[]);
-
-  const [receivedInvitations, setReceivedInvitations] = useState<FriendRequest[]>(FriendRequests.invitations||[]);
+  const [loading, setLoading]= useState(false);
+  const [error, setError]= useState<string>("");
+  // request sent
+  const [sentInvitations, setSentInvitations] = useState<FriendRequest[]>(FriendRequests.invitations ||[]);
+  // request received
+  const [receivedInvitations, setReceivedInvitations] = useState<FriendRequest[]>(FriendRequests.proposals||[]);
   useEffect(()=>{
     dispatch(getAllRequest(currentUser.id));
-    setSentInvitations(FriendRequests.proposals);
-    setReceivedInvitations(FriendRequests.invitations);
+    setSentInvitations(FriendRequests.invitations);
+    setReceivedInvitations(FriendRequests.proposals);
 
   },[])
-  const handleWithdraw = (id: number) => {
+  const handleWithdraw = async(invitation: RequestType) => {
+    try{  
+      setSentInvitations(sentInvitations.filter(item=>item.id!=invitation.id));
+      await deleteInvitation({userId:currentUser.id,friendId: invitation.id}, setError, setLoading)
+    }catch(e:any){
+      console.log(e);
+      toast.error(e.message);
+      
+    }
   };
 
-  const handleAccept = (id: number) => {
+  const handleAccept = async(invitation: RequestType) => {
+    try{
+      setReceivedInvitations(receivedInvitations.filter(item=>item.id!=invitation.id));
+      await acceptInvitation({userId:invitation.id,friendId:currentUser.id},  setError, setLoading)
+
+    }catch(e:any){
+      console.log(e);
+      toast.error(e.message);
+    }finally{
+      toast.success("succesfully ")
+    }
   };
 
-  const handleReject = (id: number) => {
+  const handleReject = async(invitation: RequestType) => {
+     try{
+      setReceivedInvitations(receivedInvitations.filter(item=>item.id!=invitation.id));
+      await deleteInvitation({userId:invitation.id,friendId: currentUser.id}, setError, setLoading)
+
+    }catch(e:any){
+      console.log(e);
+      toast.error(e.message);
+    }finally{
+      toast.success("you reject this invitation")
+    }
   };
   return (
     <>

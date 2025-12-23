@@ -17,7 +17,7 @@ export const createGroup = async (
     }
 };
 export const createGroupConnect = async (
-    data: { groupId: string; adminId: string; memberId: string },
+    data: { groupId: number; adminId: number; memberId: number},
     setError: (error: string) => void,
     setLoading: (loading: boolean) => void
 ) => {

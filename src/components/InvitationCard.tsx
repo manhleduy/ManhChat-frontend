@@ -2,15 +2,16 @@ import React from 'react';
 import { MessageCircle } from 'lucide-react';
 import type { FriendRequest, RequestType } from '@/lib/const';
 import { AVATAR_GRADIENT } from '@/lib/const';
+import { deleteInvitation } from '@/lib/services/invitationService';
 
 type InvitationType = 'sent' | 'received';
 
 interface InvitationCardProps {
   card:  RequestType;
   type: InvitationType;
-  onWithdraw?: (id: number) => void;
-  onAccept?: (id: number) => void;
-  onReject?: (id: number) => void;
+  onWithdraw?: (invitation: RequestType) => Promise<void>;
+  onAccept?: (invitation: RequestType) => Promise<void>;
+  onReject?: (invitation: RequestType) => Promise<void>;
 }
 
 const InvitationCard: React.FC<InvitationCardProps> = ({
@@ -57,7 +58,11 @@ const InvitationCard: React.FC<InvitationCardProps> = ({
       <div className="flex gap-2 sm:gap-3">
         {type === 'sent' ? (
           <button
-            onClick={() => onWithdraw?.(card.id)}
+            onClick={() => {
+              
+              onWithdraw?.(card)
+            }
+            }
             className="flex-1 py-2 sm:py-3 px-3 sm:px-5 bg-orange-500 text-white text-xs sm:text-base rounded-lg font-semibold hover:bg-orange-600 transition-colors hover:-translate-y-0.5 truncate"
           >
             Withdraw
@@ -65,13 +70,13 @@ const InvitationCard: React.FC<InvitationCardProps> = ({
         ) : (
           <>
             <button
-              onClick={() => onAccept?.(card.id)}
+              onClick={() => onAccept?.(card)}
               className="flex-1 py-2 sm:py-3 px-3 sm:px-5 bg-green-500 text-white text-xs sm:text-base rounded-lg font-semibold hover:bg-green-600 transition-colors hover:-translate-y-0.5 truncate"
             >
               Accept
             </button>
             <button
-              onClick={() => onReject?.(card.id)}
+              onClick={() => onReject?.(card)}
               className="flex-1 py-2 sm:py-3 px-3 sm:px-5 bg-red-500 text-white text-xs sm:text-base rounded-lg font-semibold hover:bg-red-600 transition-colors hover:-translate-y-0.5 truncate"
             >
               Reject

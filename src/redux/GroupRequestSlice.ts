@@ -1,6 +1,6 @@
-import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type { GroupRequest, UserDefaultInfo } from "@/lib/const";
-import { getAllGroupRequest, getAllRequest } from "@/lib/services/invitationService";
+import { createSlice, type PayloadAction} from "@reduxjs/toolkit";
+import type { GroupRequest} from "@/lib/const";
+import { getAllGroupRequest } from "@/lib/services/invitationService";
 const initialState: {
   invitations:GroupRequest[],
   proposals:GroupRequest[]
@@ -15,7 +15,9 @@ export const groupRequestSlice=createSlice({
     name:"groupRequest",
     initialState,
     reducers:{
-      
+      deleteGroupRequest:(state, action: PayloadAction<number>)=>{
+        
+      }
     },
     extraReducers:(builder)=>{
       builder

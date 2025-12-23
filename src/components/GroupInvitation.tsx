@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import InvitationCard from './InvitationCard';
-import type { GroupRequest } from '@/lib/const';
+import type { GroupRequest, RequestType } from '@/lib/const';
 import { useAppDispatch } from '@/redux/reduxHook';
 import { useSelector } from 'react-redux';
 
@@ -21,13 +21,13 @@ const GroupInvitation = () => {
     setSentInvitations(GroupRequests.proposals);
     setReceivedInvitations(GroupRequests.invitations);
   },[])
-  const handleWithdraw = (id: number) => {
+  const handleWithdraw = async(invitation: RequestType) => {
   };
 
-  const handleAccept = (id: number) => {
+  const handleAccept =async (invitation: RequestType) => {
   };
 
-  const handleReject = (id: number) => {
+  const handleReject =async (invitation: RequestType) => {
   };
   console.log(GroupRequests);
   return (

@@ -60,8 +60,6 @@ export const getUserInfo = async (
     }
 };
 
-
-
 export const getAllGroup = async (
     id: string,
     setError: any,
@@ -130,14 +128,14 @@ export const updateUserAvatar = async (
 };
 
 export const createUserConnect = async (
-    userId: string,
-    friendId: string,
+    userId: number,
+    friendId: number,
     setError: any,
     setLoading: any
 ) => {
     try {
         setLoading(true);
-        const res = await api.post('/api/user/createconnect', { userId, friendId, isvalid: true });
+        const res = await api.post(`/api/user/createconnect/${userId}`, { userId, friendId, isvalid: true });
         setLoading(false);
         return res.data;
     } catch (e: any) {
