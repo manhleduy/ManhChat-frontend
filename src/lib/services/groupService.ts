@@ -23,9 +23,8 @@ export const createGroupConnect = async (
 ) => {
     try {
         setLoading(true);
-        const res = await api.post(`/api/group/createconnect/${data.groupId}`, data);
+        await api.post(`/api/group/createconnect/${data.groupId}`, data);
         setLoading(false);
-        return res.data;
     } catch (e: any) {
         setLoading(false);
         setError(e.response?.data?.message || e.message || 'An error occurred');

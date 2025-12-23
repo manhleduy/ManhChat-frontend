@@ -91,30 +91,30 @@ export const acceptInvitation= async(
     }
 }
 export const deleteGroupRequest= async(
-    data: { userId: number; adminId: number; groupId: number },
+    data: { memberId: number; adminId: number; groupId: number },
     setError:(error:string)=>void,
     setLoading:(loading:boolean)=>void
 )=>{
     try {
         setLoading(true);
-        await api.delete(`/api/invitation/group/${data.userId}`, {data});
+        await api.delete(`/api/invitation/group/${data.memberId}`, {data});
         setLoading(false);   
     } catch (e: any) {
-
         setLoading(false);
         setError(e.response?.data?.message || e.message || 'An error occurred');
     }
 } 
 
 export const acceptGroupRequest= async(
-    data: { userId: number; adminId: number; groupId: number},
+    data: { memberId: number; adminId: number; groupId: number},
     setError:(error:string)=>void,
     setLoading:(loading:boolean)=>void
 )=>{
     try {
+        const {memberId, adminId, groupId}= data;
         setLoading(true);
-        await deleteGroupRequest({userId:data.userId, adminId:data.adminId, groupId:data.groupId},setError,setLoading)
-        await createGroupConnect({groupId:data.groupId, adminId:data.adminId, memberId:data.userId},setError,setLoading)
+        await deleteGroupRequest({memberId:memberId, adminId:adminId,groupId:groupId},setError,setLoading)
+        await createGroupConnect({memberId:memberId, adminId:adminId,groupId:groupId},setError,setLoading)
         setLoading(false);
         setError("");
     } catch (e: any) { 

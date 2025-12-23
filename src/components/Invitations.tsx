@@ -14,7 +14,6 @@ import { selectUserInfo } from '@/redux/userSlice';
 import type { FriendRequest, RequestType } from '@/lib/const';
 import { acceptInvitation, deleteInvitation, getAllRequest } from '@/lib/services/invitationService';
 import toast from 'react-hot-toast';
-import { set } from 'zod';
 
 const Invitations =() => {
   const [openInviteForm, setOpenInviteForm]=useState(false);
@@ -43,7 +42,6 @@ const Invitations =() => {
       
     }
   };
-
   const handleAccept = async(invitation: RequestType) => {
     try{
       setReceivedInvitations(receivedInvitations.filter(item=>item.id!=invitation.id));

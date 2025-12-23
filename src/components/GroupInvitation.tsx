@@ -3,15 +3,17 @@ import InvitationCard from './InvitationCard';
 import type { GroupRequest, RequestType } from '@/lib/const';
 import { useAppDispatch } from '@/redux/reduxHook';
 import { useSelector } from 'react-redux';
-
+import toast from 'react-hot-toast';
 import { selectUserInfo } from '@/redux/userSlice';
 import { selectGroupRequest } from '@/redux/GroupRequestSlice';
-import { getAllGroupRequest } from '@/lib/services/invitationService';
+import { acceptGroupRequest, deleteGroupRequest, getAllGroupRequest } from '@/lib/services/invitationService';
 
 const GroupInvitation = () => {
   const dispatch= useAppDispatch();
   const currentUser= useSelector(selectUserInfo).info;
   const GroupRequests= useSelector(selectGroupRequest);
+  const [error, setError]= useState<string>("")
+  const [loading, setLoading]= useState<boolean>(false);
   const [sentInvitations, setSentInvitations] = useState<GroupRequest[]>(GroupRequests.proposals||[]);
 
   const [receivedInvitations, setReceivedInvitations] = useState<GroupRequest[]>(GroupRequests.invitations||[]);
@@ -21,15 +23,45 @@ const GroupInvitation = () => {
     setSentInvitations(GroupRequests.proposals);
     setReceivedInvitations(GroupRequests.invitations);
   },[])
-  const handleWithdraw = async(invitation: RequestType) => {
+  const handleWithdraw = async(invitation: any) => {
+    try{
+      const {id, adminId, groupId}= invitation;
+      setSentInvitations(sentInvitations.filter(item=>item.id!=invitation.id));
+      await deleteGroupRequest({memberId: id, adminId:adminId, groupId:groupId}, setError,setLoading)
+    }
+    catch(e:any){
+      console.log(e);
+      toast.error(e.message);
+    }
+
   };
 
-  const handleAccept =async (invitation: RequestType) => {
+  const handleAccept =async (invitation: any) => {
+    try{
+      const {id, adminId, groupId}= invitation;
+      setSentInvitations(sentInvitations.filter(item=>item.id!=invitation.id));
+      await acceptGroupRequest({memberId: id, adminId: adminId, groupId:groupId}, setError, setLoading)
+    }catch(e:any){
+      console.log(e);
+      toast.error(e.message);
+    }finally{
+      toast.success("you accept a new user to your group")
+    }
   };
 
-  const handleReject =async (invitation: RequestType) => {
+  const handleReject =async (invitation: any) => {
+    try{
+      const {id, adminId, groupId}= invitation;
+      setSentInvitations(sentInvitations.filter(item=>item.id!=invitation.id));
+      await deleteGroupRequest({memberId: id, adminId:adminId, groupId:groupId}, setError,setLoading)
+      
+    }catch(e:any){
+      console.log(e);
+      toast.error(e.message);
+    }finally{
+      toast.success("you reject a user")
+    }
   };
-  console.log(GroupRequests);
   return (
     <div className="h-full overflow-scroll bg-gray-100 p-4 sm:p-6 md:p-8">
       <div className="max-w-full">

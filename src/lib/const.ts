@@ -95,7 +95,8 @@ export interface FriendRequest extends InvitationDefaultInfo{
 }
 export interface GroupRequest extends InvitationDefaultInfo{
     detail: string;
-    adminId: number
+    adminId: number;
+    groupId: number;
 }
 
 //group invitation interfaces
