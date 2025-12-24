@@ -42,12 +42,11 @@ export const signUpSchema = z.object({
 export type SignUpSchema=  z.infer<typeof signUpSchema>;
 //schema for sign in schema
 export const signInSchema=z.object({
+    password: z
+        .string()
+        .refine(val=>validatePassword(val)),
     email: z
-        .string()
-        .refine(val=>validateEmail(val)),
-    name: z
-        .string()
-        .refine(val=>validateName(val))
+        .email()
 })
 export type SignInSchema= z.infer<typeof signInSchema>;
 //schema for sending friend invite

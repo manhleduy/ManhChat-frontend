@@ -25,7 +25,7 @@ export const sendInvitation = async (
     }
 };
 export const sendGroupRequest = async (
-    data: { userId: string; adminId: string; content: string; groupId:number },
+    data: { userId: number; adminName: string; content: string; groupId:number },
     setError: (error: string) => void,
     setLoading: (loading: boolean) => void
 ) => {

@@ -5,6 +5,9 @@ import GroupList from '@/components/GroupList';
 import GroupInvitation from '@/components/GroupInvitation';
 import Invitations from '@/components/Invitations';
 import AsideBar from '@/components/AsideBar';
+import { selectUserInfo } from '@/redux/userSlice';
+import { useAppSelector } from '@/redux/reduxHook';
+import { useNavigate } from 'react-router-dom';
 
 const sidebarItems = [
     { id: 'friends', label: 'Friend List', icon: Users },
@@ -24,7 +27,11 @@ type SidebarTab = 'friends' | 'groupsCommunities' | 'friendRequests' | 'groupReq
 const Contacts: React.FC = () => {
   const [activeTab, setActiveTab] = useState<SidebarTab>('friends');
   const [openPage, setOpenPage]= useState<string>("Aside")
-  
+  const currentUser= useAppSelector(selectUserInfo).info;
+  const navigate= useNavigate();
+  if(currentUser.id<=0){
+    navigate("/login");
+  }
   return (
     <div className="flex h-full w-full bg-gray-100">
       <AsideBar/>

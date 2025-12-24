@@ -9,6 +9,7 @@ export const Login = createAsyncThunk(
         try {
             const res = await api.post("/api/user/login", LoginInfo);
             return res.data.userInfo;
+            
         } catch (e: any) {
             console.log(e);
             return rejectWithValue(e.response?.data?.message || e.message || 'An error occurred');
@@ -166,7 +167,7 @@ export const findUsers=async(
 )=>{
     try{
         setLoading(true);
-        const res= await api.post("/api/user/getusers", data);
+        const res= await api.post("/api/user/findusers", data);
         setLoading(false);
         setError("");
         return res.data.users;

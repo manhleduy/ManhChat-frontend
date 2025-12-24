@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { otpSchema, type OTPSchema } from '@/lib/inputSchema';
 
 const InputOTP: React.FC = () => {
+  
   const methods = useForm<OTPSchema>({
     resolver: zodResolver(otpSchema),
     defaultValues: { otp: '' }

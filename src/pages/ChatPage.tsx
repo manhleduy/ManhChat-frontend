@@ -8,6 +8,7 @@ import { useAppDispatch, useAppSelector } from "@/redux/reduxHook"
 import { Login } from "@/lib/services/userService"
 import { selectUserInfo } from "@/redux/userSlice"
 import type { GroupDefaultInfo } from "@/lib/const"
+import { useNavigate } from "react-router-dom"
 
 const initialFriendChat: UserDefaultInfo={
   id: 0,
@@ -28,19 +29,17 @@ const initialGroupchat :GroupDefaultInfo={
   isRestricted:false
 
 }
-const defaultuser={
-  email:"mle529189@gmail.com",
-  password: "lem@19072006"
-}
-const ChatPage = () => {
 
+const ChatPage = () => {
+  
   const [openPage, setOpenPage]=useState<string>("FriendList");
   const [currentChat, setCurrentChat]= useState<UserDefaultInfo | GroupDefaultInfo>();
   const currentUser= useAppSelector(selectUserInfo).info;
-  const dispatch= useAppDispatch()
-  useEffect(()=>{
-    dispatch(Login(defaultuser));
-  },[])
+  const navigate= useNavigate();
+  if(currentUser.id<=0){
+    navigate("/login");
+  }
+  
   
   if(currentUser.id===-1) return <div>Loading...</div>
   return (

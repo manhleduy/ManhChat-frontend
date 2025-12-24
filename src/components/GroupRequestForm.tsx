@@ -3,8 +3,16 @@ import { useForm, FormProvider, useFormContext } from 'react-hook-form';
 import {zodResolver} from "@hookform/resolvers/zod"
 import { inputFormConfig } from '@/lib/const';
 import { XIcon } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import {type GroupRequestSchema, groupRequestSchema } from '@/lib/inputSchema';
+import type { GroupDefaultInfo } from '@/lib/const';
+import { SearchIcon } from 'lucide-react';
+import FoundList from './FoundList';
+import { findGroup } from '@/lib/services/groupService';
+import { sendGroupRequest } from '@/lib/services/invitationService';
+import { useAppSelector } from '@/redux/reduxHook';
+import { selectUserInfo } from '@/redux/userSlice';
 type FieldDef = {
     name: keyof GroupRequestSchema
     id: string;
@@ -12,6 +20,7 @@ type FieldDef = {
     type?: string;
     placeholder?: string;
 };
+
   const InputField: React.FC<{ field: FieldDef }> = ({ field }) => {
     const { register, formState: { errors }} = useFormContext<GroupRequestSchema>();
     const error = errors[field.name as keyof typeof errors] as any | undefined;
@@ -41,6 +50,11 @@ type FieldDef = {
 
 
 const GroupRequestForm = ({setOpenInviteForm}:any) => {
+    const currentUser= useAppSelector(selectUserInfo).info;
+    const [selectedGroup,setSelectedGroup] =useState<GroupDefaultInfo>()
+    const [foundGroups, setFoundGroups]= useState<GroupDefaultInfo[]>([]);
+    const [error, setError]= useState<string>("");
+    const [loading, setLoading]= useState<boolean>(false);
     //const [inviteInfor, setInviteInfor]= useState<InviteSchema>();
     const methods = useForm<GroupRequestSchema>({
         mode: 'onSubmit',
@@ -52,16 +66,37 @@ const GroupRequestForm = ({setOpenInviteForm}:any) => {
           content:"Hello i want to make friend with you ",
         },
     });
-    const { handleSubmit, reset } = methods;
-      const onSubmit = (data: GroupRequestSchema) => {
-        console.log(data);
-        reset();
-        setTimeout(() => {
-          
-          toast.success("successfully send your invitation")
-        }, 3000);
-      };
     
+    
+    const { handleSubmit, reset, setValue,getValues } = methods;
+    useEffect(()=>{
+        setValue("groupName", selectedGroup?.groupName||"");
+        setValue("groupId", selectedGroup?.id||0);
+        setValue("adminName", selectedGroup?.adminName||"");
+        setFoundGroups([]);
+    },[selectedGroup, setSelectedGroup])
+    console.log(getValues())
+    const onFind=async()=>{
+        try{
+        const {groupName, groupId, adminName}= getValues();
+        const result= await findGroup({groupName:groupName, groupId: groupId, adminName:adminName},setError, setLoading)
+        setFoundGroups(result);
+      }catch(e:any){
+        console.log(e);
+        toast.error(e.message);
+      }
+    }
+      const onSubmit =async (data: GroupRequestSchema) => {
+        try{
+        const {groupId, adminName, content}= getValues()
+        await sendGroupRequest({groupId: groupId, adminName: adminName, content:content, userId: currentUser.id}, setError, setLoading);
+       reset();
+      }catch(e:any){
+        console.log(e);
+        toast.error(e.message); 
+      }
+      };
+      console.log(foundGroups);
     
 
     const fields: FieldDef[] = [
@@ -104,8 +139,15 @@ const GroupRequestForm = ({setOpenInviteForm}:any) => {
               </button>
             </form>
           </FormProvider>
+            <button 
+          onClick={()=>{onFind()}}
+          className='bg-green-500 w-full py-3.5 my-3 text-white rounded-lg text-base font-semibold flex justify-center items-center hover:bg-green-600'>
+            <SearchIcon height={20} width={20}/>
+            find group
+          </button>
         </div>
-
+        <FoundList onSelect={setSelectedGroup} List= {foundGroups}/>
+        
         
       </main>
     </div>

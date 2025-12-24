@@ -8,9 +8,6 @@ import SignUpPage from "./pages/SignUpPage"
 
 
 function App() {
-  
-
-  
   return (
     <main className="flex gap-1 h-screen w-screen" > 
       <Toaster position="top-center" />

@@ -55,7 +55,8 @@ export interface GroupDefaultInfo{
     adminId: number, 
     groupName: string,
     createdAt:string,
-    isRestricted: boolean
+    isRestricted: boolean,
+    adminName?: string
 }
 //group chat interfaces
 export interface DefaultGroupChatInfo{

@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react';
 import ManhChatImage from '../assets/ManhChat.png';
 import { Input } from '@/components/ui/input';
 import { Camera, User, Home, Calendar, Phone, Edit2, X, Check } from 'lucide-react';
+import { useAppSelector } from '@/redux/reduxHook';
+import { selectUserInfo } from '@/redux/userSlice';
+import { useNavigate } from 'react-router-dom';
 
 const defaultConfig = {
   user_name: 'John Doe',
@@ -18,6 +21,11 @@ type ProfileData = {
 };
 
 const ProfilePage: React.FC = () => {
+    const navigate= useNavigate();
+    const currentUser= useAppSelector(selectUserInfo).info
+    if(currentUser.id<=0){
+      navigate("/login");
+    }
   const [profileData, setProfileData] = useState<ProfileData>({
     name: defaultConfig.user_name,
     address: defaultConfig.user_address,

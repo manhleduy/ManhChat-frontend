@@ -6,7 +6,7 @@ import { inputFormConfig } from '@/lib/const';
 import { XIcon, SearchIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { sendInvitation } from '@/lib/services/invitationService';
-import UserList from './UserList';
+import FoundList from './FoundList';
 import { findUsers } from '@/lib/services/userService';
 import type { UserDefaultInfo } from '@/lib/const';
 import { useFieldArray } from 'react-hook-form';
@@ -145,7 +145,7 @@ const InvitationForm = ({setOpenInviteForm}:any) => {
             find your friend
           </button>
         </div>
-        <UserList onUserSelect={setSelectedUser} userList= {foundUsers}/>
+        <FoundList onSelect={setSelectedUser} List= {foundUsers}/>
 
         
       </main>

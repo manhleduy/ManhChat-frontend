@@ -72,7 +72,7 @@ const SignUpPage: React.FC = () => {
   console.log(signUpData);
 
   const onSubmit = (data: FormData) => {
-    setSignUpData({...data, profilePic: "", id:""});
+    setSignUpData({...data, profilePic: "", id:0});
     setShowSuccess(true);
     reset();
     setTimeout(() => {

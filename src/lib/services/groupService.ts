@@ -74,3 +74,18 @@ export const updateGroup = async (
         setError(e.response?.data?.message || e.message || 'An error occurred');
     }
 };
+export const findGroup= async(
+    data:{groupName:string, groupId: number, adminName:string},
+    setError:(error:string)=>void,
+    setLoading:(loading:boolean)=>void
+)=>{
+    try{
+        setLoading(true);
+        const res= await api.post("/api/group/findgroups", data);
+        setLoading(false);
+        return res.data.groups;
+    }catch(e:any){
+        setLoading(false);
+        setError(e.response?.data?.message || e.message || 'An error occurred')
+    }
+}

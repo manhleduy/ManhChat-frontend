@@ -17,9 +17,11 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { Label } from './ui/label';
+import { useAppDispatch } from '@/redux/reduxHook';
+import { logout } from '@/redux/userSlice';
 
 const AsideBar = () => {
-
+  const dispatch= useAppDispatch();
   return (
     <div className='flex flex-col justify-between h-full w-[60px]  p-4 bg-green-400'>
       <div className='flex flex-col gap-5'>
@@ -93,7 +95,11 @@ const AsideBar = () => {
                 </SelectContent>
               </Select>
             </div>
-            <button className='flex items-center gap-x-2 font-semibold'>
+            <button
+            onClick={()=>{
+              dispatch(logout())
+            }}
+            className='flex items-center gap-x-2 font-semibold'>
               <LogOut width={20} height={20} color='red'/>
               Logout
             </button>

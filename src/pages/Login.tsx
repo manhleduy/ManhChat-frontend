@@ -4,7 +4,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import ManhChatImage from '../assets/ManhChat.png';
 import { signInSchema,type SignInSchema } from '@/lib/inputSchema';
 import { inputFormConfig } from '@/lib/const';
-
+import { useAppDispatch } from '@/redux/reduxHook';
+import { Login as LoginAction } from '@/lib/services/userService';
 const defaultConfig = {
   page_title: 'Welcome Back',
   name_label: inputFormConfig.name_label,
@@ -17,7 +18,7 @@ const defaultConfig = {
 const Login: React.FC = () => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [config, setConfig] = useState<typeof defaultConfig>(defaultConfig);
-
+  const dispatch =useAppDispatch();
   useEffect(() => {
     const sdk = (window as any).elementSdk;
     if (!sdk) return;
@@ -56,16 +57,14 @@ const Login: React.FC = () => {
   const methods = useForm<SignInSchema>({
     resolver: zodResolver(signInSchema),
     mode: 'onSubmit',
-    defaultValues: { name: '', email: '' },
+    defaultValues: { password: '', email: '' },
   });
 
   const { handleSubmit } = methods;
 
   const onSubmit = (data: SignInSchema) => {
-    // Stub: perform login
-    console.log('login data', data);
-    setShowSuccess(true);
-    setTimeout(() => setShowSuccess(false), 2500);
+    console.log(data)
+    //dispatch(LoginAction(data))
   };
 
   // small InputField that uses FormProvider context
@@ -91,7 +90,7 @@ const Login: React.FC = () => {
   };
 
   const fields: FieldDef[] = [
-    { name: 'name', id: 'name', label: config.name_label, placeholder: 'Enter your name' },
+    { name: 'password', id: 'password', label: config.name_label, placeholder: 'Enter your name' },
     { name: 'email', id: 'email', label: config.email_label, type: 'email', placeholder: 'Enter your email' },
   ];
 
