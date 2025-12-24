@@ -29,7 +29,6 @@ const initialGroupchat :GroupDefaultInfo={
   isRestricted:false
 
 }
-
 const ChatPage = () => {
   
   const [openPage, setOpenPage]=useState<string>("FriendList");

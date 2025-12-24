@@ -4,8 +4,12 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import ManhChatImage from '../assets/ManhChat.png';
 import { signInSchema,type SignInSchema } from '@/lib/inputSchema';
 import { inputFormConfig } from '@/lib/const';
-import { useAppDispatch } from '@/redux/reduxHook';
+import { useAppDispatch, useAppSelector } from '@/redux/reduxHook';
 import { Login as LoginAction } from '@/lib/services/userService';
+import { Eye, EyeOff } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
+import { selectUserInfo } from '@/redux/userSlice';
 const defaultConfig = {
   page_title: 'Welcome Back',
   name_label: inputFormConfig.name_label,
@@ -18,7 +22,10 @@ const defaultConfig = {
 const Login: React.FC = () => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [config, setConfig] = useState<typeof defaultConfig>(defaultConfig);
+  const [showPassword, setShowPassword] = useState(false);
+  const currentUser= useAppSelector(selectUserInfo);
   const dispatch =useAppDispatch();
+  const navigate= useNavigate();
   useEffect(() => {
     const sdk = (window as any).elementSdk;
     if (!sdk) return;
@@ -52,7 +59,7 @@ const Login: React.FC = () => {
       console.warn('elementSdk init failed', err);
     }
   }, []);
-
+  
   // form setup using zod resolver
   const methods = useForm<SignInSchema>({
     resolver: zodResolver(signInSchema),
@@ -62,47 +69,66 @@ const Login: React.FC = () => {
 
   const { handleSubmit } = methods;
 
-  const onSubmit = (data: SignInSchema) => {
-    console.log(data)
-    //dispatch(LoginAction(data))
+  const onSubmit = async(data: SignInSchema) => {
+    try{
+      console.log(data)
+      await dispatch(LoginAction(data))
+    }catch(e:any){
+      console.log(e);
+      toast.error(e.message);
+    }finally{
+      setTimeout(()=>{
+        if(currentUser.status==="failed"){
+          toast.error(currentUser.error)
+        }else{
+          toast.success("Login successfully");
+          navigate('/');
+        }
+      }, 5000);
+      
+        
+    }
+
   };
 
   // small InputField that uses FormProvider context
   type FieldDef = { name: keyof SignInSchema; id: string; label: string; type?: string; placeholder?: string };
-  const InputField: React.FC<{ field: FieldDef }> = ({ field }) => {
+  const InputField: React.FC<{ field: FieldDef; showPassword?: boolean; setShowPassword?: (value: boolean) => void }> = ({ field, showPassword, setShowPassword }) => {
     const { register, formState: { errors } } = useFormContext<SignInSchema>();
     const error = errors[field.name as keyof typeof errors] as any | undefined;
     return (
       <div className="mb-6">
         <label htmlFor={field.id} className="block text-sm font-semibold text-green-800 mb-2">{field.label}</label>
-        <input
-          id={field.id}
-          type={field.type || 'text'}
-          placeholder={field.placeholder}
-          {...register(field.name as any)}
-          className={`w-full px-4 py-3 border-2 rounded-lg text-base font-normal bg-white text-gray-900 placeholder-gray-400 outline-none transition-all ${
-            error ? 'border-red-500' : 'border-green-300 focus:border-green-500 focus:ring-2 focus:ring-green-100'
-          }`}
-        />
+        <div className="relative">
+          <input
+            id={field.id}
+            type={field.name === 'password' ? (showPassword ? 'text' : 'password') : (field.type || 'text')}
+            placeholder={field.placeholder}
+            {...register(field.name as any)}
+            className={`w-full px-4 py-3 pr-10 border-2 rounded-lg text-base font-normal bg-white text-gray-900 placeholder-gray-400 outline-none transition-all ${
+              error ? 'border-red-500' : 'border-green-300 focus:border-green-500 focus:ring-2 focus:ring-green-100'
+            }`}
+          />
+          {field.name === 'password' && setShowPassword && (
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+            >
+              {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+            </button>
+          )}
+        </div>
         {error && <div className="text-red-600 text-sm mt-1.5 font-medium">{String(error.message)}</div>}
       </div>
     );
   };
 
   const fields: FieldDef[] = [
-    { name: 'password', id: 'password', label: config.name_label, placeholder: 'Enter your name' },
+    { name: 'password', id: 'password', label: "Your password",type: 'password', placeholder: 'Enter your name' },
     { name: 'email', id: 'email', label: config.email_label, type: 'email', placeholder: 'Enter your email' },
   ];
 
-  const handleSignup = () => {
-    // user navigation to signup
-    window.location.href = '/signup';
-  };
-
-  const handleForgotPassword = () => {
-    // user flow
-    window.location.href = '/forgot-password';
-  };
 
   return (
     <div className="min-h-screen w-full bg-white flex items-center justify-center px-5">
@@ -127,7 +153,7 @@ const Login: React.FC = () => {
           <FormProvider {...methods}>
             <form onSubmit={handleSubmit(onSubmit)} noValidate>
               {fields.map(f => (
-                <InputField key={String(f.name)} field={f} />
+                <InputField key={String(f.name)} field={f} showPassword={f.name === 'password' ? showPassword : undefined} setShowPassword={f.name === 'password' ? setShowPassword : undefined} />
               ))}
 
               <button
@@ -144,12 +170,18 @@ const Login: React.FC = () => {
         <div className="text-center">
           <div className="mb-3 text-sm text-gray-500">
             <span>Don't have an account? </span>
-            <button type="button" className="bg-none border-none text-green-500 font-semibold cursor-pointer underline text-sm font-inherit hover:text-green-600" onClick={handleSignup}>
+            <button 
+            type="button" 
+            className="bg-none border-none text-green-500 font-semibold cursor-pointer underline text-sm font-inherit hover:text-green-600" 
+            onClick={()=>{navigate("/signup")}}>
               {config.signup_text}
             </button>
           </div>
           <div className="text-sm text-gray-500">
-            <button type="button" className="bg-none border-none text-green-500 font-semibold cursor-pointer underline text-sm font-inherit hover:text-green-600" onClick={handleForgotPassword}>
+            <button 
+            type="button" 
+            className="bg-none border-none text-green-500 font-semibold cursor-pointer underline text-sm font-inherit hover:text-green-600" 
+            onClick={()=>{navigate("/forgotpassword")}}>
               {config.forgot_password_text}
             </button>
           </div>
