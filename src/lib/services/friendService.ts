@@ -1,4 +1,3 @@
-import { data } from "react-router-dom";
 import { api } from "../axios";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 export const getFriendList=createAsyncThunk(

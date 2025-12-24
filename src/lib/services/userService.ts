@@ -56,7 +56,7 @@ export const logout = async (setError: any,setLoading: any) => {
 };
 
 export const getUserInfo = async (
-    id: string,
+    id: number,
     setError: any,
     setLoading: any
 ) => {

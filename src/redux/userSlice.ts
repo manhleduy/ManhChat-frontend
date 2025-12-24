@@ -10,7 +10,7 @@ const initialState: {status:string, info:UserDefaultInfo, error: any}={
     email: "",
     profilePic: "",
     phonenumber: "",
-    birthday:""
+    birthday:new Date()
   },
   error:""
 
@@ -46,7 +46,7 @@ export const usersSlice=createSlice({
             email: "",
             profilePic: "",
             phonenumber: "",
-            birthday:""
+            birthday:new Date()
           }
           state.status="failed"
         }

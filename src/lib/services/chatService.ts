@@ -81,7 +81,7 @@ export const recallChat = async (
 ) => {
   try {
     setLoading(true);
-    const res = await api.delete(`/api/chat/recall/${data.userId}`, { data });
+    await api.delete(`/api/chat/recall/${data.userId}`, { data });
     setError(null)
     setLoading(false)
     

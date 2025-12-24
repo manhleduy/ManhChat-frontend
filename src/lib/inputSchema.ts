@@ -83,6 +83,24 @@ export const groupRequestSchema=z.object({
 })
 export type GroupRequestSchema= z.infer<typeof groupRequestSchema>;
 
+export const profileChangeSchema=z.object({
+    name: z
+        .string()
+        .refine(val=>validateName(val)),
+    address:z
+        .string()
+        .refine(val=>validateAddress(val)),
+    birthday: z
+        .date()
+        .refine(val=>validateBirthday(val)),
+    phonenumber:z
+        .string()
+        .refine(val=>validatePhoneNumber(val)),
+    
+})
+
+export type ProfileChangeSchema= z.infer<typeof profileChangeSchema>;
+
 export const otpSchema = z.object({
     otp: z
         .string()
