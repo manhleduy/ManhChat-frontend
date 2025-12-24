@@ -71,7 +71,7 @@ const Login: React.FC = () => {
 
   const onSubmit = async(data: SignInSchema) => {
     try{
-      console.log(data)
+      
       await dispatch(LoginAction(data))
     }catch(e:any){
       console.log(e);

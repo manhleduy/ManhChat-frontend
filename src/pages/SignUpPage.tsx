@@ -1,10 +1,18 @@
 import React, {useState } from 'react';
-import { useForm, FormProvider, useFormContext } from 'react-hook-form';
+import { useForm, FormProvider, useFormContext, Controller } from 'react-hook-form';
 import ManhChatImage from '../assets/ManhChat.png';
 import type { UserSignUpInfo } from '@/lib/const';
 import { signUpSchema } from '@/lib/inputSchema';
 import {zodResolver} from "@hookform/resolvers/zod"
 import { inputFormConfig } from '@/lib/const';
+import { useNavigate } from 'react-router-dom';
+import DatePicker from 'react-datepicker';
+import ReactDatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import toast from 'react-hot-toast';
+import { signUp } from '@/lib/services/userService';
+
+
 type FieldDef = {
     name: keyof FormData;
     id: string;
@@ -15,8 +23,6 @@ type FieldDef = {
   const InputField: React.FC<{ field: FieldDef }> = ({ field }) => {
     const { register, formState: { errors }} = useFormContext<FormData>();
     const error = errors[field.name as keyof typeof errors] as any | undefined;
-
-
     return (
       <div className="mb-6" >
         <label htmlFor={field.id} className="block text-sm font-semibold text-green-800 mb-2">
@@ -46,12 +52,16 @@ interface FormData{
     address:string;
     email:string;
     phonenumber:string;
-    birthday:string;
+    birthday:Date;
     password: string;
     confirmPassword: string;
+
 };
 
 const SignUpPage: React.FC = () => {
+  const navigate= useNavigate();
+  const [error, setError]= useState<string>("");
+  const [loading, setLoading]= useState<boolean>(false);
   const [signUpData, setSignUpData]= useState<UserSignUpInfo>()
   const methods = useForm<FormData>({
     mode: 'onSubmit',
@@ -63,27 +73,34 @@ const SignUpPage: React.FC = () => {
       confirmPassword: '',
       phonenumber: '',
       address: '',
-      birthday: '',
+      birthday: new Date(),
     },
   });
 
-  const { handleSubmit, reset } = methods;
-  const [showSuccess, setShowSuccess] = useState(false);
+  const { handleSubmit, reset, control } = methods;
   console.log(signUpData);
 
-  const onSubmit = (data: FormData) => {
-    setSignUpData({...data, profilePic: "", id:0});
-    setShowSuccess(true);
-    reset();
-    setTimeout(() => {
-      setShowSuccess(false);
-    }, 3000);
+  const onSubmit =async (data: FormData) => {
+    
+    try{
+      await signUp({...data, profilePic: "", id:0}, setError, setLoading)
+    }catch(e:any){
+      console.log(e);
+      toast.error(e.message);
+      reset();
+
+    }finally{
+      setTimeout(()=>{
+        toast.success("Sign up successfully");
+        navigate("/login");
+        reset();
+
+      }, 5000);
+    }
+    
+    
   };
 
-  const handleSignIn = () => {
-    // Navigate to sign in page
-    window.location.href = '/signin';
-  };
 
   // Reusable input field that pulls methods from FormProvider via useFormContext
 
@@ -95,10 +112,10 @@ const SignUpPage: React.FC = () => {
     { name: 'password', id: 'password', label: inputFormConfig.password_label, type: 'password', placeholder: 'Enter your password' },
     { name: 'confirmPassword', id: 'confirmPassword', label: inputFormConfig.confirm_password_label, type: 'password', placeholder: 'Confirm your password' },
     { name: 'address', id: 'address', label: inputFormConfig.address_label, placeholder: 'Enter your address' },
-    { name: 'phonenumber', id: 'phonenumber', label: inputFormConfig.phone_number_label, placeholder: 'Enter your phone number' },
-    { name: 'birthday', id: 'birthday', label: inputFormConfig.birthday_label, type: 'date' },
+    { name: 'phonenumber', id: 'phonenumber', label: inputFormConfig.phone_number_label, placeholder: 'Enter your phone number' }
+    //{ name: 'birthday', id: 'birthday', label: inputFormConfig.birthday_label, type: 'date' },
   ];
-
+  
   return (
     <div className="min-h-screen w-full bg-white flex items-center justify-center px-5 py-10">
       <main className="w-full max-w-md">
@@ -117,13 +134,6 @@ const SignUpPage: React.FC = () => {
           <p className="text-base text-gray-500">Join us today!</p>
         </div>
 
-        {/* Success Message */}
-        {showSuccess && (
-          <div className="bg-green-50 border-2 border-green-500 rounded-lg p-4 mb-4 text-green-800 font-medium text-center">
-            Account created successfully!
-          </div>
-        )}
-
         {/* Sign Up Form - uses FormProvider to share methods with InputField */}
         <div className="bg-green-50 border-2 border-green-300 rounded-2xl p-8 mb-6">
           <FormProvider {...methods}>
@@ -131,6 +141,27 @@ const SignUpPage: React.FC = () => {
               {fields.map(f => (
                 <InputField key={String(f.name)} field={f} />
               ))}
+              {/* Birthday Field */}
+              <Controller
+                control={control}
+                name="birthday"
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <div className='mb-6'>
+                  <label htmlFor="birthday" className="block text-sm font-semibold text-green-800 mb-2">
+                    {inputFormConfig.birthday_label}
+                  </label>
+                  <ReactDatePicker
+                    id="birthday"
+                    selected={value}
+                    onChange={onChange}
+                    onBlur={onBlur}
+                    className="w-full px-4 py-3 border-2 rounded-lg text-base font-normal bg-white text-gray-900 placeholder-gray-400 outline-none transition-all"
+                    dateFormat="yyyy-MM-dd"
+                    placeholderText="Enter your birthday"
+                  />
+                  </div>
+                )}
+              />
 
               {/* Submit Button */}
               <button
@@ -148,7 +179,7 @@ const SignUpPage: React.FC = () => {
           <button
             type="button"
             className="bg-none border-none text-green-500 font-semibold cursor-pointer underline text-sm font-inherit hover:text-green-600"
-            onClick={handleSignIn}
+            onClick={()=>{navigate("/login")}}
           >
             {inputFormConfig.signin_text}
           </button>

@@ -29,7 +29,7 @@ export interface UserDefaultInfo{
     email:string;
     profilePic:string;
     phonenumber:string;
-    birthday:string;
+    birthday:Date;
 }
 export interface UserSignUpInfo extends UserDefaultInfo{
     password:string;

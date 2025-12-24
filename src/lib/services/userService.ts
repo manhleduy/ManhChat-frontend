@@ -23,8 +23,18 @@ export const signUp = async (
     setLoading: any
 ) => {
     try {
-        setLoading(true);
-        const res = await api.post('/api/user/signup', data);
+        const {birthday, name, email, password, phonenumber, address}= data;
+        const normalizeDate:string= birthday.getFullYear()+"-"+(birthday.getMonth()+1)+"-"+birthday.getDate();
+        setLoading(true); 
+        const res = await api.post('/api/user/signup', {
+            name: name,
+            email: email,
+            profilePic:"",
+            password: password,
+            phonenumber: phonenumber,
+            address: address,
+            birthday: normalizeDate
+        });
         setLoading(false);
         return res.data;
     } catch (e: any) {

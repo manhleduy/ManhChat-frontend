@@ -28,7 +28,7 @@ export const signUpSchema = z.object({
         .string()
         .refine(val=>validateAddress(val)),
     birthday: z
-        .string()
+        .date()
         .refine(val=>validateBirthday(val))  
     }).superRefine((data,ctx)=>{
         if(data.password!==data.confirmPassword){

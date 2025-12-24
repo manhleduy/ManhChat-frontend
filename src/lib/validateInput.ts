@@ -15,8 +15,8 @@ export const validatePhoneNumber = (value: string): boolean => {
     return phoneRegex.test(value.replace(/\D/g, ''));
 };
 
-export const validateBirthday = (value: string): boolean => {
-    return value.length > 0;
+export const validateBirthday = (value: Date): boolean => {
+    return value ?true :false
 };
 export const validateEmail=(email:string):boolean =>{
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
