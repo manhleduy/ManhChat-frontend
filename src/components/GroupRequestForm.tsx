@@ -25,7 +25,6 @@ type FieldDef = {
     const { register, formState: { errors }} = useFormContext<GroupRequestSchema>();
     const error = errors[field.name as keyof typeof errors] as any | undefined;
     
-
     return (
       <div className="mb-6">
         <label htmlFor={field.id} className="block text-sm font-semibold text-green-800 mb-2">

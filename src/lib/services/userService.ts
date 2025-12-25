@@ -88,14 +88,19 @@ export const getAllGroup = async (
 };
 
 export const updateUserInfo = async (
-    id: string,
+    id: number,
     data: Partial<UserDefaultInfo>,
     setError: any,
     setLoading: any
 ) => {
     try {
+        const {birthday, name, phonenumber, address}= data;
+        if(!birthday){
+            return;
+        }
+        const normalizeDate:string= birthday.getFullYear()+"-"+ (birthday.getMonth()+1)+"-"+birthday.getDate();
         setLoading(true);
-        const res = await api.put(`/api/user/updateInfo/${id}`, data);
+        const res = await api.put(`/api/user/updateInfo/${id}`, {birthday:normalizeDate, name, phonenumber, address});
         setLoading(false);
         return res.data;
     } catch (e: any) {
