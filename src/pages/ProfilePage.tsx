@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import ManhChatImage from '../assets/ManhChat.png';
 import { Input } from '@/components/ui/input';
 import { Camera, User, Home, Calendar, Phone, Edit2, X, Check } from 'lucide-react';
-import { useAppSelector } from '@/redux/reduxHook';
+import { useAppDispatch, useAppSelector } from '@/redux/reduxHook';
 import { selectUserInfo } from '@/redux/userSlice';
 import { useNavigate } from 'react-router-dom';
 import { getUserInfo, updateUserInfo } from '@/lib/services/userService';
@@ -14,6 +14,10 @@ import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css"; // Required for styling
 import { type ProfileChangeSchema, profileChangeSchema } from '@/lib/inputSchema';
 import { useFormContext } from 'react-hook-form';
+import AsideBar from '@/components/AsideBar';
+import { selectUserPostList } from '@/redux/PostListSlice';
+import { getAllPost } from '@/lib/services/postService';
+import Post from '@/components/Post';
 type FieldDef = {
   name: keyof ProfileChangeSchema;
   id: string;
@@ -58,10 +62,14 @@ const fields: FieldDef[] = [
 
 const ProfilePage: React.FC = () => {
   const navigate = useNavigate();
+
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [isEditing, setIsEditing] = useState(false);
+  const dispatch= useAppDispatch()
   const currentUser = useAppSelector(selectUserInfo).info;
+  const currentPost= useAppSelector(selectUserPostList);
+  const [post, setPost]= useState(currentPost)
 
   // Initialize React Hook Form
   const methods = useForm<ProfileChangeSchema>({
@@ -104,6 +112,10 @@ const ProfilePage: React.FC = () => {
     if (currentUser.id > 0) fetchData();
   }, [currentUser.id, reset]);
    
+  useEffect(()=>{
+    if(currentUser.id<=0) navigate('/');
+    dispatch(getAllPost(currentUser.id)) 
+  },[post, setPost])
   // Form Submit Handler
   const onSubmit =async (data: ProfileChangeSchema) => {
     if(!isEditing)return;
@@ -128,7 +140,9 @@ const ProfilePage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center px-5 pt-10 pb-5" data-theme="dark">
+    <div className='flex h-full w-full'>
+    <AsideBar/>
+    <div className="min-h-screen w-full flex flex-col items-center justify-center px-5 pt-10 pb-5" data-theme="dark">
       <main className="w-full max-w-xl">
         <div className="text-center mb-6">
           <h1 className="text-3xl font-semibold text-green-700 mb-2">My Profile</h1>
@@ -220,6 +234,13 @@ const ProfilePage: React.FC = () => {
           </form>
         </FormProvider>
       </main>
+      {
+        post.map((item,index)=>(
+          <Post props={item} key={index}/>
+        ))
+      }
+    </div>
+    
     </div>
   );
 };

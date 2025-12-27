@@ -74,15 +74,14 @@ export interface GroupChatInfo extends DefaultGroupChatInfo{
 
 }
 //post interfaces
-export interface PostConnect{
-    postId: string;
-    userId: string;
-}
-export interface PostInfo extends PostConnect{
-    postId:string;
-    content: string;
-    likeNumber: number;
-    createdAt: string;
+export interface PostDefaultInfo{
+    postId:number;
+    userId: number;
+    content:string;
+    likeNum: number;
+    createdAt: Date;
+    name: string;
+    profilePic: string
 }
 //invitation interfaces
 export interface InvitationDefaultInfo{ 

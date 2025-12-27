@@ -17,7 +17,7 @@ const initialFriendChat: UserDefaultInfo={
   email:"",
   phonenumber:"",
   profilePic:"",
-  birthday:""
+  birthday:new Date()
 
 }
 const initialGroupchat :GroupDefaultInfo={

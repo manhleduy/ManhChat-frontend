@@ -6,12 +6,14 @@ import friendListReducer from './FriendListSlice'
 import groupListReducer from './GroupListSlice'
 import FriendRequestReducer from './FriendRequestSlice'
 import GroupRequestReducer from './GroupRequestSlice'
+import PostListReducer from './PostListSlice'
 const rootReducer= combineReducers({
     users: usersReducer,
     friendList: friendListReducer,
     groupList: groupListReducer,
     friendRequest: FriendRequestReducer,
-    groupRequest: GroupRequestReducer
+    groupRequest: GroupRequestReducer,
+    postList: PostListReducer
 })
 const persistConfig={
     key:"root",

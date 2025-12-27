@@ -5,6 +5,7 @@ import ProfilePage from "./pages/ProfilePage"
 import Contacts from "./pages/Contacts"
 import LoginPage from "./pages/Login" 
 import SignUpPage from "./pages/SignUpPage"
+import PostPage from "./pages/PostPage"
 
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
         <Route path="/contacts" element={<Contacts/>} /> 
         <Route path="/login" element={<LoginPage/>} /> {/* Use LoginPage component */}
         <Route path="/signup" element={<SignUpPage/>} />
+        <Route path="/post" element={<PostPage/>}/>
       </Routes>
       </div>
       

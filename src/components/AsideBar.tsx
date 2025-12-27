@@ -1,4 +1,4 @@
-import {User, Settings,BookUser, MessageCircle, LogOut } from 'lucide-react';
+import {User, Settings,BookUser, MessageCircle, LogOut, NewspaperIcon } from 'lucide-react';
 import {
   Tooltip,
   TooltipContent,
@@ -55,6 +55,16 @@ const AsideBar = () => {
             </TooltipContent>
           </Tooltip>
         </a>
+        <a href="/post" className='text-2xl font-bold'>
+           <Tooltip>
+            <TooltipTrigger asChild>
+              <NewspaperIcon width={30} height={30}/>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>News</p>
+            </TooltipContent>
+          </Tooltip>
+        </a>
       </div>
     <Popover>
       <PopoverTrigger asChild>
@@ -95,6 +105,7 @@ const AsideBar = () => {
                 </SelectContent>
               </Select>
             </div>
+            
             <button
             onClick={()=>{
               dispatch(logout())

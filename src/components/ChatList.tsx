@@ -31,8 +31,7 @@ const FriendList= ({onlyMode, setOpenPage, setCurrentChat}:{onlyMode:boolean, se
   },[])
   
 
-  
-  const displayedFriends= friendList.map((item)=>{
+  const displayedFriends= friendList?.map((item)=>{
     return {
        ...item,
        lastMessage:"con me may",
@@ -41,7 +40,7 @@ const FriendList= ({onlyMode, setOpenPage, setCurrentChat}:{onlyMode:boolean, se
        online: false
        }
   })
-  const displayedGroups= groupList.map((item)=>{
+  const displayedGroups= groupList?.map((item)=>{
     return {
       ...item,
       lastMessage:"con me may",
@@ -64,7 +63,7 @@ const FriendList= ({onlyMode, setOpenPage, setCurrentChat}:{onlyMode:boolean, se
   }
 
   
-
+  if(!friendList || !groupList) return <div>loading</div>
   return (
     <div className={`min-w-[300px] h-full  flex flex-col ${onlyMode? "w-full ":"w-2/12"}`} style={{ background: FriendListConfig.background_color }}>
       <header className="px-5 py-4 border-b border-gray-200" role="banner">
