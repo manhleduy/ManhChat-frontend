@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react';
 import { FriendListConfig } from '@/lib/const';
 import { useAppDispatch, useAppSelector } from '@/redux/reduxHook';
 import { getFriendList } from '@/lib/services/friendService';
-import { selectFriendList } from '@/redux/FriendListSlice';
-import { selectUserInfo } from '@/redux/userSlice';
+import { selectFriendList } from '@/redux/slice/FriendListSlice';
+import { selectUserInfo } from '@/redux/slice/userSlice';
 import { getAllGroup } from '@/lib/services/groupService';
-import { selectGroupList } from '@/redux/GroupListSlice';
+import { selectGroupList } from '@/redux/slice/GroupListSlice';
 import { ArrowDown, ArrowUp } from 'lucide-react';
 
 const COLOR=['#ff6b9d', '#4a90e2', '#f39c12', '#9b59b6', '#e74c3c', '#1abc9c', '#34495e', '#e67e22', "#2ecc71", "#8e44ad"];

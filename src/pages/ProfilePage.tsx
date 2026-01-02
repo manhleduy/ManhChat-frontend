@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import ManhChatImage from '../assets/ManhChat.png';
 import { Input } from '@/components/ui/input';
-import { Camera, User, Home, Calendar, Phone, Edit2, X, Check } from 'lucide-react';
+import { Camera, User, Home, Calendar, Phone, Edit2, X, Check, Newspaper } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/redux/reduxHook';
-import { selectUserInfo } from '@/redux/userSlice';
+import { selectUserInfo } from '@/redux/slice/userSlice';
 import { useNavigate } from 'react-router-dom';
 import { getUserInfo, updateUserInfo } from '@/lib/services/userService';
 import toast from 'react-hot-toast';
@@ -15,9 +15,11 @@ import "react-datepicker/dist/react-datepicker.css"; // Required for styling
 import { type ProfileChangeSchema, profileChangeSchema } from '@/lib/inputSchema';
 import { useFormContext } from 'react-hook-form';
 import AsideBar from '@/components/AsideBar';
-import { selectUserPostList } from '@/redux/PostListSlice';
-import { getAllPost } from '@/lib/services/postService';
+import { selectUserPostList } from '@/redux/slice/PostListSlice';
+import { getAllPost, createPost } from '@/lib/services/postService';
 import Post from '@/components/Post';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import UserPostList from '@/components/UserPostList';
 type FieldDef = {
   name: keyof ProfileChangeSchema;
   id: string;
@@ -112,10 +114,7 @@ const ProfilePage: React.FC = () => {
     if (currentUser.id > 0) fetchData();
   }, [currentUser.id, reset]);
    
-  useEffect(()=>{
-    if(currentUser.id<=0) navigate('/');
-    dispatch(getAllPost(currentUser.id)) 
-  },[post, setPost])
+
   // Form Submit Handler
   const onSubmit =async (data: ProfileChangeSchema) => {
     if(!isEditing)return;
@@ -132,16 +131,17 @@ const ProfilePage: React.FC = () => {
       toast.success("Profile updated locally!");
     }
   };
-  
-
   const handleCancel = () => {
     reset(); // Reverts to the last provided 'defaultValues' (fetched data)
     setIsEditing(false);
   };
+  
 
   return (
-    <div className='flex h-full w-full'>
+    <div className=' flex h-full w-full max-h-screen'>
+    <div className='relative left-0'>
     <AsideBar/>
+    </div>
     <div className="min-h-screen w-full flex flex-col items-center justify-center px-5 pt-10 pb-5" data-theme="dark">
       <main className="w-full max-w-xl">
         <div className="text-center mb-6">
@@ -234,11 +234,8 @@ const ProfilePage: React.FC = () => {
           </form>
         </FormProvider>
       </main>
-      {
-        post.map((item,index)=>(
-          <Post props={item} key={index}/>
-        ))
-      }
+      
+      
     </div>
     
     </div>

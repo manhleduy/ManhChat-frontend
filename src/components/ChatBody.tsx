@@ -3,7 +3,7 @@ import ChatBlock from './ChatBlock';
 import { ChevronLeft } from 'lucide-react';
 import { useAppSelector } from '@/redux/reduxHook';
 import { getAllChat } from '@/lib/services/chatService';
-import { selectUserInfo } from '@/redux/userSlice';
+import { selectUserInfo } from '@/redux/slice/userSlice';
 import type { GroupChatBlock, FriendChatBlock,ChatBlockInfo, GroupDefaultInfo, MessageType, } from '@/lib/const';
 
 import { createChat, getAllGroupChat, createGroupChat } from '@/lib/services/chatService';

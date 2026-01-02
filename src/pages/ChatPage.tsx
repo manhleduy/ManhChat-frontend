@@ -5,40 +5,30 @@ import { useEffect, useState } from "react"
 import type { UserDefaultInfo } from "@/lib/const"
 import InitialChatBody from "@/components/InitialChatBody"
 import { useAppDispatch, useAppSelector } from "@/redux/reduxHook"
-import { Login } from "@/lib/services/userService"
-import { selectUserInfo } from "@/redux/userSlice"
+import { selectUserInfo } from "@/redux/slice/userSlice"
 import type { GroupDefaultInfo } from "@/lib/const"
 import { useNavigate } from "react-router-dom"
 
-const initialFriendChat: UserDefaultInfo={
-  id: 0,
-  name: "",
-  address:"",
-  email:"",
-  phonenumber:"",
-  profilePic:"",
-  birthday:new Date()
 
-}
-const initialGroupchat :GroupDefaultInfo={
-  id:0,
-  detail:"",
-  groupName:"",
-  adminId:0,
-  createdAt:"",
-  isRestricted:false
-
-}
 const ChatPage = () => {
   
   const [openPage, setOpenPage]=useState<string>("FriendList");
   const [currentChat, setCurrentChat]= useState<UserDefaultInfo | GroupDefaultInfo>();
   const currentUser= useAppSelector(selectUserInfo).info;
   const navigate= useNavigate();
+  const dispatch= useAppDispatch();
+  
   if(currentUser.id<=0){
     navigate("/login");
   }
-  
+  useEffect(()=>{
+    dispatch({type:"SOCKET_CONNECT", payload: currentUser.id.toString()});
+    return ()=>{
+      dispatch({type:"SOCKET_DISCONNECT"});
+    }
+  },[currentUser.id])
+
+
   
   if(currentUser.id===-1) return <div>Loading...</div>
   return (

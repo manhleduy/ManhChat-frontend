@@ -1,12 +1,18 @@
 import {combineReducers, configureStore} from "@reduxjs/toolkit"
 import storage from "redux-persist/lib/storage"
 import {persistReducer, persistStore} from "redux-persist"
-import usersReducer from './userSlice'
-import friendListReducer from './FriendListSlice'
-import groupListReducer from './GroupListSlice'
-import FriendRequestReducer from './FriendRequestSlice'
-import GroupRequestReducer from './GroupRequestSlice'
-import PostListReducer from './PostListSlice'
+
+import socketMiddleware from "./middleware/socketMiddleware"
+
+import usersReducer from './slice/userSlice'
+import friendListReducer from './slice/FriendListSlice'
+import groupListReducer from './slice/GroupListSlice'
+import FriendRequestReducer from './slice/FriendRequestSlice'
+import GroupRequestReducer from './slice/GroupRequestSlice'
+import PostListReducer from './slice/PostListSlice'
+
+
+
 const rootReducer= combineReducers({
     users: usersReducer,
     friendList: friendListReducer,
@@ -20,14 +26,15 @@ const persistConfig={
     storage
 }
 
-export const store= configureStore({
+export const store: any= configureStore({
     reducer: persistReducer(persistConfig, rootReducer), 
     middleware: (getDefaultMiddleware)=>{
+        
         return getDefaultMiddleware({
             serializableCheck: {
                 ignoredActions: ["persist/PERSIST", "persist/REHYDRATE"]
             }
-        })
+        }).concat(socketMiddleware);
     }
 })
 export type AppStore= typeof store

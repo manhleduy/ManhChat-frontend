@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/popover"
 import { Label } from './ui/label';
 import { useAppDispatch } from '@/redux/reduxHook';
-import { logout } from '@/redux/userSlice';
+import { logout } from '@/redux/slice/userSlice';
 
 const AsideBar = () => {
   const dispatch= useAppDispatch();

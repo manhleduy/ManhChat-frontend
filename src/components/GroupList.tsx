@@ -8,7 +8,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import type { GroupDefaultInfo } from '@/lib/const';
-import { selectGroupList } from '@/redux/GroupListSlice';
+import { selectGroupList } from '@/redux/slice/GroupListSlice';
 import { useSelector } from 'react-redux';
 
 

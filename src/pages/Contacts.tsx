@@ -5,7 +5,7 @@ import GroupList from '@/components/GroupList';
 import GroupInvitation from '@/components/GroupInvitation';
 import Invitations from '@/components/Invitations';
 import AsideBar from '@/components/AsideBar';
-import { selectUserInfo } from '@/redux/userSlice';
+import { selectUserInfo } from '@/redux/slice/userSlice';
 import { useAppSelector } from '@/redux/reduxHook';
 import { useNavigate } from 'react-router-dom';
 

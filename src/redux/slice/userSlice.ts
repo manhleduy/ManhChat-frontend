@@ -9,8 +9,7 @@ const initialState: {status:string, info:UserDefaultInfo, error: any}={
     address:"",
     email: "",
     profilePic: "",
-    phonenumber: "",
-    birthday:new Date()
+    phonenumber: ""
   },
   error:""
 
@@ -35,7 +34,9 @@ export const usersSlice=createSlice({
           state.status='completed'
         },
         pending:(state)=>{
-          state.status= "pending"
+          state.status= "pending",
+          state.info= initialState.info,
+          state.error=""
         },
         rejected:(state, action)=>{
           state.error= action.payload || "unknown error"

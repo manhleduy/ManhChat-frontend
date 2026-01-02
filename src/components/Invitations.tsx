@@ -9,8 +9,8 @@ import {
 import InvitationForm from './InvitationForm';
 import { useAppDispatch } from '@/redux/reduxHook';
 import { useSelector } from 'react-redux';
-import { selectFriendRequest } from '@/redux/FriendRequestSlice';
-import { selectUserInfo } from '@/redux/userSlice';
+import { selectFriendRequest } from '@/redux/slice/FriendRequestSlice';
+import { selectUserInfo } from '@/redux/slice/userSlice';
 import type { FriendRequest, RequestType } from '@/lib/const';
 import { acceptInvitation, deleteInvitation, getAllRequest } from '@/lib/services/invitationService';
 import toast from 'react-hot-toast';

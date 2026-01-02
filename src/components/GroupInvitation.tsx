@@ -4,8 +4,8 @@ import type { GroupRequest, RequestType } from '@/lib/const';
 import { useAppDispatch } from '@/redux/reduxHook';
 import { useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
-import { selectUserInfo } from '@/redux/userSlice';
-import { selectGroupRequest } from '@/redux/GroupRequestSlice';
+import { selectUserInfo } from '@/redux/slice/userSlice';
+import { selectGroupRequest } from '@/redux/slice/GroupRequestSlice';
 import { acceptGroupRequest, deleteGroupRequest, getAllGroupRequest } from '@/lib/services/invitationService';
 import GroupRequestForm from './GroupRequestForm';
 import {

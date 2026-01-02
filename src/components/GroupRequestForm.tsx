@@ -12,7 +12,7 @@ import FoundList from './FoundList';
 import { findGroup } from '@/lib/services/groupService';
 import { sendGroupRequest } from '@/lib/services/invitationService';
 import { useAppSelector } from '@/redux/reduxHook';
-import { selectUserInfo } from '@/redux/userSlice';
+import { selectUserInfo } from '@/redux/slice/userSlice';
 type FieldDef = {
     name: keyof GroupRequestSchema
     id: string;

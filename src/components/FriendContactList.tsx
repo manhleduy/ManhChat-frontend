@@ -1,8 +1,8 @@
 import React, { use } from 'react';
 import { Search } from 'lucide-react';
-import { selectUserInfo } from '@/redux/userSlice';
+import { selectUserInfo } from '@/redux/slice/userSlice';
 import { useAppSelector } from '@/redux/reduxHook';
-import { selectFriendList } from '@/redux/FriendListSlice';
+import { selectFriendList } from '@/redux/slice/FriendListSlice';
 import {
   Select,
   SelectContent,

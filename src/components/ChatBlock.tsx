@@ -1,6 +1,6 @@
 import type { MessageType} from '@/lib/const';
 import { useAppSelector } from '@/redux/reduxHook';
-import { selectUserInfo } from '@/redux/userSlice';
+import { selectUserInfo } from '@/redux/slice/userSlice';
 import { Share, TrashIcon } from 'lucide-react';
 import { Heart } from 'lucide-react';
 import toast from 'react-hot-toast';

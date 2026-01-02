@@ -1,9 +1,9 @@
-import { selectUserPostList, selectFriendPostList } from "@/redux/PostListSlice";
+import { selectUserPostList, selectFriendPostList } from "@/redux/slice/PostListSlice";
 import { getAllFriendPost, getAllPost } from "@/lib/services/postService";
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/redux/reduxHook";
 import { useNavigate } from "react-router-dom";
-import { selectUserInfo } from "@/redux/userSlice";
+import { selectUserInfo } from "@/redux/slice/userSlice";
 import Post from "@/components/Post";
 import AsideBar from "@/components/AsideBar";
 const PostPage = () => {
@@ -20,7 +20,7 @@ const PostPage = () => {
     },[friendPosts, useFriendPosts]);
     console.log(currentPost);
   return (
-        <div className="flex  h-full w-full">
+        <div className="flex h-full w-full">
         
             <style>{`
                 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
@@ -30,7 +30,7 @@ const PostPage = () => {
                 }
             `}</style>
             <AsideBar/>
-            <section className="flex flex-col items-start px-6 md:px-16 lg:px-24 text-sm max-w-6xl mx-auto">
+            <section className="flex flex-col w-full items-start px-6 md:px-16 lg:px-24 text-sm max-w-6xl mx-auto">
                 
                 <h1
                     className="text-3xl font-medium bg-gradient-to-r from-slate-800 to-slate-500 text-transparent bg-clip-text mt-4">

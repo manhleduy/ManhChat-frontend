@@ -11,7 +11,7 @@ import { findUsers } from '@/lib/services/userService';
 import type { UserDefaultInfo } from '@/lib/const';
 import { useFieldArray } from 'react-hook-form';
 import { useAppSelector } from '@/redux/reduxHook';
-import { selectUserInfo } from '@/redux/userSlice';
+import { selectUserInfo } from '@/redux/slice/userSlice';
 // Define the User interface
 
 type FieldDef = {

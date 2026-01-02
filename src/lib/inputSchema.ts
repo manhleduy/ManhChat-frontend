@@ -101,9 +101,17 @@ export const profileChangeSchema=z.object({
 
 export type ProfileChangeSchema= z.infer<typeof profileChangeSchema>;
 
+export const postSchema= z.object({
+    content:z
+        .string()
+        .refine(val=>validateContent(val))
+})
+
+export type PostSchema= z.infer<typeof postSchema>;
 export const otpSchema = z.object({
     otp: z
         .string()
         .regex(/^\d{6}$/, "OTP must be exactly 6 digits")
 });
 export type OTPSchema = z.infer<typeof otpSchema>;
+

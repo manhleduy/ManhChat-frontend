@@ -9,7 +9,7 @@ import { Login as LoginAction } from '@/lib/services/userService';
 import { Eye, EyeOff } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { selectUserInfo } from '@/redux/userSlice';
+import { selectUserInfo } from '@/redux/slice/userSlice';
 const defaultConfig = {
   page_title: 'Welcome Back',
   name_label: inputFormConfig.name_label,
@@ -60,6 +60,7 @@ const Login: React.FC = () => {
     }
   }, []);
   
+  
   // form setup using zod resolver
   const methods = useForm<SignInSchema>({
     resolver: zodResolver(signInSchema),
@@ -70,23 +71,23 @@ const Login: React.FC = () => {
   const { handleSubmit } = methods;
 
   const onSubmit = async(data: SignInSchema) => {
-    try{
-      
+    try{    
       await dispatch(LoginAction(data))
     }catch(e:any){
       console.log(e);
-      toast.error(e.message);
+      toast.error("error occured");
     }finally{
       setTimeout(()=>{
         if(currentUser.status==="failed"){
           toast.error(currentUser.error)
         }else{
+        
           toast.success("Login successfully");
           navigate('/');
+
+
         }
-      }, 5000);
-      
-        
+      }, 2000);
     }
 
   };
