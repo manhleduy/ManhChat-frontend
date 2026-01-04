@@ -1,8 +1,8 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type { FriendChatBlock, GroupChatInfo } from "@/lib/const";
+import type { FriendChatBlock, GroupChatBlock } from "@/lib/const";
 const initialState:{
     friendChats:FriendChatBlock[];
-    groupChats:GroupChatInfo[]
+    groupChats:GroupChatBlock[]
 }={
     friendChats:[],
     groupChats:[]
@@ -15,14 +15,17 @@ export const chatReceivedSlice=createSlice({
         state.friendChats=[...state.friendChats,action.payload]   
         return state;
       },
-      pushGroupChat:(state, action: PayloadAction<GroupChatInfo>)=>{
+      pushGroupChat:(state, action: PayloadAction<GroupChatBlock>)=>{
         state.groupChats=[...state.groupChats,action.payload]
+        return state;
       },
-      popFriendChat:(state, action: PayloadAction<FriendChatBlock>)=>{      
-        state.friendChats= state.friendChats.filter((chat:any)=>chat.senderId!==action.payload.senderId)        
+      popFriendChat:(state, action: PayloadAction<number>)=>{      
+        state.friendChats= state.friendChats.filter((chat:any)=>chat.senderId!==action.payload) 
+        return state;       
       },
-      popGroupChat:(state, action: PayloadAction<GroupChatInfo>)=>{  
-        state.groupChats=state.groupChats.filter((chat:any)=>chat.chatGroupId!==action.payload.chatGroupId)
+      popGroupChat:(state, action: PayloadAction<number>)=>{  
+        state.groupChats=state.groupChats.filter((chat:any)=>chat.groupId!==action.payload)
+        return state;
       },
       restartList:(state)=>{
         state.friendChats=[];

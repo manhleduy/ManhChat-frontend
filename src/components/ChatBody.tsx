@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import ChatBlock from './ChatBlock';
 import { ChevronLeft } from 'lucide-react';
-import { useAppSelector } from '@/redux/reduxHook';
-import { getAllChat } from '@/lib/services/chatService';
+import { useAppDispatch, useAppSelector } from '@/redux/reduxHook';
+import { getAllChat, markAsRead } from '@/lib/services/chatService';
 import { selectUserInfo } from '@/redux/slice/userSlice';
 import type { GroupChatBlock, FriendChatBlock,ChatBlockInfo, GroupDefaultInfo, MessageType, } from '@/lib/const';
 import { createChat, getAllGroupChat, createGroupChat } from '@/lib/services/chatService';
 import toast from 'react-hot-toast';
+import { popFriendChat, popGroupChat, selectChatReceivedList } from '@/redux/slice/ChatReceivedSlice';
+import { useGetMessage } from '@/hook/reacthook';
+import socket from '@/lib/socket';
 interface Response{
   message:string,
   status: number
@@ -16,16 +19,20 @@ const ChatBody = (
   
   { onlyMode, setOpenPage, currentChat }: 
   { onlyMode: boolean; setOpenPage: any; currentChat: any }) => {
-  
+  const dispatch= useAppDispatch()
   const currentUser = useAppSelector(selectUserInfo).info;
+  const [error, setError]=useState<string>("")
+  
   const [messages, setMessages] = useState<MessageType[]>([]);
   const [loading, setLoading] = useState(false);
   const [response, setResponse]= useState<Response>({message:"", status:0});
   const [inputValue, setInputValue] = useState<string>('');
   const [file, setFile]= useState<string>('');
+  const receivedMessage= useAppSelector(selectChatReceivedList);
   
   const checkFriendChat:boolean= currentChat.name? true : false;
   const checkGroupChat: boolean= currentChat.groupName ? true : false;
+
   //handle the submit with different type of Chatblock
   const handleSubmit =async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,14 +46,17 @@ const ChatBody = (
           
         };
         await createChat(newMessage,setResponse, setLoading);
+        setMessages(messages=>[...messages, newMessage])
         setInputValue('');
       }else if(checkGroupChat){
+        
         const newMessage :GroupChatBlock  = {
           content: inputValue,
           senderId: currentUser.id,
           groupId: currentChat.id
         };
         await createGroupChat(newMessage, setResponse, setLoading);
+        setMessages(messages=>[...messages, newMessage])
         setInputValue('');
       }else{
         toast.error("something error in the input")
@@ -60,6 +70,7 @@ const ChatBody = (
     const fetchChats = async () => {
       if (currentChat.id >0 && checkFriendChat) {
         const chatBlocks = await getAllChat(currentUser.id, currentChat.id, setResponse, setLoading);
+
         setMessages(chatBlocks);
       }else if(currentChat.id>0 && checkGroupChat){
         const chatBlocks= await getAllGroupChat(currentChat.id, currentUser.id, setResponse, setLoading);
@@ -75,13 +86,43 @@ const ChatBody = (
     };
     fetchChats();
   }, [currentChat.id, currentUser.id, currentChat.groupId])
-
-  //receive some new message and update chat body
+  //handle socket send message
+  const {message, groupMessage}=useGetMessage(socket, currentUser)
   useEffect(()=>{
-    const handleNewMessage= (newMessage: string)=>{
+    if(message && message.senderId===currentChat.id){
+      setMessages(messages=>[...messages, message]);
       
+      dispatch(popFriendChat(currentChat.id));
+      
+    }else if(groupMessage && groupMessage.groupId===currentChat.id){
+      setMessages(messages=>[...messages, groupMessage])
+      dispatch(popGroupChat(currentChat.id));
+
+    }else{
+      console.log("unkown error")
     }
-  },[messages])
+    return (()=>{
+      dispatch(popFriendChat(currentChat.id));
+      dispatch(popGroupChat(currentChat.id));
+    })
+  }, [message, groupMessage])
+  console.log(receivedMessage)
+
+  // change the isread state of the chat block
+  useEffect(()=>{
+    const markRead=async()=>{
+      try{
+      
+       await markAsRead({receiverId:currentUser.id, senderId:currentChat.id},setError,setLoading)
+      }
+      catch(e){
+        toast.error("error");
+      }
+    }
+    markRead()
+
+  },[])
+
   return (
     <div className={`w-full h-full flex flex-col  overflow-hidden`} >
       {/* Header */}
@@ -125,8 +166,8 @@ const ChatBody = (
             </div>
           </div>
         ) : (
-          messages.map(msg => (
-          <ChatBlock chatBlockInfo={msg}  />
+          messages.map((msg, index) => (
+          <ChatBlock chatBlockInfo={msg} key={index} />
           ))
         )}
       </main>

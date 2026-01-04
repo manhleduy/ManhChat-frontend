@@ -111,29 +111,43 @@ export const likeChat = async (
   }
 };
 
-
-
-export const markAsRead = async (
-  data: { userId: number; chatblockId: string },
-  setResponse: (error: any) => void,
-  setLoading: (loading: boolean) => void
-) => {
-  try {
+export const markAsRead=async(
+  data:{receiverId: number, senderId: number},
+  setError:(error:any)=>void,
+  setLoading: (loading: boolean)=>void
+)=>{
+  try{
     setLoading(true);
-    const res = await api.put(`/api/chat/read/${data.chatblockId}`, data);
+    setError(null);
+    if(!data) return;
+    await api.put(`/api/chat/read`, data);
     setLoading(false);
-    setResponse({
-      message: res.data,
-      status: res.status,
-    })
-  } catch (e: any) {
+  }catch(e:any){
     setLoading(false);
-    setResponse({
-      status:e.response?.status || 500,
-      message:e.response?.data?.message || e.message || 'An error occurred'
-    });
+    setError(e.message);
+    console.log(e);
+
   }
-};
+}
+
+export const markAsGroupRead= async(
+  data:{groupId: number},
+  setError:(error:any)=>void,
+  setLoading: (loading: boolean)=>void
+)=>{
+  try{
+    setLoading(true);
+    if(data) return;
+    await api.put(`/api/chat/group/read`, data);
+    setLoading(false);
+  }catch(e:any){
+    setLoading(false);
+    setError(e.message);
+    console.log(e);
+
+  }
+}
+
 export const recallGroupChat= async()=>{
 
 }

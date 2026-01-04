@@ -59,8 +59,7 @@ function App() {
   };
 
   }, [currentUser.id]); 
-  const currentOnlineUsers= useAppSelector((state)=>state.onlineUserList);
-  console.log("current online users in app.tsx:", currentOnlineUsers);
+  
 
   return (
     <main className="flex gap-1 h-screen w-screen" > 

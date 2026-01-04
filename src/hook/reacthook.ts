@@ -1,9 +1,9 @@
-import type { ChatBlockInfo, FriendChatBlock, GroupChatInfo, UserDefaultInfo } from "@/lib/const";
+import type { ChatBlockInfo, FriendChatBlock, GroupChatBlock, UserDefaultInfo } from "@/lib/const";
 import { useState, useEffect } from "react";
 
 export const useGetMessage=(socket:any, currentUser: UserDefaultInfo)=>{
     const [message, setMessage]= useState<FriendChatBlock>();
-    const [groupMessage, setGroupMessage]= useState<GroupChatInfo>();
+    const [groupMessage, setGroupMessage]= useState<GroupChatBlock>();
      useEffect(()=>{
             if(currentUser && currentUser.id){
                 socket.on("receiveMessage", (data:any)=>{

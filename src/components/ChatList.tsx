@@ -7,6 +7,7 @@ import { selectUserInfo } from '@/redux/slice/userSlice';
 import { getAllGroup } from '@/lib/services/groupService';
 import { selectGroupList } from '@/redux/slice/GroupListSlice';
 import { ArrowDown, ArrowUp } from 'lucide-react';
+import { selectOnlineUserList } from '@/redux/slice/onlineUserSlice';
 
 const COLOR=['#ff6b9d', '#4a90e2', '#f39c12', '#9b59b6', '#e74c3c', '#1abc9c', '#34495e', '#e67e22', "#2ecc71", "#8e44ad"];
 
@@ -29,6 +30,7 @@ const FriendList= ({onlyMode, setOpenPage, setCurrentChat}:{onlyMode:boolean, se
       dispatch(getFriendList(currentUser.id));
       dispatch(getAllGroup(currentUser.id))
   },[])
+  const currentOnlineUsers= useAppSelector(selectOnlineUserList);
   
 
   const displayedFriends= friendList?.map((item)=>{
@@ -37,7 +39,7 @@ const FriendList= ({onlyMode, setOpenPage, setCurrentChat}:{onlyMode:boolean, se
        lastMessage:"con me may",
        time:"25/10",
        unread:1,
-       online: false
+       online: currentOnlineUsers.includes(item.id)?true: false
        }
   })
   const displayedGroups= groupList?.map((item)=>{
@@ -94,7 +96,7 @@ const FriendList= ({onlyMode, setOpenPage, setCurrentChat}:{onlyMode:boolean, se
             {openFriendList?<ArrowUp height={15} width={15}/>:<ArrowDown height={15} width={15}/>}
           </button>
           {openFriendList? displayedFriends.map((friend,index) => (
-            //friend id cha
+            
             <div
               key={friend.id}
               role="button"
