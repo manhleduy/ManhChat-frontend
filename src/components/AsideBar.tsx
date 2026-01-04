@@ -19,6 +19,7 @@ import {
 import { Label } from './ui/label';
 import { useAppDispatch } from '@/redux/reduxHook';
 import { logout } from '@/redux/slice/userSlice';
+import { restartList } from '@/redux/slice/ChatReceivedSlice';
 
 const AsideBar = () => {
   const dispatch= useAppDispatch();
@@ -109,6 +110,8 @@ const AsideBar = () => {
             <button
             onClick={()=>{
               dispatch(logout())
+              dispatch({type:"SOCKET_DISCONNECT"})
+            
             }}
             className='flex items-center gap-x-2 font-semibold'>
               <LogOut width={20} height={20} color='red'/>

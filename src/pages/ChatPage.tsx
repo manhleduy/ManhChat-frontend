@@ -21,13 +21,9 @@ const ChatPage = () => {
   if(currentUser.id<=0){
     navigate("/login");
   }
-  useEffect(()=>{
-    dispatch({type:"SOCKET_CONNECT", payload: currentUser.id.toString()});
-    return ()=>{
-      dispatch({type:"SOCKET_DISCONNECT"});
-    }
-  },[currentUser.id])
-
+  
+  
+  
 
   
   if(currentUser.id===-1) return <div>Loading...</div>

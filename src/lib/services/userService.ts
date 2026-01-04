@@ -24,7 +24,7 @@ export const signUp = async (
 ) => {
     try {
         const {birthday, name, email, password, phonenumber, address}= data;
-        const normalizeDate:string= birthday.getFullYear()+"-"+(birthday.getMonth()+1)+"-"+birthday.getDate();
+        const normalizeDate:string= birthday?.getFullYear()+"-"+(birthday?.getMonth()+1)+"-"+birthday?.getDate();
         setLoading(true); 
         const res = await api.post('/api/user/signup', {
             name: name,

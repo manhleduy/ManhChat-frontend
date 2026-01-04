@@ -5,7 +5,6 @@ import { useAppSelector } from '@/redux/reduxHook';
 import { getAllChat } from '@/lib/services/chatService';
 import { selectUserInfo } from '@/redux/slice/userSlice';
 import type { GroupChatBlock, FriendChatBlock,ChatBlockInfo, GroupDefaultInfo, MessageType, } from '@/lib/const';
-
 import { createChat, getAllGroupChat, createGroupChat } from '@/lib/services/chatService';
 import toast from 'react-hot-toast';
 interface Response{
@@ -27,7 +26,6 @@ const ChatBody = (
   
   const checkFriendChat:boolean= currentChat.name? true : false;
   const checkGroupChat: boolean= currentChat.groupName ? true : false;
-  
   //handle the submit with different type of Chatblock
   const handleSubmit =async (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,7 +74,14 @@ const ChatBody = (
       }
     };
     fetchChats();
-  }, [currentChat.id, currentUser.id, currentChat.groupId]);
+  }, [currentChat.id, currentUser.id, currentChat.groupId])
+
+  //receive some new message and update chat body
+  useEffect(()=>{
+    const handleNewMessage= (newMessage: string)=>{
+      
+    }
+  },[messages])
   return (
     <div className={`w-full h-full flex flex-col  overflow-hidden`} >
       {/* Header */}
