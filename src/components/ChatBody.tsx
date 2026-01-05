@@ -8,8 +8,8 @@ import type { GroupChatBlock, FriendChatBlock,ChatBlockInfo, GroupDefaultInfo, M
 import { createChat, getAllGroupChat, createGroupChat } from '@/lib/services/chatService';
 import toast from 'react-hot-toast';
 import { popFriendChat, popGroupChat, selectChatReceivedList } from '@/redux/slice/ChatReceivedSlice';
-import { useGetMessage } from '@/hook/reacthook';
 import socket from '@/lib/socket';
+import { useGetSocketData } from '@/hook/reacthook';
 interface Response{
   message:string,
   status: number
@@ -87,7 +87,8 @@ const ChatBody = (
     fetchChats();
   }, [currentChat.id, currentUser.id, currentChat.groupId])
   //handle socket send message
-  const {message, groupMessage}=useGetMessage(socket, currentUser)
+  const message= useGetSocketData<FriendChatBlock>(socket, currentUser, "receiveMessage");
+  const groupMessage= useGetSocketData<GroupChatBlock>(socket, currentUser, "receiveGroupMessage");
   useEffect(()=>{
     if(message && message.senderId===currentChat.id){
       setMessages(messages=>[...messages, message]);

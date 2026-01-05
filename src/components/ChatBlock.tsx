@@ -12,50 +12,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {  likeChat, recallChat } from '@/lib/services/chatService';
-import { useEffect, useState } from 'react';
-
-const ChatBlock = ({chatBlockInfo}:any) => {
-  const { senderId, content, createdAt, likeNum, id, isRead, profilePic, name } = chatBlockInfo as MessageType;
-  const [error, setError]= useState<string>("")
-  const [loading, setLoading]= useState<boolean>(false);
-  
-  
- 
-  const DeleteMessage=async()=>{
-    try{
-     await recallChat({chatblockId:id||0, userId:currentUser.id},setError,setLoading );
-  
-    } catch(e:any){
-      toast.error(e.message);
-    } finally{
-      toast.success("Message Deleted")
-    }
-  }
-  const LikeMessage= async()=>{
-    try{
-      await likeChat(id||0, setError, setLoading)
-    }catch(e:any){
-      toast.error(e.message);
-    }finally{
-      
-    }
-  }
-  
-  const currentUser = useAppSelector(selectUserInfo).info;
-
-  if(senderId===currentUser.id)return (
-    <div className="flex justify-end">
-      
-      <div className={`flex relative  gap-2 items-end ${isRead ? 'flex-row-reverse' : 'flex-row'}`}>
-        <button
-         onClick={()=>{
-          LikeMessage();
-         }}
-        className='flex absolute right-0 bottom-0 m-1 '>
-          <Heart height={15} width={15} fill="red"/>
-          <div>{likeNum}</div>
-        </button>
-        <DropdownMenu modal={false}>
+import React, { useEffect, useState, type JSX, type ReactElement, type ReactNode } from 'react';
+//chat drop down 
+const SenderDropDown=(props:any)=>{
+  const DeleteMessage=props.DeleteMessage;
+  return(
+    <DropdownMenu modal={false}>
         <DropdownMenuTrigger >
           ...
         </DropdownMenuTrigger>
@@ -69,43 +31,51 @@ const ChatBlock = ({chatBlockInfo}:any) => {
                 <TrashIcon height={20}  width={20}/>
               </div>
             </DropdownMenuItem>
-            <DropdownMenuItem>
-              <button className='flex'>
+            <DropdownMenuItem >
+              <div className='flex'>
                 <div>Share</div>
                 <Share height={20}  width={20}/>
-              </button>
+              </div>
             </DropdownMenuItem>
             <DropdownMenuItem disabled>Download</DropdownMenuItem>
           </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>
-        <div
-          className={`flex flex-col max-w-xs ${isRead ? 'items-end' : 'items-start'} animate-[slideIn_0.3s_ease-out]`}
-        >
-          <div className="flex items-center gap-2 mb-1.5 px-1">
-            <span className="text-sm font-semibold text-green-600">{currentUser.name}</span>
-            
-          </div>
-          <div
-            className="px-4 py-3 rounded-2xl text-sm leading-relaxed wrap-break-word bg-blue-500 text-white rounded-br-sm"
-          >
-            {content}
-          </div>
-          <span className="text-xs text-gray-400">{createdAt?.slice(0,10)}</span>
-        </div>
-
-        <button
-          className="opacity-0 hover:opacity-100 transition-opacity duration-200 shrink-0"
-          aria-label="Message options"
-        >
-          
-        </button>
-      </div>
-    </div>
   )
+}
+
+//base chat block
+const BaseChatBlock=(props:any)=>{
+  const [error, setError]= useState<string>("")
+  const [loading, setLoading]= useState<boolean>(false);
+  const { senderId, content, createdAt, likeNum, id, isRead, profilePic, name } = props.chatBlockInfo as MessageType;
+  
+  const {config, dropdown}= props
+  //like the message
+  const LikeMessage= async()=>{
+    try{
+      await likeChat(id||0, setError, setLoading)
+    }catch(e:any){
+      toast.error(e.message);
+    }finally{
+      
+    }
+  }
+  //delete the message
+  const DeleteMessage=async()=>{
+      try{
+      await recallChat({chatblockId:id||0, userId:currentUser.id},setError,setLoading );
+    
+      } catch(e:any){
+        toast.error(e.message);
+      } finally{
+        toast.success("Message Deleted")
+      }
+    }
+  const currentUser = useAppSelector(selectUserInfo).info;
   return (
-    <div className="flex justify-start">
-      <div className={`flex gap-2 items-end ${isRead ? 'flex-row-reverse' : 'flex-row'}`}>
+    <div className={`flex ${config.justifyPosition}`}>
+      <div className={`flex gap-2 items-end`}>
         <button
          onClick={()=>{
           LikeMessage();
@@ -114,15 +84,18 @@ const ChatBlock = ({chatBlockInfo}:any) => {
           <Heart height={15} width={15} fill="red"/>
           <div>{likeNum}</div>
         </button>
+        {dropdown?<SenderDropDown DeleteMessage={DeleteMessage}/>:null}
+
         <div
-          className={`flex flex-col max-w-xs ${isRead ? 'items-end' : 'items-start'} animate-[slideIn_0.3s_ease-out]`}
+          className={`flex flex-col max-w-xs  animate-[slideIn_0.3s_ease-out]`}
         >
           <div className="flex items-center gap-2 mb-1.5 px-1">
             <span className="text-sm font-semibold text-green-600">{name}</span>
             
           </div>
           <div
-            className="px-4 py-3 rounded-2xl text-sm leading-relaxed wrap-break-word bg-gray-100 text-gray-800 rounded-bl-sm"
+            style={{background:config.backgroundColor}}
+            className={`px-4 py-3 rounded-2xl text-sm leading-relaxed wrap-break-word ${config.mesageStyle}` }
           >
             {content}
           </div>
@@ -136,7 +109,64 @@ const ChatBlock = ({chatBlockInfo}:any) => {
         </button>
       </div>
     </div>
-  );
+  )
+}
+
+//chat block from the sender perspective
+const senderChatBlock=(WrappedComponent:(props:any)=>JSX.Element, chatBlockInfo:any)=>{
+  return function EnhancedComponent(props:any){
+    //config of the sender
+    const senderConfig={
+      mesageStyle: " bg-blue-500 text-white rounded-br-sm",
+      backgroundColor:"blue-500",
+      justifyPosition: "justify-end"
+    }
+    return (
+      <WrappedComponent
+      dropdown={<SenderDropDown/>}
+      chatBlockInfo={chatBlockInfo}
+      config={senderConfig}
+      />
+    )
+  }
+  
+  
+}
+const receiverChatBlock=(WrappedComponent:(props:any)=>JSX.Element, chatBlockInfo:any)=>{
+  return function EnhancedComponent(props:any){
+      //config of the receiver
+      const receiverConfig={
+        messageStyle:" bg-gray-100 text-gray-800 rounded-bl-sm",
+        justifyPosition: "justify-start",
+        backgroundColor: "gray"
+      }
+      return (
+      <WrappedComponent
+      chatBlockInfo={chatBlockInfo}
+      config={receiverConfig}
+      />
+    )
+      
+  }
+}
+
+const ChatBlock = ({chatBlockInfo}:any) => {
+  
+
+  
+  
+  const { senderId} = chatBlockInfo as MessageType;
+  
+  const currentUser = useAppSelector(selectUserInfo).info;
+
+  if(senderId===currentUser.id){
+   
+    const SenderChatComponent=senderChatBlock(BaseChatBlock, chatBlockInfo)
+    return <SenderChatComponent/>
+  }
+  const ReceiverChatComponent= receiverChatBlock(BaseChatBlock, chatBlockInfo)
+  return <ReceiverChatComponent/>
+
 };
 
 export default ChatBlock;

@@ -8,6 +8,7 @@ import { getAllGroup } from '@/lib/services/groupService';
 import { selectGroupList } from '@/redux/slice/GroupListSlice';
 import { ArrowDown, ArrowUp } from 'lucide-react';
 import { selectOnlineUserList } from '@/redux/slice/onlineUserSlice';
+import socket from '@/lib/socket';
 
 const COLOR=['#ff6b9d', '#4a90e2', '#f39c12', '#9b59b6', '#e74c3c', '#1abc9c', '#34495e', '#e67e22', "#2ecc71", "#8e44ad"];
 
@@ -28,8 +29,10 @@ const FriendList= ({onlyMode, setOpenPage, setCurrentChat}:{onlyMode:boolean, se
  
   useEffect(()=>{
       dispatch(getFriendList(currentUser.id));
-      dispatch(getAllGroup(currentUser.id))
+      dispatch(getAllGroup(currentUser.id));
+
   },[])
+
   const currentOnlineUsers= useAppSelector(selectOnlineUserList);
   
 
@@ -51,7 +54,13 @@ const FriendList= ({onlyMode, setOpenPage, setCurrentChat}:{onlyMode:boolean, se
       online:false
     }
   })
-
+  // join all group
+   useEffect(()=>{
+        socket.emit("joinGroup", groupList.map((item)=>{
+          return {groupName: item.groupName, groupId: item.id}
+        }));
+        return()=> socket.off("joinGroup");
+    },[groupList,socket])
     
     
   const handleSelectUser = (id: number) => {

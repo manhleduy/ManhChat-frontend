@@ -10,15 +10,17 @@ import { useAppDispatch, useAppSelector } from "./redux/reduxHook"
 import { selectUserInfo } from "./redux/slice/userSlice"
 import { useEffect } from "react"
 import socket from "./lib/socket"
-import { useGetMessage, useUserOffline, useUserOnline } from "./hook/reacthook"
+import { useGetSocketData} from "./hook/reacthook"
 import { pushFriendChat,pushGroupChat, selectChatReceivedList} from "./redux/slice/ChatReceivedSlice"
 import { addOnlineUser, removeOnlineUser, selectOnlineUserList } from "./redux/slice/onlineUserSlice"
+import type { FriendChatBlock, GroupChatBlock } from "./lib/const"
 
 function App() {
   const dispatch = useAppDispatch();
   const currentUser= useAppSelector(selectUserInfo).info;
   //get message
-  const {message, groupMessage}=useGetMessage(socket, currentUser)
+  const message= useGetSocketData<FriendChatBlock>(socket, currentUser, "receiveMessage");
+  const groupMessage= useGetSocketData<GroupChatBlock>(socket, currentUser, "receiveGroupMessage");
   useEffect(()=>{
     if(message){
       console.log("new message received in app.tsx:", message);
@@ -28,9 +30,11 @@ function App() {
       console.log("new group message received in app.tsx:", groupMessage);
       dispatch(pushGroupChat(groupMessage));
     }
-  }, [message])
+  }, [message, groupMessage])
+  
   //user online 
-  const onlineUsers=useUserOnline(socket, currentUser);
+  const onlineUsers= useGetSocketData<number>(socket, currentUser, "userOnline")
+  
   useEffect(()=>{
     if(onlineUsers!==undefined && onlineUsers){
       
@@ -40,7 +44,8 @@ function App() {
 
   
   //user offline
-  const offlineUsers= useUserOffline(socket, currentUser);
+  const offlineUsers= useGetSocketData<number>(socket, currentUser, "userOffline")
+
   useEffect(()=>{
     if(offlineUsers!==undefined && offlineUsers){
       dispatch(removeOnlineUser(offlineUsers));
