@@ -108,6 +108,7 @@ export type RequestType= FriendRequest | GroupRequest
 
 
 
+
 //config for FriendList
 export const FriendListConfig={
     sidebar_title: 'Messages',

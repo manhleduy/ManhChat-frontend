@@ -9,6 +9,7 @@ import { selectGroupList } from '@/redux/slice/GroupListSlice';
 import { ArrowDown, ArrowUp, Group } from 'lucide-react';
 import { selectOnlineUserList } from '@/redux/slice/onlineUserSlice';
 import socket from '@/lib/socket';
+import { useDebounce } from '@/hook/reacthook';
 
 const COLOR=['#ff6b9d', '#4a90e2', '#f39c12', '#9b59b6', '#e74c3c', '#1abc9c', '#34495e', '#e67e22', "#2ecc71", "#8e44ad"];
 
@@ -16,6 +17,7 @@ const COLOR=['#ff6b9d', '#4a90e2', '#f39c12', '#9b59b6', '#e74c3c', '#1abc9c', '
 
 const BaseList=(props: any)=>{
   const {
+    query,
     onlyMode,
     config,
     setOpenList,
@@ -35,7 +37,7 @@ const BaseList=(props: any)=>{
             <div>{config.label}</div>
             {openList?<ArrowUp height={15} width={15}/>:<ArrowDown height={15} width={15}/>}
           </button>
-          {openList? displayList.map((item:any,index:number) => (
+          {openList? displayList.filter((item:any)=>item.name.toLowerCase().includes(query.toLowerCase())).map((item:any,index:number) => (
             
             <div
               key={item.id}
@@ -178,6 +180,8 @@ const ChatList= ({onlyMode, setOpenPage, setCurrentChat}:{onlyMode:boolean, setO
   const [activeUserId, setActiveUserId] = useState<number | null>(null);//public
   const [activeGroupId, setActiveGroupId] = useState<number | null>(null);//public
   const [query, setQuery] = useState<string>('');//public
+  const queryValue= useDebounce(query, 500);
+
   
   // join all group
   const FriendList= GetFriendList(BaseList);
@@ -198,7 +202,10 @@ const ChatList= ({onlyMode, setOpenPage, setCurrentChat}:{onlyMode:boolean, setO
             placeholder={FriendListConfig.search_placeholder}
             aria-label="Search conversations"
             value={query}
-            onChange={e => setQuery(e.target.value)}
+            onChange={e => {
+              setQuery(e.target.value);
+              
+            }}
           />
         </div>
       </header>
@@ -215,6 +222,7 @@ const ChatList= ({onlyMode, setOpenPage, setCurrentChat}:{onlyMode:boolean, setO
           activeId={activeUserId}
           setOpenPage={setOpenPage}
           onlyMode={onlyMode}
+          query={queryValue}
           />
           {/*list of group*/}
           <GroupList
@@ -225,6 +233,7 @@ const ChatList= ({onlyMode, setOpenPage, setCurrentChat}:{onlyMode:boolean, setO
           activeId={activeGroupId}
           setOpenPage={setOpenPage}
           onlyMode={onlyMode}
+          query={queryValue}
           />
         </div>
       </main>

@@ -1,13 +1,94 @@
 import React, { useState} from 'react';
 import { Users, Globe, Mail, User, ArrowBigLeft } from 'lucide-react';
-import FriendContactList from '@/components/FriendContactList';
-import GroupList from '@/components/GroupList';
 import GroupInvitation from '@/components/GroupInvitation';
 import Invitations from '@/components/Invitations';
 import AsideBar from '@/components/AsideBar';
 import { selectUserInfo } from '@/redux/slice/userSlice';
 import { useAppSelector } from '@/redux/reduxHook';
 import { useNavigate } from 'react-router-dom';
+import BaseContactList from '@/components/BaseContactList';
+import { selectFriendList } from '@/redux/slice/FriendListSlice';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { selectGroupList } from '@/redux/slice/GroupListSlice';
+// friend contact list 
+const FriendList= () => {
+  const defaultConfig = {
+    page_title: 'Friend List',
+    search_placeholder: 'Search friends...',
+  };
+
+  const friendList  = useAppSelector(selectFriendList).friendList;
+  //drop box
+  const SelectDropBox=(props:any)=>{
+  const {selectedCategory,setSelectedCategory}= props;
+  return (
+    <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+      <SelectTrigger className="w-40 border-2 border-green-500 text-gray-800 text-sm font-medium hover:border-green-600">
+        <SelectValue placeholder="Select category" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="All">All</SelectItem>
+        <SelectItem value="Customer">Customer</SelectItem>
+        <SelectItem value="Family">Family</SelectItem>
+        <SelectItem value="Job">Job</SelectItem>
+        <SelectItem value="Friend">Friend</SelectItem>
+        <SelectItem value="Pioneer">Pioneer</SelectItem>
+      </SelectContent>
+    </Select>
+  )
+}
+  return (
+   <BaseContactList
+   presentList={friendList}
+   config={defaultConfig}
+   SelectDropBox={SelectDropBox}
+   />
+  );
+};
+// group contact list
+
+
+const GroupList = () => {
+  const defaultConfig = {
+    page_title: 'Groups',
+    search_placeholder: 'Search groups...',
+  };
+  const groupsData: any = useAppSelector(selectGroupList).groupList.map((item)=>{
+    return {...item, name: item.groupName}
+  })
+  //drop box
+  const SelectDropbox= (props:any)=>{
+  const {selectedCategory,setSelectedCategory}= props;
+  
+  return (
+    <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+      <SelectTrigger className="w-40 border-2 border-green-500 text-gray-800 text-sm font-medium hover:border-green-600">
+        <SelectValue placeholder="Select status" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="All">All</SelectItem>
+        <SelectItem value="Active">Active</SelectItem>
+        <SelectItem value="Inactive">Inactive</SelectItem>
+      </SelectContent>
+    </Select>
+  )
+}
+
+  return <BaseContactList 
+  presentList={groupsData} 
+  config={defaultConfig} 
+  SelectDropBox={SelectDropbox}
+  />;
+  
+  
+};
+//default config
 
 const sidebarItems = [
     { id: 'friends', label: 'Friend List', icon: Users },
@@ -17,7 +98,7 @@ const sidebarItems = [
   ];
 
 const pageComponents: Record<SidebarTab, React.FC> = {
-    friends: FriendContactList,
+    friends: FriendList,
     groupsCommunities: GroupList,
     friendRequests: Invitations,
     groupRequests: GroupInvitation,

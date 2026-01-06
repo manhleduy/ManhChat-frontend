@@ -1,4 +1,5 @@
 import type { ChatBlockInfo, FriendChatBlock, GroupChatBlock, GroupDefaultInfo, UserDefaultInfo } from "@/lib/const";
+
 import { useState, useEffect } from "react";
 
 
@@ -15,3 +16,12 @@ export const useGetSocketData=<T>(socket: any, currentUser: UserDefaultInfo, emi
     },[socket, currentUser.id])
     return socketData;
 }   
+
+export const useDebounce = <T>(value: T, delay: number): T => {
+    const [debounce, set]= useState<T>(value)
+    useEffect(()=>{
+        const t= setTimeout(()=>{set(value)}, delay)
+        return ()=>clearTimeout(t);
+    },[value, delay])
+    return debounce
+}
