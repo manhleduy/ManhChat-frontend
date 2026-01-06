@@ -30,7 +30,7 @@ const ChatBody = (
   const [file, setFile]= useState<string>('');
   const receivedMessage= useAppSelector(selectChatReceivedList);
   
-  const checkFriendChat:boolean= currentChat.name? true : false;
+  const checkFriendChat:boolean= currentChat.email? true : false;
   const checkGroupChat: boolean= currentChat.groupName ? true : false;
 
   //handle the submit with different type of Chatblock

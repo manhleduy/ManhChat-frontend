@@ -29,15 +29,6 @@ type Friend = {
   color: string;
 };
 
-/*const friends: Friend[] = [
-  { id: 1, name: 'Alice Johnson', initial: 'A', status: 'Online', color: COLORS[0] },
-  { id: 2, name: 'Andrew Smith', initial: 'A', status: 'Offline', color: COLORS[2] },
-  { id: 3, name: 'Benjamin Lee', initial: 'B', status: 'Online', color: COLORS[4] },
-  { id: 4, name: 'Catherine Brown', initial: 'C', status: 'Online', color: COLORS[6] },
-  { id: 5, name: 'Chris Wilson', initial: 'C', status: 'Offline', color: COLORS[8] },
-  { id: 6, name: 'David Martinez', initial: 'D', status: 'Online', color: COLORS[10] },
-  { id: 7, name: 'Emily Davis', initial: 'E', status: 'Offline', color: COLORS[12] },
-];*/
 
 const defaultConfig = {
   page_title: 'Friend List',

@@ -105,7 +105,8 @@ export type MessageType= FriendChatBlock | GroupChatBlock
 
 export type RequestType= FriendRequest | GroupRequest
 
-//chatblock
+
+
 
 //config for FriendList
 export const FriendListConfig={
@@ -135,6 +136,8 @@ export const inputFormConfig = {
   singup_text: "haven't had an account yet? Create now!"
 };
 
+
+//build in gradient
 export const AVATAR_GRADIENT= [
   'linear-gradient(135deg, #2196f3, #64b5f6)',
   'linear-gradient(135deg, #9c27b0, #ba68c8)',
@@ -145,8 +148,10 @@ export const AVATAR_GRADIENT= [
   'linear-gradient(135deg, #673ab7, #9575cd)'
 ]
 
+//themes
 export const THEMES = [
   "light",
   "dark"
 ];
+export const SocketEmitEvent=["joinGroup"]
 export type TypeEquality<T,U>= keyof T extends keyof U ? (keyof U extends keyof T ? true : false) : false;
