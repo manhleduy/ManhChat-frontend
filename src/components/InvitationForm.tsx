@@ -74,6 +74,7 @@ const InvitationForm = ({setOpenInviteForm}:any) => {
       setValue("phonenumber", selectedUser?.phonenumber||"");
       setFoundUsers([]);
     },[selectedUser, setSelectedUser])
+
     const onFind=async()=>{
       try{
         const {name, phonenumber, email}= getValues();
@@ -87,7 +88,7 @@ const InvitationForm = ({setOpenInviteForm}:any) => {
     const onSubmit =async (data: FriendInviteSchema) => {
       try{
         const {name, email, phonenumber, content}= getValues()
-        await sendInvitation({name:name,email:email, phonenumber:phonenumber, content:content, senderId:currentUser.id  }, setError, setLoading);
+        await sendInvitation({name:name,email:email, phonenumber:phonenumber, content:content, senderId:currentUser.id }, setError, setLoading);
        reset();
       }catch(e:any){
         console.log(e);

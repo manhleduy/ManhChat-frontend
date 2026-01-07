@@ -14,21 +14,47 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { UserPlus } from 'lucide-react';
-const GroupInvitation = () => {
-  const dispatch= useAppDispatch();
-  const currentUser= useSelector(selectUserInfo).info;
-  const GroupRequests= useSelector(selectGroupRequest);
-  const [error, setError]= useState<string>("")
-  const [loading, setLoading]= useState<boolean>(false);
-  const [openInviteForm, setOpenInviteForm]=useState(false);
-  const [sentInvitations, setSentInvitations] = useState<GroupRequest[]>(GroupRequests.proposals||[]);
-  const [receivedInvitations, setReceivedInvitations] = useState<GroupRequest[]>(GroupRequests.invitations||[]);
+
+//tool tip
+
+export const GroupInvitation = (WrappedComponent:any) => {
+  const RequestTooltip=(props: any)=>{
+    const {setOpenInviteForm}= props;
+    return (
+      <Tooltip>
+        <TooltipTrigger>
+          <div
+            onClick={()=>setOpenInviteForm(true)}
+            className='ml-2 flex items-center justify-center border-3 border-black rounded-full w-fit h-fit p-1'>
+            <UserPlus height={20} width={20}/>
+          </div>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>make a friend</p>
+        </TooltipContent>
+      </Tooltip>
+    )
+}
+//config
+const config={
+    sentLabel:"Group Invitation Sent",
+    receivedLabel:"Group Invitation Received"
+  }
+  return function EnhancedComponent(props:any){
+    const dispatch= useAppDispatch();
+    const currentUser= useSelector(selectUserInfo).info;//private
+    const GroupRequests= useSelector(selectGroupRequest);//private
+    const [error, setError]= useState<string>("")//private
+    const [loading, setLoading]= useState<boolean>(false);//private
+    const [sentInvitations, setSentInvitations] = useState<GroupRequest[]>(GroupRequests.sentRequests||[]);
+    const [receivedInvitations, setReceivedInvitations] = useState<GroupRequest[]>(GroupRequests.receivedRequests||[]);
 
   useEffect(()=>{
-    dispatch(getAllGroupRequest(currentUser.id));
-    setSentInvitations(GroupRequests.proposals);
-    setReceivedInvitations(GroupRequests.invitations);
+    dispatch(getAllGroupRequest(currentUser.id));//private
+    setSentInvitations(GroupRequests.sentRequests);//public
+    setReceivedInvitations(GroupRequests.receivedRequests);//public
   },[])
+  
   const handleWithdraw = async(invitation: any) => {
     try{
       const {id, adminId, groupId}= invitation;
@@ -40,7 +66,7 @@ const GroupInvitation = () => {
       toast.error(e.message);
     }
 
-  };
+  };//private
   const handleAccept =async (invitation: any) => {
     try{
       const {id, adminId, groupId}= invitation;
@@ -52,7 +78,7 @@ const GroupInvitation = () => {
     }finally{
       toast.success("you accept a new user to your group")
     }
-  };
+  };//private
   const handleReject =async (invitation: any) => {
     try{
       const {id, adminId, groupId}= invitation;
@@ -65,70 +91,21 @@ const GroupInvitation = () => {
     }finally{
       toast.success("you reject a user")
     }
-  };
-  return (
-    <>
-    {openInviteForm? <GroupRequestForm setOpenInviteForm={setOpenInviteForm}/> : null}
-    <div className="h-full overflow-scroll bg-gray-100 p-4 sm:p-6 md:p-8">
-      <div className="max-w-full">
-        {/* Group Invitation Sent Section */}
-        <div className="mb-10 sm:mb-12">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 mb-4 sm:mb-6 pb-3 border-b-4 border-green-500">
-            Group Invitations Sent
-            <Tooltip>
-                <TooltipTrigger>
-                  <div
-                  onClick={()=>setOpenInviteForm(true)}
-                  className='ml-2 flex items-center justify-center border-3 border-black rounded-full w-fit h-fit p-1'>
-                    <UserPlus height={20} width={20}/>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>make a friend</p>
-                </TooltipContent>
-              </Tooltip>
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {sentInvitations.length > 0 ? (
-              sentInvitations.map(item => (
-                <InvitationCard
-                  key={item.id}
-                  card={item}
-                  type="sent"
-                  onWithdraw={handleWithdraw}
-                />
-              ))
-            ) : (
-              <p className="text-gray-500 text-lg py-8">No sent group invitations</p>
-            )}
-          </div>
-        </div>
-
-        {/* Group Invitation Received Section */}
-        <div>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 mb-4 sm:mb-6 pb-3 border-b-4 border-green-500">
-            Group Invitations Received
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {receivedInvitations.length > 0 ? (
-              receivedInvitations.map(item => (
-                <InvitationCard
-                  key={item.id}
-                  card={item}
-                  type="received"
-                  onAccept={handleAccept}
-                  onReject={handleReject}
-                />
-              ))
-            ) : (
-              <p className="text-gray-500 text-lg py-8">No received group invitations</p>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-    </>
-  );
+  };//private
+    return(
+      <WrappedComponent
+        handleReject={handleReject}
+        handleAccept={handleAccept}
+        handleWithdraw={handleWithdraw}
+        sentInvitations={sentInvitations}
+        receivedInvitations={receivedInvitations}
+        config={config}
+        RequestTooltip={RequestTooltip}
+        RequestForm={GroupRequestForm}
+        {...props}
+      />
+    )
+  }
+  
+  
 };
-
-export default GroupInvitation;

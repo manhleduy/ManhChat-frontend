@@ -8,12 +8,13 @@ import SignUpPage from "./pages/SignUpPage"
 import PostPage from "./pages/PostPage"
 import { useAppDispatch, useAppSelector } from "./redux/reduxHook"
 import { selectUserInfo } from "./redux/slice/userSlice"
-import { useEffect } from "react"
+import { use, useEffect } from "react"
 import socket from "./lib/socket"
 import { useGetSocketData} from "./hook/reacthook"
 import { pushFriendChat,pushGroupChat, selectChatReceivedList} from "./redux/slice/ChatReceivedSlice"
 import { addOnlineUser, removeOnlineUser, selectOnlineUserList } from "./redux/slice/onlineUserSlice"
-import type { FriendChatBlock, GroupChatBlock } from "./lib/const"
+import type { FriendChatBlock, GroupChatBlock, FriendRequest, GroupRequest } from "./lib/const"
+import { pushFriendReceivedRequest } from "./redux/slice/FriendRequestSlice"
 
 function App() {
   const dispatch = useAppDispatch();
@@ -23,18 +24,35 @@ function App() {
   const groupMessage= useGetSocketData<GroupChatBlock>(socket, currentUser, "receiveGroupMessage");
   useEffect(()=>{
     if(message){
-      console.log("new message received in app.tsx:", message);
       dispatch(pushFriendChat(message));
     }
     if(groupMessage){
-      console.log("new group message received in app.tsx:", groupMessage);
       dispatch(pushGroupChat(groupMessage));
     }
   }, [message, groupMessage])
+
+  //get friend request
+  const friendRequest= useGetSocketData<FriendRequest>(socket, currentUser, "receiveRequest");
+  useEffect(()=>{
+    if(friendRequest){
+      console.log("new friend request received in app.tsx:", friendRequest);
+      dispatch(pushFriendReceivedRequest(friendRequest));
+    }
+  })
+  //get group request
+  const groupRequest= useGetSocketData<GroupRequest>(socket, currentUser, "receiveGroupRequest");
+  useEffect(()=>{
+    if(groupRequest){
+      console.log("new group request received in app.tsx:", groupRequest);
+      //dispatch()
+    }
+  })
   
+  
+  
+
   //user online 
   const onlineUsers= useGetSocketData<number>(socket, currentUser, "userOnline")
-  
   useEffect(()=>{
     if(onlineUsers!==undefined && onlineUsers){
       
@@ -42,17 +60,14 @@ function App() {
     }
   }, [onlineUsers])
 
-  
   //user offline
   const offlineUsers= useGetSocketData<number>(socket, currentUser, "userOffline")
-
   useEffect(()=>{
     if(offlineUsers!==undefined && offlineUsers){
       dispatch(removeOnlineUser(offlineUsers));
     }
   }, [offlineUsers])
-  
-  
+    
   //socket connection effect
   useEffect(() => {
   if (currentUser?.id>0) {

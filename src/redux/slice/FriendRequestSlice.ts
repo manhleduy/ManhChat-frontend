@@ -1,13 +1,13 @@
-import { createSlice} from "@reduxjs/toolkit";
+import { createSlice, type PayloadAction} from "@reduxjs/toolkit";
 import type { FriendRequest} from "@/lib/const";
 import { getAllRequest } from "@/lib/services/invitationService";
 const initialState: {
-  invitations:FriendRequest[],
-  proposals:FriendRequest[]
+  receivedRequests:FriendRequest[],
+  sentRequests:FriendRequest[]
   error:any, 
   status:string}= {
-    invitations: [],
-    proposals: [],
+    receivedRequests: [],
+    sentRequests: [],
     error: "",
     status: "completed"
   }
@@ -15,15 +15,30 @@ export const friendRequestSlice=createSlice({
     name:"friendRequest",
     initialState,
     reducers:{
-      
+        pushFriendReceivedRequest:(state, action: PayloadAction<FriendRequest>)=>{
+          state.receivedRequests.push(action.payload)
+          return state;
+        },
+        popFriendReceivedRequest: (state, action: PayloadAction<number>)=>{
+          state.receivedRequests= state.receivedRequests.filter((request)=>request.id!==action.payload)
+          return state;
+        },
+        pushFriendSentRequest:(state, action: PayloadAction<FriendRequest>)=>{
+          state.sentRequests.push(action.payload)
+          return state;
+        },
+        popFriendSentRequest: (state, action: PayloadAction<number>)=>{
+          state.sentRequests=state.sentRequests.filter((request)=>request.id!==action.payload)
+          return state;
+        }
     },
     extraReducers:(builder)=>{
       builder
       .addAsyncThunk(getAllRequest,{
         fulfilled:(state,action)=>{
           state.error="",
-          state.invitations= action.payload.invitations,
-          state.proposals= action.payload.proposals,
+          state.receivedRequests= action.payload.receivedRequests,
+          state.sentRequests= action.payload.sentRequests,
           state.status="completed"
         },
          pending:(state)=>{
@@ -31,8 +46,8 @@ export const friendRequestSlice=createSlice({
         },
         rejected:(state, action)=>{
           state.error= action.payload || "unknown error",
-          state.proposals=[],
-          state.invitations=[],
+          state.sentRequests=[],
+          state.receivedRequests=[],
           state.status="failed"
         }
       })
@@ -43,6 +58,6 @@ export const friendRequestSlice=createSlice({
     }
 
 })
-export const {} = friendRequestSlice.actions;
+export const {pushFriendReceivedRequest, popFriendReceivedRequest, pushFriendSentRequest, popFriendSentRequest} = friendRequestSlice.actions;
 export const {selectFriendRequest}= friendRequestSlice.selectors;
 export default friendRequestSlice.reducer

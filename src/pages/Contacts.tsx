@@ -1,7 +1,7 @@
 import React, { useState} from 'react';
 import { Users, Globe, Mail, User, ArrowBigLeft } from 'lucide-react';
-import GroupInvitation from '@/components/GroupInvitation';
-import Invitations from '@/components/Invitations';
+import { GroupInvitation } from '@/components/GroupInvitation';
+import {Invitations} from '@/components/Invitations';
 import AsideBar from '@/components/AsideBar';
 import { selectUserInfo } from '@/redux/slice/userSlice';
 import { useAppSelector } from '@/redux/reduxHook';
@@ -16,6 +16,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { selectGroupList } from '@/redux/slice/GroupListSlice';
+import BaseInvitations from '@/components/BaseInvitation';
 // friend contact list 
 const FriendList= () => {
   const defaultConfig = {
@@ -52,8 +53,6 @@ const FriendList= () => {
   );
 };
 // group contact list
-
-
 const GroupList = () => {
   const defaultConfig = {
     page_title: 'Groups',
@@ -89,7 +88,8 @@ const GroupList = () => {
   
 };
 //default config
-
+const groupInvitation= GroupInvitation(BaseInvitations)
+const friendInvitation= Invitations(BaseInvitations)
 const sidebarItems = [
     { id: 'friends', label: 'Friend List', icon: Users },
     { id: 'groupsCommunities', label: 'Groups & Communities', icon: Globe },
@@ -100,8 +100,8 @@ const sidebarItems = [
 const pageComponents: Record<SidebarTab, React.FC> = {
     friends: FriendList,
     groupsCommunities: GroupList,
-    friendRequests: Invitations,
-    groupRequests: GroupInvitation,
+    friendRequests: friendInvitation,
+    groupRequests: groupInvitation,
   };
 type SidebarTab = 'friends' | 'groupsCommunities' | 'friendRequests' | 'groupRequests';
 

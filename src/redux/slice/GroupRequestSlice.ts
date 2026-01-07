@@ -2,12 +2,12 @@ import { createSlice, type PayloadAction} from "@reduxjs/toolkit";
 import type { GroupRequest} from "@/lib/const";
 import { getAllGroupRequest } from "@/lib/services/invitationService";
 const initialState: {
-  invitations:GroupRequest[],
-  proposals:GroupRequest[]
+  receivedRequests:GroupRequest[],
+  sentRequests:GroupRequest[]
   error:any, 
   status:string}= {
-    invitations: [],
-    proposals: [],
+    receivedRequests: [],
+    sentRequests: [],
     error:"",
     status:"completed"
   }
@@ -24,8 +24,8 @@ export const groupRequestSlice=createSlice({
       .addAsyncThunk(getAllGroupRequest,{
         fulfilled:(state,action)=>{
           state.error="",
-          state.invitations= action.payload.joinRequests,
-          state.proposals= action.payload.proposals,
+          state.receivedRequests= action.payload.receivedRequests,
+          state.sentRequests= action.payload.sentRequests,
           state.status="completed"
         },
          pending:(state)=>{
@@ -33,8 +33,8 @@ export const groupRequestSlice=createSlice({
         },
         rejected:(state, action)=>{
           state.error= action.payload || "unknown error",
-          state.proposals=[],
-          state.invitations=[],
+          state.sentRequests=[],
+          state.receivedRequests=[],
           state.status="failed"
         }
       })

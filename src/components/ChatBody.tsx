@@ -97,7 +97,7 @@ const ChatBody = (
       
     }else if(groupMessage && groupMessage.groupId===currentChat.id){
       setMessages(messages=>[...messages, groupMessage])
-      dispatch(popGroupChat(currentChat.id));
+      dispatch(popGroupChat(currentChat.id)); 
 
     }else{
       console.log("unkown error")
@@ -107,7 +107,6 @@ const ChatBody = (
       dispatch(popGroupChat(currentChat.id));
     })
   }, [message, groupMessage])
-  console.log(receivedMessage)
 
   // change the isread state of the chat block
   useEffect(()=>{

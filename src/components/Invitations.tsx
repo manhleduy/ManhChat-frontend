@@ -13,25 +13,52 @@ import { selectFriendRequest } from '@/redux/slice/FriendRequestSlice';
 import { selectUserInfo } from '@/redux/slice/userSlice';
 import type { FriendRequest, RequestType } from '@/lib/const';
 import { acceptInvitation, deleteInvitation, getAllRequest } from '@/lib/services/invitationService';
+import socket from '@/lib/socket';
+import { useGetSocketData } from '@/hook/reacthook';
 import toast from 'react-hot-toast';
 
-const Invitations =() => {
-  const [openInviteForm, setOpenInviteForm]=useState(false);
+export const Invitations =(WrappedComponent:any) => {
+  const RequestTooltip=(props:any)=>{
+    const {setOpenInviteForm}= props;
+    return(
+      <Tooltip>
+        <TooltipTrigger>
+          <div
+            onClick={()=>setOpenInviteForm(true)}
+            className='ml-2 flex items-center justify-center border-3 border-black rounded-full w-fit h-fit p-1'>
+            <UserPlus height={20} width={20}/>
+          </div>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>make a friend</p>
+        </TooltipContent>
+      </Tooltip>
+    )
+  }
+  //config
+  const config={
+    sentLable:"Invitation Sent",
+    receivedLabel:"Invitation Received"
+  }
+  return function EnhancedComponent(props:any){
   const currentUser= useSelector(selectUserInfo).info;
   const dispatch= useAppDispatch();
   const FriendRequests= useSelector(selectFriendRequest);
   const [loading, setLoading]= useState(false);
   const [error, setError]= useState<string>("");
   // request sent
-  const [sentInvitations, setSentInvitations] = useState<FriendRequest[]>(FriendRequests.invitations ||[]);
+  const [sentInvitations, setSentInvitations] = useState<FriendRequest[]>(FriendRequests.receivedRequests ||[]);
   // request received
-  const [receivedInvitations, setReceivedInvitations] = useState<FriendRequest[]>(FriendRequests.proposals||[]);
+  const [receivedInvitations, setReceivedInvitations] = useState<FriendRequest[]>(FriendRequests.sentRequests||[]);
+
   useEffect(()=>{
     dispatch(getAllRequest(currentUser.id));
-    setSentInvitations(FriendRequests.invitations);
-    setReceivedInvitations(FriendRequests.proposals);
+    setSentInvitations(FriendRequests.receivedRequests);
+    setReceivedInvitations(FriendRequests.sentRequests);
 
   },[])
+
+  
   const handleWithdraw = async(invitation: RequestType) => {
     try{  
       setSentInvitations(sentInvitations.filter(item=>item.id!=invitation.id));
@@ -68,70 +95,19 @@ const Invitations =() => {
     }
   };
   return (
-    <>
-    {openInviteForm? <InvitationForm setOpenInviteForm={setOpenInviteForm}/> : null}
-    <div className="bg-gray-100 p-4 h-full overflow-scroll sm:p-6 md:p-8 ">
-      <div className="max-w-full">
-        {/* Invitation Sent Section */}
-        <div className="mb-10 sm:mb-12">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 mb-4 sm:mb-6 pb-3 border-b-4 border-green-500 flex items-center">
-            Invitation Sent
-            
-              <Tooltip>
-                <TooltipTrigger>
-                  <div
-                  onClick={()=>setOpenInviteForm(true)}
-                  className='ml-2 flex items-center justify-center border-3 border-black rounded-full w-fit h-fit p-1'>
-                    <UserPlus height={20} width={20}/>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>make a friend</p>
-                </TooltipContent>
-              </Tooltip>
-          
-          </h2>
-          <div className="grid  grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-20 sm:gap-6">
-            {sentInvitations.length > 0 ? (
-              sentInvitations.map(card => (
-                <InvitationCard
-                  key={card.id}
-                  card={card}
-                  type="sent"
-                  onWithdraw={handleWithdraw}
-                />
-              ))
-            ) : (
-              <p className="text-gray-500 text-lg py-8">No sent invitations</p>
-            )}
-          </div>
-        </div>
-
-        {/* Invitation Received Section */}
-        <div>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 mb-4 sm:mb-6 pb-3 border-b-4 border-green-500">
-            Invitation Received
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {receivedInvitations.length > 0 ? (
-              receivedInvitations.map(card => (
-                <InvitationCard
-                  key={card.id}
-                  card={card}
-                  type="received"
-                  onAccept={handleAccept}
-                  onReject={handleReject}
-                />
-              ))
-            ) : (
-              <p className="text-gray-500 text-lg py-8">No received invitations</p>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-    </>
-  );
+     <WrappedComponent
+        handleReject={handleReject}
+        handleAccept={handleAccept}
+        handleWithdraw={handleWithdraw}
+        sentInvitations={sentInvitations}
+        receivedInvitations={receivedInvitations}
+        config={config}
+        RequestTooltip={RequestTooltip}
+        RequestForm={InvitationForm}
+        {...props}
+      />
+  )
+}
 };
 
-export default Invitations;
+

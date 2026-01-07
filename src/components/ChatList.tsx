@@ -81,6 +81,7 @@ const BaseList=(props: any)=>{
     </>
   )
 }
+
 const GetFriendList= (WrappedComponent:any)=>{
   return function EnhancedComponent(props:any){
     const dispatch=useAppDispatch();
@@ -122,7 +123,7 @@ const GetFriendList= (WrappedComponent:any)=>{
     )
   }
 
-  }
+}
 
 const GetGroupList=(WrappedComponent:any)=>{
   return function EnhancedComponent(props:any){
