@@ -1,17 +1,20 @@
-import { selectUserPostList, selectFriendPostList } from "@/redux/slice/PostListSlice";
-import { getAllFriendPost, getAllPost } from "@/lib/services/postService";
+import { selectFriendPostList } from "@/redux/slice/PostListSlice";
+import { getAllFriendPost } from "@/lib/services/postService";
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/redux/reduxHook";
 import { useNavigate } from "react-router-dom";
 import { selectUserInfo } from "@/redux/slice/userSlice";
 import Post from "@/components/Post";
 import AsideBar from "@/components/AsideBar";
+import { Pen } from "lucide-react";
+import CreatePostForm from "@/components/CreatePostForm";
 const PostPage = () => {
     const dispatch= useAppDispatch()
     const navigate= useNavigate();
     const currentUser= useAppSelector(selectUserInfo).info;
     const currentPost= useAppSelector(selectFriendPostList);
     const [friendPosts, useFriendPosts]= useState(currentPost)
+    const [openCreateForm, setOpenCreateForm]= useState(false);
     useEffect(()=>{
         if(currentUser.id<0)navigate('/')
         dispatch(getAllFriendPost(currentUser.id));
@@ -21,7 +24,7 @@ const PostPage = () => {
     console.log(currentPost);
   return (
         <div className="flex h-full w-full">
-        
+            {openCreateForm? <CreatePostForm setOpenCreateForm={setOpenCreateForm}/> : null}
             <style>{`
                 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
             
@@ -33,10 +36,19 @@ const PostPage = () => {
             <section className="flex flex-col w-full items-start px-6 md:px-16 lg:px-24 text-sm max-w-6xl mx-auto">
                 
                 <h1
-                    className="text-3xl font-medium bg-gradient-to-r from-slate-800 to-slate-500 text-transparent bg-clip-text mt-4">
+                    className="text-3xl font-medium bg-gradient-to-r from-green-800 to-green-500 text-transparent bg-clip-text mt-4">
                     Explore what your friends do in lately
                 </h1>
-                <p className="text-slate-500 mt-4 max-w-2xl">
+                <h2
+                    className="text-3xl font-medium bg-gradient-to-r from-green-800 to-green-500 text-transparent bg-clip-text mt-4">
+                    Post a post to friend 
+                    <button
+                    onClick={()=>setOpenCreateForm(true)}
+                    className="bg-white border-3 border-green-500 m-2 rounded-full p-2">
+                        <Pen height={20} width={20} fill="green"/>
+                    </button>
+                </h2>
+                <p className="text-green-600 mt-4 max-w-2xl">
                     
                 </p>
             

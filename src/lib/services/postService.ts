@@ -49,7 +49,7 @@ export const likePost= async(postId: number)=>{
     }
 }
 export const createPost= async(
-    data: PostDefaultInfo,
+    data:{ userId:number, content:string, file:string},
     setError: (message: string)=>void,
     setLoading: (load: boolean)=>void
 )=>{

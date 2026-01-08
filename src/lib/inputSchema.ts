@@ -104,7 +104,10 @@ export type ProfileChangeSchema= z.infer<typeof profileChangeSchema>;
 export const postSchema= z.object({
     content:z
         .string()
-        .refine(val=>validateContent(val))
+        .refine(val=>validateContent(val)),
+    file:z
+        .string()
+        .refine(val=>validateContent(val)),
 })
 export type PostSchema= z.infer<typeof postSchema>;
 

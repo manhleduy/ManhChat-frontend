@@ -55,7 +55,7 @@ export const Invitations =(WrappedComponent:any) => {
   useEffect(()=>{
     if(newRequest){
     setSentInvitations(a=>[...a, newRequest]);
-    console.log("data received");
+    toast.success("get a request ")
     }
   },[newRequest])
 
@@ -66,7 +66,6 @@ export const Invitations =(WrappedComponent:any) => {
 
   },[])
 
-  
   const handleWithdraw = async(invitation: RequestType) => {
     try{  
       setSentInvitations(sentInvitations.filter(item=>item.id!=invitation.id));
@@ -101,6 +100,8 @@ export const Invitations =(WrappedComponent:any) => {
       toast.success("you reject this invitation")
     }
   };
+
+
   return (
      <WrappedComponent
         handleReject={handleReject}
