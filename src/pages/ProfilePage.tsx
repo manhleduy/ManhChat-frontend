@@ -142,7 +142,7 @@ const ProfilePage: React.FC = () => {
     <div className='relative left-0'>
     <AsideBar/>
     </div>
-    <div className="min-h-screen w-full flex flex-col items-center justify-center px-5 pt-10 pb-5" data-theme="dark">
+    <div className="min-h-screen w-full flex flex-col items-center justify-center px-5 pt-10 pb-5">
       <main className="w-full max-w-xl">
         <div className="text-center mb-6">
           <h1 className="text-3xl font-semibold text-green-700 mb-2">My Profile</h1>

@@ -1,6 +1,7 @@
 import type { ChatBlockInfo, FriendChatBlock, GroupChatBlock, GroupDefaultInfo, UserDefaultInfo } from "@/lib/const";
 
 import { useState, useEffect } from "react";
+import { api } from "@/lib/axios";
 
 
 export const useGetSocketData=<T>(socket: any, currentUser: UserDefaultInfo, emitEvent: string)=>{

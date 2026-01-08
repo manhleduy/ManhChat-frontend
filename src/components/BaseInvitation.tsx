@@ -1,21 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import InvitationCard from './InvitationCard';
-import { UserPlus } from 'lucide-react';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
-import InvitationForm from './InvitationForm';
-import { useAppDispatch } from '@/redux/reduxHook';
-import { useSelector } from 'react-redux';
-import { selectFriendRequest } from '@/redux/slice/FriendRequestSlice';
-import { selectUserInfo } from '@/redux/slice/userSlice';
-import type { FriendRequest, GroupRequest, RequestType } from '@/lib/const';
-import { acceptInvitation, deleteInvitation, getAllRequest } from '@/lib/services/invitationService';
-import socket from '@/lib/socket';
-import { useGetSocketData } from '@/hook/reacthook';
-import toast from 'react-hot-toast';
 
 const BaseInvitations =(props:any) => {
     const {
@@ -42,7 +26,7 @@ const BaseInvitations =(props:any) => {
         {/* Sent Section */}
         <div className="mb-10 sm:mb-12">
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 mb-4 sm:mb-6 pb-3 border-b-4 border-green-500 flex items-center">
-            {config.sentLabel}
+            Request Received
             <RequestTooltip setOpenInviteForm={setOpenInviteForm}/>    
         
           </h2>

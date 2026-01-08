@@ -10,6 +10,7 @@ import toast from 'react-hot-toast';
 import { popFriendChat, popGroupChat, selectChatReceivedList } from '@/redux/slice/ChatReceivedSlice';
 import socket from '@/lib/socket';
 import { useGetSocketData } from '@/hook/reacthook';
+import GroupInfomation from './GroupInfomation';
 interface Response{
   message:string,
   status: number
@@ -124,6 +125,7 @@ const ChatBody = (
   },[])
 
   return (
+    <>
     <div className={`w-full h-full flex flex-col  overflow-hidden`} >
       {/* Header */}
       <header className="px-6 py-6 border-b border-gray-200 bg-gray-50">
@@ -254,6 +256,8 @@ const ChatBody = (
         </form>
       </div>
     </div>
+    {checkGroupChat?<GroupInfomation group={currentChat}/>:null}
+    </>
   );
 };
 

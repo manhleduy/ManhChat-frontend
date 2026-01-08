@@ -15,7 +15,7 @@ const COLORS = [
   '#6366f1', '#818cf8',  // Indigo
 ];
 const BaseContactList= (props:any) => {
-    const {presentList, config, SelectDropBox}= props
+    const {presentList=[], config, SelectDropBox}= props
     const [query, setQuery] = useState('');
     const queryValue= useDebounce(query, 500);
     const [selectedCategory, setSelectedCategory] = React.useState('All');
@@ -51,6 +51,7 @@ const BaseContactList= (props:any) => {
     });
     return res;
   }, [groupedItems, queryValue, sortOrder]);
+
 
   return (
     <main className="flex-1 bg-white h-full flex flex-col overflow-hidden">

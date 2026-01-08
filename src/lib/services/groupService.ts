@@ -2,7 +2,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { api } from "../axios";
 
 export const createGroup = async (
-    data: { detail: string; adminId: string; groupName: string; isRestricted: boolean },
+    data: { detail: string; adminId: number; groupName: string; isRestricted: boolean },
     setError: (error: string) => void,
     setLoading: (loading: boolean) => void
 ) => {

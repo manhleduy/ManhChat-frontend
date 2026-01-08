@@ -24,7 +24,7 @@ const ChatPage = () => {
   
   if(currentUser.id===-1) return <div>Loading...</div>
   return (
-    <div className="flex w-full h-full" data-theme="dark" >
+    <div className="flex w-full h-full"  >
       
       <AsideBar/>
       <div className="flex sm:hidden w-full">

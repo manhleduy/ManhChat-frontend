@@ -47,14 +47,22 @@ export const Invitations =(WrappedComponent:any) => {
   const [loading, setLoading]= useState(false);
   const [error, setError]= useState<string>("");
   // request sent
-  const [sentInvitations, setSentInvitations] = useState<FriendRequest[]>(FriendRequests.receivedRequests ||[]);
+  const [sentInvitations, setSentInvitations] = useState<FriendRequest[]>(FriendRequests.sentRequests||[]);
   // request received
-  const [receivedInvitations, setReceivedInvitations] = useState<FriendRequest[]>(FriendRequests.sentRequests||[]);
+  const [receivedInvitations, setReceivedInvitations] = useState<FriendRequest[]>(FriendRequests.receivedRequests||[]);
+  
+  const newRequest= useGetSocketData<FriendRequest>(socket, currentUser, "receiveRequest");
+  useEffect(()=>{
+    if(newRequest){
+    setSentInvitations(a=>[...a, newRequest]);
+    console.log("data received");
+    }
+  },[newRequest])
 
   useEffect(()=>{
     dispatch(getAllRequest(currentUser.id));
-    setSentInvitations(FriendRequests.receivedRequests);
-    setReceivedInvitations(FriendRequests.sentRequests);
+    setSentInvitations(FriendRequests.sentRequests);
+    setReceivedInvitations(FriendRequests.receivedRequests);
 
   },[])
 
@@ -81,7 +89,6 @@ export const Invitations =(WrappedComponent:any) => {
       toast.success("succesfully ")
     }
   };
-
   const handleReject = async(invitation: RequestType) => {
      try{
       setReceivedInvitations(receivedInvitations.filter(item=>item.id!=invitation.id));

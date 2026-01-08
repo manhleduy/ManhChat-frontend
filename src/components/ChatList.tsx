@@ -6,10 +6,12 @@ import { selectFriendList } from '@/redux/slice/FriendListSlice';
 import { selectUserInfo } from '@/redux/slice/userSlice';
 import { getAllGroup } from '@/lib/services/groupService';
 import { selectGroupList } from '@/redux/slice/GroupListSlice';
-import { ArrowDown, ArrowUp, Group } from 'lucide-react';
+import { ArrowDown, ArrowUp, Group, Plus } from 'lucide-react';
 import { selectOnlineUserList } from '@/redux/slice/onlineUserSlice';
 import socket from '@/lib/socket';
 import { useDebounce } from '@/hook/reacthook';
+import CreateGroupForm from './CreateGroupForm';
+
 
 const COLOR=['#ff6b9d', '#4a90e2', '#f39c12', '#9b59b6', '#e74c3c', '#1abc9c', '#34495e', '#e67e22', "#2ecc71", "#8e44ad"];
 
@@ -29,15 +31,16 @@ const BaseList=(props: any)=>{
     setCurrentChat,
     }= props;
   return(
-    <>
+    <>   
           <button 
           onClick={()=>{
             setOpenList(!openList)}}
           className=' flex justify-between w-full text-black p-2 items-center'>
             <div>{config.label}</div>
+
             {openList?<ArrowUp height={15} width={15}/>:<ArrowDown height={15} width={15}/>}
           </button>
-          {openList? displayList.filter((item:any)=>item.name.toLowerCase().includes(query.toLowerCase())).map((item:any,index:number) => (
+          {openList? displayList?.filter((item:any)=>item.name.toLowerCase().includes(query.toLowerCase())).map((item:any,index:number) => (
             
             <div
               key={item.id}
@@ -78,6 +81,7 @@ const BaseList=(props: any)=>{
               </div>
             </div>
           )): null}
+        
     </>
   )
 }
@@ -130,6 +134,7 @@ const GetGroupList=(WrappedComponent:any)=>{
     const dispatch=useAppDispatch();
     const [openList,setOpenList]= useState(true)
     const {currentUser, setActiveGroupId, setActiveUserId}= props;
+  
     //group list config
     const config={
       label: "Groups",
@@ -164,6 +169,7 @@ const GetGroupList=(WrappedComponent:any)=>{
         return()=> socket.off("joinGroup");
     },[groupList,socket])
     return(
+      <>
       <WrappedComponent
       setOpenList= {setOpenList}
       openList={openList}
@@ -171,6 +177,8 @@ const GetGroupList=(WrappedComponent:any)=>{
       handleSelect={handleSelectGroup}
       config={config}
       {...props}/>
+      
+      </>
     )
   }
 }
@@ -181,6 +189,7 @@ const ChatList= ({onlyMode, setOpenPage, setCurrentChat}:{onlyMode:boolean, setO
   const [activeUserId, setActiveUserId] = useState<number | null>(null);//public
   const [activeGroupId, setActiveGroupId] = useState<number | null>(null);//public
   const [query, setQuery] = useState<string>('');//public
+  const [openCreateForm, setOpenCreateForm]= useState(false);
   const queryValue= useDebounce(query, 500);
 
   
@@ -214,6 +223,8 @@ const ChatList= ({onlyMode, setOpenPage, setCurrentChat}:{onlyMode:boolean, setO
       <main className="flex-1 overflow-auto" role="main" aria-label="Friends list">
         
         <div className="py-2">
+          {openCreateForm? <CreateGroupForm setOpenCreateForm={setOpenCreateForm}/> : null} 
+
           {/*list of friend*/}
           <FriendList
           setActiveGroupId={setActiveGroupId}
@@ -235,7 +246,14 @@ const ChatList= ({onlyMode, setOpenPage, setCurrentChat}:{onlyMode:boolean, setO
           setOpenPage={setOpenPage}
           onlyMode={onlyMode}
           query={queryValue}
+          
           />
+          <button className=' border-2 rounded-full w-fit h-fit'
+            onClick={()=>{
+              console.log(openCreateForm)
+              setOpenCreateForm(!openCreateForm)}}>
+              <Plus height={20} width={20}/>
+          </button>
         </div>
       </main>
     </div>

@@ -106,12 +106,25 @@ export const postSchema= z.object({
         .string()
         .refine(val=>validateContent(val))
 })
-
 export type PostSchema= z.infer<typeof postSchema>;
+
+export const createGroupSchema= z.object({
+    groupName:z
+        .string()
+        .refine(val=>validateName(val)),
+    detail:z
+        .string()
+        .refine(val=>validateContent(val)),
+    isRestricted:z
+        .boolean()
+})
+export type CreateGroupSchema= z.infer<typeof createGroupSchema>;
+
 export const otpSchema = z.object({
     otp: z
         .string()
         .regex(/^\d{6}$/, "OTP must be exactly 6 digits")
 });
 export type OTPSchema = z.infer<typeof otpSchema>;
+    
 
