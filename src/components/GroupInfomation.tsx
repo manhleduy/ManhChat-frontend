@@ -100,7 +100,7 @@ const GroupInfomation = ({ group }:any) => {
           }
         `}
       </style>
-      <aside className={`h-full flex flex-col ${isLargeScreen ? 'w-1/4' : isOpen ? 'w-full fixed inset-0 z-50 bg-white' : 'w-0 hidden'}`}>
+      <aside className={`h-full flex flex-col ${isLargeScreen ? 'w-1/3' : isOpen ? 'w-full fixed inset-0 z-50 bg-white' : 'w-0 hidden'}`}>
         {!isLargeScreen && isOpen && (
           <div className="p-4 flex items-center">
             <button

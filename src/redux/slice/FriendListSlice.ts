@@ -1,8 +1,8 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type { UserDefaultInfo } from "@/lib/const";
+import type { FriendBlockInfo, UserDefaultInfo } from "@/lib/const";
 import { getFriendList } from "@/lib/services/friendService";
 const initialState: {
-  friendList:UserDefaultInfo[],
+  friendList:FriendBlockInfo[],
   error:any, 
   status:string}= {
     friendList:[],

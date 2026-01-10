@@ -35,11 +35,8 @@ const FriendList= () => {
       </SelectTrigger>
       <SelectContent>
         <SelectItem value="All">All</SelectItem>
-        <SelectItem value="Customer">Customer</SelectItem>
-        <SelectItem value="Family">Family</SelectItem>
-        <SelectItem value="Job">Job</SelectItem>
-        <SelectItem value="Friend">Friend</SelectItem>
-        <SelectItem value="Pioneer">Pioneer</SelectItem>
+        <SelectItem value="Customer">Online</SelectItem>
+        <SelectItem value="Family">Offline</SelectItem>
       </SelectContent>
     </Select>
   )
@@ -72,8 +69,8 @@ const GroupList = () => {
       </SelectTrigger>
       <SelectContent>
         <SelectItem value="All">All</SelectItem>
-        <SelectItem value="Active">Active</SelectItem>
-        <SelectItem value="Inactive">Inactive</SelectItem>
+        <SelectItem value="Private">Private</SelectItem>
+        <SelectItem value="Public">Public</SelectItem>
       </SelectContent>
     </Select>
   )

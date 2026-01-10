@@ -63,14 +63,14 @@ const BaseList=(props: any)=>{
             >
               <div className="relative shrink-0 mr-4">
                 <div className="w-12 h-12 rounded-full flex items-center justify-center text-white font-semibold" style={{ background: COLOR[index % COLOR.length] }}>
-                  {item.profilePic}
+                  {item.profilePic?<img className='rounded-full' src={item.profilePic} />:<div>{item.profilePic}</div>}
                 </div>
-                <span className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white ${item.online ? 'bg-green-500' : 'bg-gray-400'}`} aria-hidden />
+                <span className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white ${item.online ? 'bg-green-500' :item.isRestricted? 'bg-red-500' : 'bg-ray-400'}`} aria-hidden />
               </div>
 
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-gray-900 truncate">{item.name}</p>
-                <p className={`text-sm truncate ${item.unread > 0 ? 'text-gray-900 font-medium' : 'text-gray-500'}`}>{item.lastMessage}</p>
+                <p className={`text-sm truncate ${!item.isRead? 'text-gray-900 font-medium' : 'text-gray-500'}`}>{item.lastMessage? item.lastMessage: ""}</p>
               </div>
 
               <div className="flex items-center ml-3">
@@ -107,9 +107,7 @@ const GetFriendList= (WrappedComponent:any)=>{
     const displayedFriends= friendList?.map((item)=>{
     return {
        ...item,
-       lastMessage:"con me may",
-       time:"25/10",
-       unread:1,
+       time:item.createdAt?.slice(0,7)||"",
        online: currentOnlineUsers.includes(item.id)?true: false
        }
     })
@@ -151,10 +149,7 @@ const GetGroupList=(WrappedComponent:any)=>{
       return {
         ...item,
         name: item.groupName,
-        lastMessage:"con me may",
-        time:"26/10",
-        unread:1,
-        online:false
+        time:item.createdAt?.slice(0,7),
       }
     })
     useEffect(()=>{

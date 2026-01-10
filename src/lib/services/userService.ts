@@ -126,19 +126,20 @@ export const updateUserPassword = async (
     }
 };
 
-export const updateUserAvatar = async (
-    id: string,
-    avatar: string,
+export const updateUserProfilePic = async (
+    id: number,
+    avatar: any,
     setError: any,
     setLoading: any
 ) => {
     try {
         setLoading(true);
-        const res = await api.put(`/api/user/updateAvatar/${id}`, { avatar });
+        const res = await api.put(`/api/user/updateAvatar/${id}`,{avatar:avatar});
+        console.log(avatar.name);
         setLoading(false);
-        return res.data;
     } catch (e: any) {
         setLoading(false);
+        console.log(e);
         setError(e.response?.data?.message || e.message || 'An error occurred');
     }
 };

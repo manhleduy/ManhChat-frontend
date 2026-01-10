@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, {type ChangeEvent, useEffect, useState } from 'react';
 import ManhChatImage from '../assets/ManhChat.png';
 import { Input } from '@/components/ui/input';
-import { Camera, User, Home, Calendar, Phone, Edit2, X, Check, Newspaper } from 'lucide-react';
+import { Camera, User, Home, Calendar, Phone, Edit2, X, Check,ArrowRightCircle, Newspaper, ArrowLeftCircle } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/redux/reduxHook';
 import { selectUserInfo } from '@/redux/slice/userSlice';
 import { useNavigate } from 'react-router-dom';
-import { getUserInfo, updateUserInfo } from '@/lib/services/userService';
+import { getUserInfo, updateUserInfo, updateUserProfilePic } from '@/lib/services/userService';
 import toast from 'react-hot-toast';
 // Form Imports
 import { useForm, FormProvider, Controller } from 'react-hook-form';
@@ -17,8 +17,6 @@ import { useFormContext } from 'react-hook-form';
 import AsideBar from '@/components/AsideBar';
 import { selectUserPostList } from '@/redux/slice/PostListSlice';
 import { getAllPost, createPost } from '@/lib/services/postService';
-import Post from '@/components/Post';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import UserPostList from '@/components/UserPostList';
 type FieldDef = {
   name: keyof ProfileChangeSchema;
@@ -68,10 +66,9 @@ const ProfilePage: React.FC = () => {
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [isEditing, setIsEditing] = useState(false);
-  const dispatch= useAppDispatch()
   const currentUser = useAppSelector(selectUserInfo).info;
-  const currentPost= useAppSelector(selectUserPostList);
-  const [post, setPost]= useState(currentPost)
+  const  [image, setImage]= useState<any>(currentUser.profilePic);
+  const [openPostList,setOpenPostList]= useState<boolean>(false);
 
   // Initialize React Hook Form
   const methods = useForm<ProfileChangeSchema>({
@@ -84,7 +81,6 @@ const ProfilePage: React.FC = () => {
       phonenumber: '',
     }
   });
-
   const { handleSubmit, control, reset, setValue, getValues } = methods;
   
   // Authentication Guard
@@ -135,14 +131,36 @@ const ProfilePage: React.FC = () => {
     reset(); // Reverts to the last provided 'defaultValues' (fetched data)
     setIsEditing(false);
   };
-  
+  const handleImageUpload=async(e:ChangeEvent<HTMLInputElement>)=>{
+    try{
+      
+      const file= e.target.files;
+      if(!file) return;
+      const reader= new FileReader()
+      reader.readAsDataURL(file[0]);
+      reader.onload= async()=>{
+        const base64Image= reader.result;
+        await updateUserProfilePic(currentUser.id, base64Image, setError, setLoading)
+        
+      }
+      
+    }catch(e:any){
+      console.log(e);
+      toast.error(e.message);
+      reset()
+    }finally{
+      toast.success("Image uploaded")
+    }
+  }
+
 
   return (
     <div className=' flex h-full w-full max-h-screen'>
+      
     <div className='relative left-0'>
     <AsideBar/>
     </div>
-    <div className="min-h-screen w-full flex flex-col items-center justify-center px-5 pt-10 pb-5">
+    <div className={`min-h-screen w-full flex flex-col items-center justify-center px-5 pt-10 pb-5 max-lg:${openPostList? "hidden": ""}`}>
       <main className="w-full max-w-xl">
         <div className="text-center mb-6">
           <h1 className="text-3xl font-semibold text-green-700 mb-2">My Profile</h1>
@@ -151,17 +169,31 @@ const ProfilePage: React.FC = () => {
 
         <FormProvider {...methods}>
           <form onSubmit={handleSubmit(onSubmit)} className="bg-gray-50 border-2 border-gray-200 rounded-2xl px-8 pt-8 pb-32 relative">
-            
+            <button
+                onClick={()=>setOpenPostList(true)}
+                className='lg:hidden relative top-1 right-1'>
+                  <ArrowRightCircle height={30} width={30}  fill='green'/>
+            </button>
             {/* Avatar Section */}
             <div className="text-center mb-8">
               <div className="relative inline-block">
+                
                 <div className="w-24 h-24 rounded-full bg-linear-to-br from-green-100 to-green-200 border-4 border-green-500 flex items-center justify-center shadow-lg">
-                  <img src={ManhChatImage} alt="Profile" className="w-20 h-20 object-contain rounded-full" />
+                  <img src={currentUser.profilePic||image|| ManhChatImage} className="w-20 h-20 object-contain rounded-full" />
                 </div>
-                <button type="button" onClick={() => alert('Upload logic here')} className="absolute bottom-0 right-0 w-8 h-8
+                <label 
+                htmlFor='avatarupload'
+                className="absolute bottom-0 right-0 w-8 h-8
                  bg-green-500 border-4 border-white rounded-full flex items-center justify-center cursor-pointer hover:bg-green-600 transition-all shadow-md">
                   <Camera size={16} className="text-white" />
-                </button>
+                  <input 
+                  type="file" 
+                  id='avatarupload'
+                  className='hidden'
+                  accept='image/png, image/gif, image/jpeg'
+                  onChange={(e)=>handleImageUpload(e)}
+                  />
+                </label>
               </div>
             </div>
             {/* Form Fields */}
@@ -234,10 +266,15 @@ const ProfilePage: React.FC = () => {
           </form>
         </FormProvider>
       </main>
+  
+      
       
       
     </div>
     
+    <div className={`${openPostList? "": "max-lg:hidden"}`}>
+      <UserPostList setOpenPostList={setOpenPostList}/>
+    </div>
     </div>
   );
 };

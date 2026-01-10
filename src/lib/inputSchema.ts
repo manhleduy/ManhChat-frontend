@@ -105,9 +105,16 @@ export const postSchema= z.object({
     content:z
         .string()
         .refine(val=>validateContent(val)),
-    file:z
-        .string()
-        .refine(val=>validateContent(val)),
+     file: z
+    .custom<FileList>((val) => val instanceof FileList, {
+      message: "Please upload a file",
+    })
+    .refine((files) => files && files.length > 0, {
+      message: "File is required",
+    }),
+
+        
+        
 })
 export type PostSchema= z.infer<typeof postSchema>;
 

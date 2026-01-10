@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { getAllPost } from '@/lib/services/postService';
 
 import { Tooltip, TooltipTrigger, TooltipContent } from './ui/tooltip';
-import { Newspaper } from 'lucide-react';
+import { ArrowLeftCircle, Newspaper } from 'lucide-react';
 import Post from './Post';
 import { useForm } from 'react-hook-form';
 import { postSchema, type PostSchema } from '@/lib/inputSchema';
@@ -20,7 +20,7 @@ const InputField=()=>{
 
 
 
-const UserPostList = () => {
+const UserPostList = ({setOpenPostList}:any) => {
     const dispatch= useAppDispatch()
     const currentUser = useAppSelector(selectUserInfo).info;
     const currentPost= useAppSelector(selectUserPostList);
@@ -40,24 +40,27 @@ const UserPostList = () => {
     })
     
   return (
-    <div className='w-full '>
+    <div className='w-full h-full px-10 py-5'>
         <div className='flex gap-3'>
-            <h1 className='text-green-500 text-lg'>Your Post</h1>
+            <h1 className='text-green-500 text-lg flex'>
+                <button
+                className={`lg:hidden `}
+                onClick={()=>{
+                    setOpenPostList(false)
+                    }}>
+                        <ArrowLeftCircle height={30} width={30} fill='green'/>
+                    </button>
+                Your Post</h1>
             <Tooltip>
                 <TooltipTrigger asChild>
-                  <button
-                    onClick={()=>{
-                        setOpenPostForm(true);
-                    }}>
                    <Newspaper height={40} width={40} fill='green'/>
-                  </button>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>Post a news</p>
                 </TooltipContent>
             </Tooltip>
         </div>
-        <div className='flex'>
+        <div className='flex w-full h-fit justify-center  gap-5 m-4  flex-wrap '>
             {
                 post.map((item,index)=>(
                   <Post props={item} key={index}/>

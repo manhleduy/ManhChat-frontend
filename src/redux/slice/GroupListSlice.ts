@@ -1,8 +1,8 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type { GroupDefaultInfo, UserDefaultInfo } from "@/lib/const";
+import type { GroupBlockInfo} from "@/lib/const";
 import { getAllGroup } from "@/lib/services/groupService";
 const initialState: {
-  groupList:GroupDefaultInfo[],
+  groupList:GroupBlockInfo[],
   error:any, 
   status:string}= {
     groupList:[],

@@ -15,6 +15,7 @@ export const getAllFriendPost= createAsyncThunk(
         }
     }
 )
+
 export const getAllPost= createAsyncThunk(
     'post/user',
     async(userId:number, {rejectWithValue})=>{
@@ -49,7 +50,7 @@ export const likePost= async(postId: number)=>{
     }
 }
 export const createPost= async(
-    data:{ userId:number, content:string, file:string},
+    data:{ userId:number, content:string, file:any},
     setError: (message: string)=>void,
     setLoading: (load: boolean)=>void
 )=>{

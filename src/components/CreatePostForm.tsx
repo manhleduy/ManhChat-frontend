@@ -17,20 +17,27 @@ const CreatePostForm= ({setOpenCreateForm}:any) => {
   const [loading, setLoading]= useState<boolean>(false);
   const methods = useForm<PostSchema>({
     resolver: zodResolver(postSchema),
-    mode: 'all',
-    defaultValues: { file: '',content: ''},
+    mode: 'onSubmit',
+    defaultValues: { file:undefined ,content: ''},
   });
 
   const { handleSubmit } = methods;
 
   const onSubmit =async (data: PostSchema) => {  
     try{
-        const response = await createPost({userId: curretUser.id, ...data}, setError, setLoading)
-        toast.success("Group created successfully!");
-        toast.success("successful create a new group with admin is you")
+      const file= data.file;
+      if(!file) return;
+      const reader= new FileReader()
+      reader.readAsDataURL(file[0]);
+      reader.onload= async()=>{
+        const base64Image= reader.result;
+        await createPost({userId: curretUser.id, content: data.content, file: base64Image}, setError, setLoading)
+      }
     }catch(e:any){
-        console.log(e);
-        toast.error("Failed to create group", e);
+      console.log(e);
+      toast.error(e.message);
+    }finally{
+      toast.success("Image uploaded")
     }
   };
 
@@ -78,7 +85,7 @@ const CreatePostForm= ({setOpenCreateForm}:any) => {
   };
 
   const fields: FieldDef[] = [
-    { name: 'file', id: 'file', label: 'Image', placeholder: 'post your image' },
+    { name: 'file', id: 'file', label: 'Image', placeholder: 'post your image', type:'file' },
     { name: 'content', id: 'content', label: 'content', placeholder: 'said something', isTextarea: true },
   ];
 
@@ -116,7 +123,7 @@ const CreatePostForm= ({setOpenCreateForm}:any) => {
                 type="submit"
                 className="w-full py-3.5 bg-green-500 text-white rounded-lg text-base font-semibold cursor-pointer border-none transition-all hover:bg-green-600 hover:-translate-y-px hover:shadow-lg active:translate-y-0 disabled:bg-green-300 disabled:cursor-not-allowed disabled:shadow-none"
               >
-                Create Group
+                Create Post
               </button>
             </form>
           </FormProvider>

@@ -31,6 +31,11 @@ export interface UserDefaultInfo{
     phonenumber:string;
     birthday?:Date;
 }
+export interface FriendBlockInfo extends UserDefaultInfo{
+    lastMessage?: "",
+    isRead?: boolean,
+    createdAt?:string
+}
 export interface UserSignUpInfo extends UserDefaultInfo{
     password:string;
 }
@@ -58,6 +63,9 @@ export interface GroupDefaultInfo{
     isRestricted: boolean,
     adminName?: string
 }
+export interface GroupBlockInfo extends GroupDefaultInfo{
+    lastMessage?: ""
+}
 //group chat interfaces
 export interface DefaultGroupChatInfo{
     chatGroupId:string;
@@ -81,7 +89,8 @@ export interface PostDefaultInfo{
     likeNum: number;
     createdAt: Date;
     name: string;
-    profilePic: string
+    profilePic: string;
+    image:string
 }
 //invitation interfaces
 export interface InvitationDefaultInfo{ 
