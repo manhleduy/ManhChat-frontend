@@ -5,7 +5,7 @@ export interface ChatBlockInfo{
     id?:number;
     content:string;
     likeNum?:number;
-    file?:string;
+    file?:any;
     createdAt?:string;
     senderId:number;
     isRead?: boolean;

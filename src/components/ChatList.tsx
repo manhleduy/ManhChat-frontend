@@ -219,7 +219,7 @@ const ChatList= ({onlyMode, setOpenPage, setCurrentChat}:{onlyMode:boolean, setO
         
         <div className="py-2">
           {openCreateForm? <CreateGroupForm setOpenCreateForm={setOpenCreateForm}/> : null} 
-
+          
           {/*list of friend*/}
           <FriendList
           setActiveGroupId={setActiveGroupId}
@@ -243,12 +243,14 @@ const ChatList= ({onlyMode, setOpenPage, setCurrentChat}:{onlyMode:boolean, setO
           query={queryValue}
           
           />
+          
           <button className=' border-2 rounded-full w-fit h-fit'
             onClick={()=>{
               console.log(openCreateForm)
               setOpenCreateForm(!openCreateForm)}}>
               <Plus height={20} width={20}/>
           </button>
+          
         </div>
       </main>
     </div>

@@ -5,14 +5,12 @@ import { selectOnlineUserList } from '@/redux/slice/onlineUserSlice';
 
 
 
-const GroupInfomation = ({ group }:any) => {
+const GroupInfomation = ({ group, openInfoPage, setOpenInfoPage }:any) => {
   const groupId= group.id;
   const [groupInfo, setGroupInfo] = useState<any>(null);
   const [members, setMembers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
-  const [isOpen, setIsOpen] = useState(false);
-  const [isLargeScreen, setIsLargeScreen] = useState(false);
 
   const currentOnlineUser = useAppSelector(selectOnlineUserList);
 
@@ -30,27 +28,14 @@ const GroupInfomation = ({ group }:any) => {
     const fetchGroupInfo = async () => {
       const data = await getGroupInfo(groupId, setError, setLoading);
       if (data ) {
-        setGroupInfo(data);
+        setGroupInfo(data.groupInfo || {});
         setMembers(data.groupMembers || []);
       }
     };
     fetchGroupInfo();
   }, [groupId]);
   
-  useEffect(() => {
-    const checkScreenSize = () => {
-      const large = window.innerWidth >= 768; // 48rem = 768px
-      setIsLargeScreen(large);
-      if (large) {
-        setIsOpen(true);
-      } else {
-        setIsOpen(false);
-      }
-    };
-    checkScreenSize();
-    window.addEventListener('resize', checkScreenSize);
-    return () => window.removeEventListener('resize', checkScreenSize);
-  }, []);
+
 
   if (loading) {
     return <div className="h-full flex items-center justify-center">Loading...</div>;
@@ -100,11 +85,12 @@ const GroupInfomation = ({ group }:any) => {
           }
         `}
       </style>
-      <aside className={`h-full flex flex-col ${isLargeScreen ? 'w-1/3' : isOpen ? 'w-full fixed inset-0 z-50 bg-white' : 'w-0 hidden'}`}>
-        {!isLargeScreen && isOpen && (
+      <aside className={`h-full flex flex-col w-full`}>
           <div className="p-4 flex items-center">
             <button
-              onClick={() => setIsOpen(false)}
+              onClick={() => {
+                if(openInfoPage)setOpenInfoPage(false);
+              }}
               className="text-gray-600 hover:text-gray-800"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -112,7 +98,6 @@ const GroupInfomation = ({ group }:any) => {
               </svg>
             </button>
           </div>
-        )}
         {/* Group Header */}
         <div className="p-6 text-center" style={{ backgroundColor: defaultConfig.surface_color }}>
           <div className="flex justify-center mb-4">
@@ -128,9 +113,8 @@ const GroupInfomation = ({ group }:any) => {
             </div>
           </div>
           <h1
-            className={`text-2xl font-bold mb-1 ${!isLargeScreen ? 'cursor-pointer' : ''}`}
+            className={`text-2xl font-bold mb-1  cursor-pointer `}
             style={{ color: defaultConfig.text_color, fontSize: `${defaultConfig.font_size * 1.5}px` }}
-            onClick={() => !isLargeScreen && setIsOpen(true)}
           >
             {groupInfo.groupName}
           </h1>
@@ -154,24 +138,23 @@ const GroupInfomation = ({ group }:any) => {
               className="p-4 rounded-xl"
               style={{ backgroundColor: defaultConfig.surface_color }}
             >
+              <div className="text-xs opacity-70 mt-1">
+                Total Members:
+              </div>
               <div className="text-2xl font-bold">
                 {members.length}
               </div>
-              <div className="text-xs opacity-70 mt-1">
-                Total Members
-              </div>
+              
             </div>
             <div
               className="p-4 rounded-xl"
               style={{ backgroundColor: defaultConfig.surface_color }}
             >
-              <div className="text-sm font-semibold" style={{ color: defaultConfig.text_color }}>
-                {groupInfo.adminName}
-              </div>
               <div className="text-xs opacity-70 mt-1">
                 Admin: 
-                <button className=''
-                >{groupInfo.adminName}</button>
+              </div>
+              <div className="text-2xl font-bold">
+                {groupInfo.adminName}
               </div>
             </div>
           </div>

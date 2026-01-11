@@ -48,7 +48,7 @@ const SenderDropDown=(props:any)=>{
 const BaseChatBlock=(props:any)=>{
   const [error, setError]= useState<string>("")
   const [loading, setLoading]= useState<boolean>(false);
-  const { senderId, content, createdAt, likeNum, id, isRead, profilePic, name } = props.chatBlockInfo as MessageType;
+  const { senderId, content, createdAt, likeNum, id, isRead, profilePic, name, file } = props.chatBlockInfo as MessageType;
   
   const {config, dropdown}= props
   //like the message
@@ -98,6 +98,17 @@ const BaseChatBlock=(props:any)=>{
             className={`px-4 py-3 rounded-2xl text-sm leading-relaxed wrap-break-word ${config.mesageStyle}` }
           >
             {content}
+            {file && (
+              <div className="mt-2">
+                {file.match(/\.(jpeg|jpg|png)$/i) ? (
+                  <img src={file} alt="attachment" className="max-w-full h-auto rounded max-h-[100px]" />
+                ) : (
+                  <a href={file} target="_blank" rel="noopener noreferrer" className="text-blue-300 underline">
+                    Download file
+                  </a>
+                )}
+              </div>
+            )}
           </div>
           <span className="text-xs text-gray-400">{createdAt?.slice(0,10)}</span>
         </div>
