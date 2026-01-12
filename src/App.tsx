@@ -15,6 +15,7 @@ import { pushFriendChat,pushGroupChat, selectChatReceivedList} from "./redux/sli
 import { addOnlineUser, removeOnlineUser, selectOnlineUserList } from "./redux/slice/onlineUserSlice"
 import type { FriendChatBlock, GroupChatBlock, FriendRequest, GroupRequest } from "./lib/const"
 import { pushFriendReceivedRequest } from "./redux/slice/FriendRequestSlice"
+import ForgotPassword from "./pages/ForgotPassword"
 
 function App() {
   const dispatch = useAppDispatch();
@@ -92,6 +93,8 @@ function App() {
         <Route path="/login" element={<LoginPage/>} /> {/* Use LoginPage component */}
         <Route path="/signup" element={<SignUpPage/>} />
         <Route path="/post" element={<PostPage/>}/>
+        <Route path="/forgotpassword" element={<ForgotPassword/>}/>
+
       </Routes>
       </div>
       

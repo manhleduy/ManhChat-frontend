@@ -136,5 +136,22 @@ export const otpSchema = z.object({
         .regex(/^\d{6}$/, "OTP must be exactly 6 digits")
 });
 export type OTPSchema = z.infer<typeof otpSchema>;
-    
+
+//schema for change password
+export const changePasswordSchema = z.object({
+    newPassword: z
+        .string()
+        .refine(val=>validatePassword(val)),
+    confirmPassword: z
+        .string(),
+}).superRefine((data, ctx) => {
+    if (data.newPassword !== data.confirmPassword) {
+        ctx.addIssue({
+            code: "custom",
+            message: "Passwords do not match",
+            path: ['confirmPassword']
+        });
+    }
+});
+export type ChangePasswordSchema = z.infer<typeof changePasswordSchema>;
 

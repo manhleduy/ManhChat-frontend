@@ -11,8 +11,43 @@ import ReactDatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import toast from 'react-hot-toast';
 import { signUp } from '@/lib/services/userService';
+import { verifyOTP } from '@/lib/services/userService';
 
+const SignUpOTP=(WrappedComponent: any)=>{
+  return function EnhancedComponent(props:any){
+        const {setLoading, setError, error, loading, setOpenOTP, setOpenPasswordForm, newUserData}= props;
+        const [input,setInput]= useState<string>("");
+        
+        const handleSubmit=async()=>{
+            const OTP=parseInt(input)
+            try{
+                if(OTP<100000 || OTP>999999){
+                    toast.error("your OTP is not valid retry now");
+                    return;
+                }
 
+                await verifyOTP(OTP, setError, setLoading);
+               
+                toast.success("your OTP is valid")
+                setOpenOTP(false);
+                setOpenPasswordForm(true);
+
+            }catch(e:any){
+                console.log(e);
+                toast.error(e.message);
+            }
+        }
+        return(
+            <WrappedComponent
+            {...props}
+            handleSubmit={handleSubmit}
+            input={input}
+            setInput={setInput}
+            
+            />
+        )
+    }
+}
 type FieldDef = {
     name: keyof FormData;
     id: string;
@@ -43,10 +78,7 @@ type FieldDef = {
         )}
       </div>
     );
-  };
-
-
-
+};
 interface FormData{
     name:string;
     address:string;
@@ -78,11 +110,11 @@ const SignUpPage: React.FC = () => {
   });
 
   const { handleSubmit, reset, control } = methods;
-  console.log(signUpData);
-
+  
   const onSubmit =async (data: FormData) => {
     
     try{
+
       await signUp({...data, profilePic: "", id:0}, setError, setLoading)
     }catch(e:any){
       console.log(e);

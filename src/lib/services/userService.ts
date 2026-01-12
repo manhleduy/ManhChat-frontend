@@ -1,3 +1,4 @@
+import { setErrorMap } from "zod/v3";
 import { api } from "../axios";
 
 import type { UserDefaultInfo, UserLoginInfo, UserSignUpInfo } from "../const";
@@ -110,17 +111,18 @@ export const updateUserInfo = async (
 };
 
 export const updateUserPassword = async (
-    id: string,
+    email: string,
     password: string,
     setError: any,
     setLoading: any
 ) => {
     try {
         setLoading(true);
-        const res = await api.put(`/api/user/updatePassword/${id}`, { password });
+        const res = await api.put(`/api/user/updatePassword`, { password, email });
         setLoading(false);
         return res.data;
     } catch (e: any) {
+        console.log(e)
         setLoading(false);
         setError(e.response?.data?.message || e.message || 'An error occurred');
     }
@@ -191,4 +193,33 @@ export const findUsers=async(
         console.log(e);
         setError(e.message);
     }
+}
+export const sendOTP=async(email: string, setError:(error:string)=>void, setLoading:(loading:boolean)=>void)=>{
+    try{
+        setLoading(false);
+        const response= await api.post("/api/user/otp", {email:email})
+        setLoading(true);
+        return response.data;
+    }catch(e:any){
+        setLoading(false);
+        console.log(e);
+        setError(e.message)
+    }
+}
+export const verifyOTP= async(
+    otp: number,
+    setError:(error: string)=>void, 
+    setLoading:(loading:boolean)=>void)=>{
+        try{
+            setLoading(false);
+            const response= await api.post("/api/user/otp/verify", {otp:otp})
+            setLoading(true)
+            return response
+        }
+        catch(e:any){
+            setLoading(false);
+            console.log(e);
+            setError(e.message)
+        }
+
 }

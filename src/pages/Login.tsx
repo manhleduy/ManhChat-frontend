@@ -20,9 +20,9 @@ const defaultConfig = {
 };
 
 const Login: React.FC = () => {
-  const [showSuccess, setShowSuccess] = useState(false);
   const [config, setConfig] = useState<typeof defaultConfig>(defaultConfig);
   const [showPassword, setShowPassword] = useState(false);
+  
   const currentUser= useAppSelector(selectUserInfo);
   const dispatch =useAppDispatch();
   const navigate= useNavigate();
@@ -144,11 +144,7 @@ const Login: React.FC = () => {
         </div>
 
         {/* Success Message */}
-        {showSuccess && (
-          <div className="bg-green-50 border-2 border-green-500 rounded-lg p-4 mb-4 text-green-800 font-medium text-center">
-            Login successful! Welcome back.
-          </div>
-        )}
+        
 
         <div className="bg-green-50 border-2 border-green-300 rounded-2xl p-8 mb-6">
           <FormProvider {...methods}>
