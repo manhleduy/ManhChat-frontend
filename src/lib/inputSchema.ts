@@ -101,6 +101,17 @@ export const profileChangeSchema=z.object({
 
 export type ProfileChangeSchema= z.infer<typeof profileChangeSchema>;
 
+export const groupChangeSchema=z.object({
+    groupName: z
+        .string()
+        .refine(val=>validateName(val)),
+    detail:z
+        .string()
+        .refine(val=>validateContent(val)),
+})
+
+export type GroupChangeSchema= z.infer<typeof groupChangeSchema>;
+
 export const postSchema= z.object({
     content:z
         .string()

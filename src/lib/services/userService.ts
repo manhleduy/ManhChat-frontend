@@ -4,6 +4,7 @@ import { api } from "../axios";
 import type { UserDefaultInfo, UserLoginInfo, UserSignUpInfo } from "../const";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
+
 export const Login = createAsyncThunk(
     'users/fetchUser',
     async (LoginInfo: UserLoginInfo, { rejectWithValue }) => {
@@ -55,6 +56,18 @@ export const logout = async (setError: any,setLoading: any) => {
         setError(e.response?.data?.message || e.message || 'An error occurred');
     }
 };
+export const deleteUser= async(setError:any, setLoading:any, id: number)=>{
+    try{
+        setLoading(true);
+        const res= await api.delete(`/api/user/${id}`);
+        setLoading(false);
+
+    }catch(e:any){
+        console.log(e);
+        setLoading(false);
+        setError(e.message);
+    }
+}
 
 export const getUserInfo = async (
     id: number,

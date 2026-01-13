@@ -1,11 +1,11 @@
 import React, {type ChangeEvent, useEffect, useState } from 'react';
 import ManhChatImage from '../assets/ManhChat.png';
 import { Input } from '@/components/ui/input';
-import { Camera, User, Home, Calendar, Phone, Edit2, X, Check,ArrowRightCircle, Newspaper, ArrowLeftCircle } from 'lucide-react';
+import { Camera, User, Home, Calendar, Phone, Edit2, X, Check,ArrowRightCircle, Trash2Icon, TrashIcon, icons, XIcon } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/redux/reduxHook';
 import { selectUserInfo } from '@/redux/slice/userSlice';
 import { useNavigate } from 'react-router-dom';
-import { getUserInfo, updateUserInfo, updateUserProfilePic } from '@/lib/services/userService';
+import { deleteUser, getUserInfo, updateUserInfo, updateUserProfilePic } from '@/lib/services/userService';
 import toast from 'react-hot-toast';
 // Form Imports
 import { useForm, FormProvider, Controller } from 'react-hook-form';
@@ -15,9 +15,8 @@ import "react-datepicker/dist/react-datepicker.css"; // Required for styling
 import { type ProfileChangeSchema, profileChangeSchema } from '@/lib/inputSchema';
 import { useFormContext } from 'react-hook-form';
 import AsideBar from '@/components/AsideBar';
-import { selectUserPostList } from '@/redux/slice/PostListSlice';
-import { getAllPost, createPost } from '@/lib/services/postService';
 import UserPostList from '@/components/UserPostList';
+import ConfirmButton from '@/components/Confirmbutton';
 type FieldDef = {
   name: keyof ProfileChangeSchema;
   id: string;
@@ -26,6 +25,7 @@ type FieldDef = {
   placeholder?: string;
   icon: React.ReactNode;
 };
+
 
 const InputField: React.FC<{ field: FieldDef, isEditing:boolean, value:any }> = ({ field, isEditing, value }) => {
   const { register , formState: { errors } } = useFormContext<ProfileChangeSchema>();
@@ -69,6 +69,7 @@ const ProfilePage: React.FC = () => {
   const currentUser = useAppSelector(selectUserInfo).info;
   const  [image, setImage]= useState<any>(currentUser.profilePic);
   const [openPostList,setOpenPostList]= useState<boolean>(false);
+  const [openConfirm, setOpenConfirm]= useState(false);
 
   // Initialize React Hook Form
   const methods = useForm<ProfileChangeSchema>({
@@ -127,10 +128,24 @@ const ProfilePage: React.FC = () => {
       toast.success("Profile updated locally!");
     }
   };
+  //cancel profile change
   const handleCancel = () => {
     reset(); // Reverts to the last provided 'defaultValues' (fetched data)
     setIsEditing(false);
   };
+  //delte user account
+  const handleDelete= async()=>{
+    try{
+      //await deleteUser(setError, setLoading, currentUser.id);
+      
+    }catch(e:any){
+      console.log(e);
+      toast.error(e.message);
+    }finally{
+      toast.success("Account deleted successfully, good bye!");
+    }
+  }
+  //upload user profile image
   const handleImageUpload=async(e:ChangeEvent<HTMLInputElement>)=>{
     try{
       
@@ -156,12 +171,12 @@ const ProfilePage: React.FC = () => {
 
   return (
     <div className=' flex h-full w-full max-h-screen'>
-      
     <div className='relative left-0'>
-    <AsideBar/>
+      <AsideBar/>
     </div>
-    <div className={`min-h-screen w-full flex flex-col items-center justify-center px-5 pt-10 pb-5 max-lg:${openPostList? "hidden": ""}`}>
-      <main className="w-full max-w-xl">
+    {/* Profile Page Content  change profile button and delete user*/}
+    <div className={` min-h-screen z-100 w-full flex flex-col items-center justify-center px-5 pt-10 pb-5 max-lg:${openPostList? "hidden": ""}`}>
+      <main className="w-full max-w-xl ">
         <div className="text-center mb-6">
           <h1 className="text-3xl font-semibold text-green-700 mb-2">My Profile</h1>
           <p className="text-sm text-green-500">View and manage your personal information</p>
@@ -232,6 +247,15 @@ const ProfilePage: React.FC = () => {
 
             </div>
             {/* Action Buttons */}
+            <div className='absolute m-1  bottom-6 right-6 flex'>
+               <ConfirmButton
+                  acceptFunc={handleDelete}
+                  cancelFunc={()=>setOpenConfirm(false)}
+                  icon={<Trash2Icon height={24} width={24} fill="red"/>}
+                  setOpenConfirm={setOpenConfirm}
+                  openConfirm={openConfirm}
+                />
+            </div>
             <div className="absolute bottom-6 left-6 flex gap-2">
               {!isEditing ? (
                 <button
@@ -265,13 +289,9 @@ const ProfilePage: React.FC = () => {
             </div>
           </form>
         </FormProvider>
-      </main>
-  
-      
-      
-      
+      </main> 
     </div>
-    
+    {/* User Post List */}
     <div className={`${openPostList? "": "max-lg:hidden"}`}>
       <UserPostList setOpenPostList={setOpenPostList}/>
     </div>

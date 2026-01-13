@@ -30,7 +30,22 @@ export const createGroupConnect = async (
         setError(e.response?.data?.message || e.message || 'An error occurred');
     }
 };
+export const deleteGroup = async (
+    data: { groupId: number; adminId: number },
+    setError:any,
+    setLoading:any
+)=>{
+    try{
+        setLoading(true);
+        await api.delete(`/api/group`, {data});
+        setLoading(false);
 
+    }catch(e:any){
+        console.log(e);
+        setError(e.message);
+        setLoading(false);
+    }
+}
 export const getGroupInfo = async (
     id: string,
     setError: (error: string) => void,

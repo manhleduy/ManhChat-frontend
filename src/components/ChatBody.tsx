@@ -12,6 +12,7 @@ import socket from '@/lib/socket';
 import { useGetSocketData } from '@/hook/reacthook';
 import GroupInfomation from './GroupInfomation';
 import FriendInformation from './FriendInformation';
+import { clearAllListeners } from '@reduxjs/toolkit';
 interface Response{
   message:string,
   status: number
@@ -32,7 +33,8 @@ const BaseChatBody=(props:any)=>{
         InfoButton,
         attachedFile,
         setAttachedFile,
-        handleFileSelect
+        handleFileSelect,
+        setOpenInfoPage,
       }= props;
     return (
       <div className={`w-full h-full flex flex-col  overflow-hidden max-lg:${openInfoPage? "hidden": ""}`} >
@@ -288,18 +290,16 @@ const GroupChatBody=(WrapppedComponent: any)=>{
   }, [currentUser.id, currentChat.groupId])
     //socket handle
     const groupMessage= useGetSocketData<GroupChatBlock>(socket, currentUser, "receiveGroupMessage");
-  useEffect(()=>{
-    if(groupMessage && groupMessage.groupId===currentChat.id){
-      setMessages(messages=>[...messages, groupMessage])
-      dispatch(popGroupChat(currentChat.id)); 
+    useEffect(()=>{
+        if(groupMessage && groupMessage.groupId===currentChat.id){
+        setMessages(messages=>[...messages, groupMessage])
+        dispatch(popGroupChat(currentChat.id)); 
 
-    }else{
-      console.log("unkown error")
-    }
-    return (()=>{
-      dispatch(popGroupChat(currentChat.id));
-    })
-  }, [groupMessage])
+      }else{
+        console.log("unkown error")
+      }
+    }, [groupMessage])
+    
     return(
       <>
       <WrapppedComponent
@@ -317,8 +317,8 @@ const GroupChatBody=(WrapppedComponent: any)=>{
       handleFileSelect={handleFileSelect}
       />
       {openInfoPage
-      ?<div className='w-full lg:w-1/3 h-full'><GroupInfomation group={currentChat} setOpenInfoPage={setOpenInfoPage} openInfoPage={openInfoPage}/></div>
-      :<div className='max-lg:hidden w-1/3 h-full'><GroupInfomation group={currentChat}/></div>
+      ?<div className='w-full lg:hidden h-full'><GroupInfomation group={currentChat} setOpenInfoPage={setOpenInfoPage} openInfoPage={openInfoPage}/></div>
+      :<div className=' w-1/3 max-lg:hidden h-full'><GroupInfomation group={currentChat}/></div>
       }
       </>
       )

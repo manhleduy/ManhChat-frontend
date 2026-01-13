@@ -10,12 +10,13 @@ import DatePicker from 'react-datepicker';
 import ReactDatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import toast from 'react-hot-toast';
-import { signUp } from '@/lib/services/userService';
+import { sendOTP, signUp } from '@/lib/services/userService';
 import { verifyOTP } from '@/lib/services/userService';
+import InputOTP from '@/components/InputOTP';
 
 const SignUpOTP=(WrappedComponent: any)=>{
   return function EnhancedComponent(props:any){
-        const {setLoading, setError, error, loading, setOpenOTP, setOpenPasswordForm, newUserData}= props;
+        const {setLoading, setError, error, loading, setOpenOTP, newUserData}= props;
         const [input,setInput]= useState<string>("");
         
         const handleSubmit=async()=>{
@@ -26,12 +27,12 @@ const SignUpOTP=(WrappedComponent: any)=>{
                     return;
                 }
 
-                await verifyOTP(OTP, setError, setLoading);
-               
+                const result= await verifyOTP(OTP, setError, setLoading);
+                if(result?.status===200){
+                  await signUp(newUserData, setError, setLoading);
+                }
                 toast.success("your OTP is valid")
                 setOpenOTP(false);
-                setOpenPasswordForm(true);
-
             }catch(e:any){
                 console.log(e);
                 toast.error(e.message);
@@ -95,6 +96,8 @@ const SignUpPage: React.FC = () => {
   const [error, setError]= useState<string>("");
   const [loading, setLoading]= useState<boolean>(false);
   const [signUpData, setSignUpData]= useState<UserSignUpInfo>()
+  const [openOTP, setOpenOTP]= useState(false);
+
   const methods = useForm<FormData>({
     mode: 'onSubmit',
     resolver:zodResolver(signUpSchema),
@@ -112,10 +115,12 @@ const SignUpPage: React.FC = () => {
   const { handleSubmit, reset, control } = methods;
   
   const onSubmit =async (data: FormData) => {
-    
     try{
-
-      await signUp({...data, profilePic: "", id:0}, setError, setLoading)
+      //await signUp({...data, profilePic: "", id:0}, setError, setLoading)
+      sendOTP(data.email, setError, setLoading);
+      setSignUpData({...data, profilePic: "", id:0});
+      
+      setOpenOTP(true);
     }catch(e:any){
       console.log(e);
       toast.error(e.message);
@@ -147,6 +152,18 @@ const SignUpPage: React.FC = () => {
     { name: 'phonenumber', id: 'phonenumber', label: inputFormConfig.phone_number_label, placeholder: 'Enter your phone number' }
     //{ name: 'birthday', id: 'birthday', label: inputFormConfig.birthday_label, type: 'date' },
   ];
+
+  if(openOTP){
+    const EnhancedOTP= SignUpOTP(InputOTP)
+    return <EnhancedOTP
+    setLoading={setLoading}
+    setError={setError}
+    error={error}
+    loading={loading}
+    setOpenOTP={setOpenOTP}
+    newUserData={signUpData}
+    />
+  }
   
   return (
     <div className="min-h-screen w-full bg-white flex items-center justify-center px-5 py-10">

@@ -17,10 +17,12 @@ const ChatPage = () => {
   const currentUser= useAppSelector(selectUserInfo).info;
   const navigate= useNavigate();
   const dispatch= useAppDispatch();
-  
-  if(currentUser.id<=0){
+  useEffect(()=>{
+    if(currentUser.id<=0){
     navigate("/login");
   }
+  },[])
+  
   
   if(currentUser.id===-1) return <div>Loading...</div>
   return (
