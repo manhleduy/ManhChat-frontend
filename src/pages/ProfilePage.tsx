@@ -254,6 +254,7 @@ const ProfilePage: React.FC = () => {
                   icon={<Trash2Icon height={24} width={24} fill="red"/>}
                   setOpenConfirm={setOpenConfirm}
                   openConfirm={openConfirm}
+                  size={14}
                 />
             </div>
             <div className="absolute bottom-6 left-6 flex gap-2">

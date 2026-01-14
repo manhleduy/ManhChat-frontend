@@ -1,17 +1,49 @@
-import React from 'react';
-import { User, ArrowLeftCircle } from 'lucide-react';
+import React, { useState } from 'react';
+import { User, ArrowLeftCircle, UserRoundX } from 'lucide-react';
 import type { UserDefaultInfo } from '@/lib/const';
+import ConfirmButton from './Confirmbutton';
+import toast from 'react-hot-toast';
+import { unFriend } from '@/lib/services/friendService';
+import { selectUserInfo } from '@/redux/slice/userSlice';
+import { useAppSelector } from '@/redux/reduxHook';
 
 interface FriendInformationProps {
   userInfo: UserDefaultInfo;
   setOpenInfoPage:(value:boolean)=>void;
 }
 
+
 const FriendInformation: React.FC<FriendInformationProps> = ({ userInfo, setOpenInfoPage }) => {
+  const [openConfirm, setOpenConfirm]= useState(false);
+  const [error, setError]= useState<string>("");
+  const [loading, setLoading]= useState<boolean>(false);
+  const currentUser= useAppSelector(selectUserInfo).info
+  const handleDeleteFriend=async()=>{
+    try{
+      await unFriend({userId: currentUser.id, friendId: userInfo.id}, setError, setLoading)
+      toast.success("your have delete your friend");
+      setOpenInfoPage(false);
+
+    }catch(e:any){
+      console.log(e);
+      toast.error(e.message);
+    }
+  }
   return (
+    
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-      <div className="bg-green-200 rounded-lg shadow-lg p-6 max-w-md w-full mx-4">
-        <div className='relative top-1 left-1'>
+      <div className="bg-green-200 absolute rounded-lg shadow-lg p-6  max-w-md w-full mx-4">
+        <div className='absolute top-1 right-1 cursor-pointer'>
+          <ConfirmButton
+            acceptFunc={handleDeleteFriend}
+            cancelFunc={()=>setOpenConfirm(false)}
+            openConfirm={openConfirm}
+            setOpenConfirm={setOpenConfirm}
+            size={6}
+            icon={<UserRoundX height={20} width={10} />}
+          />
+        </div>
+        <div className='absolute top-1 left-1'>
             <button onClick={()=>{setOpenInfoPage(false)}}>
                 <ArrowLeftCircle height={25} width={25}/>
             </button>
@@ -42,6 +74,8 @@ const FriendInformation: React.FC<FriendInformationProps> = ({ userInfo, setOpen
         </div>
       </div>
     </div>
+   
+    
   );
 };
 

@@ -316,9 +316,9 @@ const GroupChatBody=(WrapppedComponent: any)=>{
       setAttachedFile={setAttachedFile}
       handleFileSelect={handleFileSelect}
       />
+      <div className=' w-1/3 max-lg:hidden h-full'><GroupInfomation group={currentChat} setOpenInfoPage={setOpenInfoPage} openInfoPage={openInfoPage}/></div>
       {openInfoPage
-      ?<div className='w-full lg:hidden h-full'><GroupInfomation group={currentChat} setOpenInfoPage={setOpenInfoPage} openInfoPage={openInfoPage}/></div>
-      :<div className=' w-1/3 max-lg:hidden h-full'><GroupInfomation group={currentChat}/></div>
+      &&<div className='w-full lg:hidden h-full'><GroupInfomation group={currentChat} setOpenInfoPage={setOpenInfoPage} openInfoPage={openInfoPage}/></div>
       }
       </>
       )

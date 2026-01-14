@@ -54,7 +54,6 @@ const GroupRequestForm = ({setOpenInviteForm}:any) => {
     const [foundGroups, setFoundGroups]= useState<GroupDefaultInfo[]>([]);
     const [error, setError]= useState<string>("");
     const [loading, setLoading]= useState<boolean>(false);
-    //const [inviteInfor, setInviteInfor]= useState<InviteSchema>();
     const methods = useForm<GroupRequestSchema>({
         mode: 'onSubmit',
         resolver:zodResolver(groupRequestSchema),
@@ -74,7 +73,7 @@ const GroupRequestForm = ({setOpenInviteForm}:any) => {
         setValue("adminName", selectedGroup?.adminName||"");
         setFoundGroups([]);
     },[selectedGroup, setSelectedGroup])
-    console.log(getValues())
+    
     const onFind=async()=>{
         try{
         const {groupName, groupId, adminName}= getValues();
@@ -95,7 +94,6 @@ const GroupRequestForm = ({setOpenInviteForm}:any) => {
         toast.error(e.message); 
       }
       };
-      console.log(foundGroups);
     
 
     const fields: FieldDef[] = [

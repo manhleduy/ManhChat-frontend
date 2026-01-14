@@ -2,17 +2,18 @@ interface deleteProps{
   acceptFunc:any;
   cancelFunc:any;
   icon: React.ReactNode;
+  size: number;
   setOpenConfirm:(check: boolean)=>void;
   openConfirm:boolean
 }
 const ConfirmButton= (props:deleteProps)=> {
-    const {acceptFunc, cancelFunc, icon, setOpenConfirm, openConfirm}= props;
+    const {acceptFunc, cancelFunc, icon, setOpenConfirm, openConfirm, size}= props;
     if(!openConfirm){
         return (
         <button
             type='button'
             onClick={()=>setOpenConfirm(true)}
-            className="w-14 h-14 rounded-full bg-red-500 text-white flex items-center justify-center shadow-md hover:bg-red-600 transition-all"
+            className={`w-${size} h-${size} rounded-full bg-red-500 text-white flex items-center justify-center shadow-md hover:bg-red-600 transition-all`}
         >
             {icon}
         </button>

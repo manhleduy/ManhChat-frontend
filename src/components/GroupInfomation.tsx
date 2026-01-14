@@ -2,7 +2,24 @@ import { useState, useEffect } from 'react';
 import { getGroupInfo } from '@/lib/services/groupService';
 import { useAppSelector } from '@/redux/reduxHook';
 import { selectOnlineUserList } from '@/redux/slice/onlineUserSlice';
-
+import {groupChangeSchema, type GroupChangeSchema } from '@/lib/inputSchema';
+import { useForm, FormProvider } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+import { PenBox } from 'lucide-react';
+const defaultConfig = {
+    background_color: "#ffffff",
+    primary_color: "#10b981",
+    accent_color: "#059669",
+    text_color: "#1f2937",
+    surface_color: "#f0fdf4",
+    font_family: "Plus Jakarta Sans",
+    font_size: 16
+};
 
 
 const GroupInfomation = ({ group, openInfoPage, setOpenInfoPage }:any) => {
@@ -11,19 +28,19 @@ const GroupInfomation = ({ group, openInfoPage, setOpenInfoPage }:any) => {
   const [members, setMembers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
-
+  const [changeInfo, setChangeInfo]= useState<boolean>(false);
   const currentOnlineUser = useAppSelector(selectOnlineUserList);
 
-  const defaultConfig = {
-    background_color: "#ffffff",
-    primary_color: "#10b981",
-    accent_color: "#059669",
-    text_color: "#1f2937",
-    surface_color: "#f0fdf4",
-    font_family: "Plus Jakarta Sans",
-    font_size: 16
-  };
-
+  /*const methods= useForm<GroupChangeSchema>({
+    mode: 'onSubmit',
+    resolver:zodResolver(groupChangeSchema),
+    defaultValues:{
+      groupName:"",
+      detail:""
+    }
+  })*/
+  
+  
   useEffect(() => {
     const fetchGroupInfo = async () => {
       const data = await getGroupInfo(groupId, setError, setLoading);
@@ -34,9 +51,6 @@ const GroupInfomation = ({ group, openInfoPage, setOpenInfoPage }:any) => {
     };
     fetchGroupInfo();
   }, [groupId]);
-  
-
-
   if (loading) {
     return <div className="h-full flex items-center justify-center">Loading...</div>;
   }
@@ -48,9 +62,9 @@ const GroupInfomation = ({ group, openInfoPage, setOpenInfoPage }:any) => {
   if (!groupInfo) {
     return <div className="h-full flex items-center justify-center">No data available</div>;
   }
-
   return (
-    <>
+    
+      <>
       <style>
         {`
           .online-indicator {
@@ -113,10 +127,26 @@ const GroupInfomation = ({ group, openInfoPage, setOpenInfoPage }:any) => {
             </div>
           </div>
           <h1
-            className={`text-2xl font-bold mb-1  cursor-pointer `}
+            className={`text-2xl font-bold mb-1  cursor-pointer flex w-full items-center justify-center text-center`}
             style={{ color: defaultConfig.text_color, fontSize: `${defaultConfig.font_size * 1.5}px` }}
           >
+            <div className='flex'>
             {groupInfo.groupName}
+            <button
+            onClick={()=>{
+              setChangeInfo(true);
+            }}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <PenBox width={30} height={30}/>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>change group information</p>
+                </TooltipContent>
+              </Tooltip>
+            </button>
+            </div>
+            
           </h1>
         </div>
 

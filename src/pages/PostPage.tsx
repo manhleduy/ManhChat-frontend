@@ -33,7 +33,7 @@ const PostPage = () => {
                 }
             `}</style>
             <AsideBar/>
-            <section className="flex flex-col w-full items-start px-6 md:px-16 lg:px-24 text-sm max-w-6xl mx-auto">
+            <section className="flex flex-col w-full flex-wrap items-start px-6 md:px-16 lg:px-24 text-sm max-w-6xl mx-auto">
                 
                 <h1
                     className="text-3xl font-medium bg-gradient-to-r from-green-800 to-green-500 text-transparent bg-clip-text mt-4">
@@ -52,7 +52,7 @@ const PostPage = () => {
                     
                 </p>
             
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
+                <div className="grid grid-cols-1  gap-6 mt-10 w-full">
                     {
                         friendPosts.map((item, index)=>(
                             <Post props={item} key={index}/>
