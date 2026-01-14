@@ -334,6 +334,9 @@ const FriendChatBody=(WrappedComponent: any)=>{
     const [openInfoPage, setOpenInfoPage]= useState(false);
     const [attachedFile, setAttachedFile] = useState<File | null>(null);
 
+
+
+    
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>, type: 'file' | 'image') => {
     const file = e.target.files?.[0];
     if (file) {
