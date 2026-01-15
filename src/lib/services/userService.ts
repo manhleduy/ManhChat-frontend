@@ -69,37 +69,7 @@ export const deleteUser= async(setError:any, setLoading:any, id: number)=>{
     }
 }
 
-export const getUserInfo = async (
-    id: number,
-    setError: any,
-    setLoading: any
-) => {
-    try {
-        setLoading(true);
-        const res = await api.get(`/api/user/${id}`);
-        setLoading(false);
-        return res.data.userInfo;
-    } catch (e: any) {
-        setLoading(false);
-        setError(e.response?.data?.message || e.message || 'An error occurred');
-    }
-};
 
-export const getAllGroup = async (
-    id: string,
-    setError: any,
-    setLoading: any
-) => {
-    try {
-        setLoading(true);
-        const res = await api.get(`/api/user/group/${id}`);
-        setLoading(false);
-        return res.data.groupList;
-    } catch (e: any) {
-        setLoading(false);
-        setError(e.response?.data?.message || e.message || 'An error occurred');
-    }
-};
 
 export const updateUserInfo = async (
     id: number,
@@ -176,21 +146,7 @@ export const createUserConnect = async (
     }
 };
 
-export const getUserInvitation= async(
-    data:{name: string, email?:string, phonenumber?:string},
-    setError:(error:string)=>void,
-    setLoading:(loading:boolean)=>void
-)=>{
-    try{
-        setLoading(true);
-        const res= await api.post("/api/user/invitation", data);
-        setLoading(false);
-        return res.data
-    }catch(e:any){
-        console.log(e);
-        setError(e.message);
-    }
-}
+
 export const findUsers=async(
     data:{name: string, email:string, phonenumber:string},
     setError:(error:string)=>void,

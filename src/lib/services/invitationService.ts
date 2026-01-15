@@ -39,30 +39,7 @@ export const sendGroupRequest = async (
         setError(e.response?.data?.message || e.message || 'An error occurred');
     }
 };
-export const getAllRequest= createAsyncThunk(
-    "invitation/friendRequest",
-    async (id:number, {rejectWithValue})=>{
-        try{
-            const res= await api.get(`/api/invitation/${id}`)
-            return res.data;
-        }catch(e:any){
-            console.log(e);
-            rejectWithValue(e.response.data);
-        }
-    }
-)
-export const getAllGroupRequest= createAsyncThunk(
-    "invitation/groupRequest",
-    async (id: number, {rejectWithValue})=>{
-        try{
-            const res= await api.get(`/api/invitation/group/${id}`)
-            return res.data;
-        }catch(e:any){
-            console.log(e);
-            rejectWithValue(e.response.data);
-        }
-    }
-)
+
 export const deleteInvitation = async (
     data: { userId: number; friendId: number },
     setError: (error: string) => void,

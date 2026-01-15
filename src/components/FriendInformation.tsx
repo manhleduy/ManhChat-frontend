@@ -17,7 +17,8 @@ const FriendInformation: React.FC<FriendInformationProps> = ({ userInfo, setOpen
   const [openConfirm, setOpenConfirm]= useState(false);
   const [error, setError]= useState<string>("");
   const [loading, setLoading]= useState<boolean>(false);
-  const currentUser= useAppSelector(selectUserInfo).info
+  const currentUser= useAppSelector(selectUserInfo).info;
+
   const handleDeleteFriend=async()=>{
     try{
       await unFriend({userId: currentUser.id, friendId: userInfo.id}, setError, setLoading)
@@ -30,7 +31,6 @@ const FriendInformation: React.FC<FriendInformationProps> = ({ userInfo, setOpen
     }
   }
   return (
-    
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
       <div className="bg-green-200 absolute rounded-lg shadow-lg p-6  max-w-md w-full mx-4">
         <div className='absolute top-1 right-1 cursor-pointer'>

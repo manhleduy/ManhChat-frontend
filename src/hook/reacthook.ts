@@ -60,13 +60,66 @@ export const useFetch=<T>(url: string, type: "get"|"post", defaultInfo: T, body?
     },[])
     return {error, loading, data};
 }
-const MakeRequest= async(url:string, type:"post"|"put"|"delete", defaultInfo:string, body:any)=>{
-    try{
-        const response= await api[type](url, body);
-        
+const FetchData= async(url:string, type:"get"|"post"|"put"|"delete", defaultInfo:string, body:any)=>{
+    const [error, setError]= useState<string>("")
+    const [loading, setLoading]= useState<boolean>(false);
+    const [data, setData]= useState<string>("");
+     try{
+        setLoading(false);
+        if(type==="get"){
+            const response= await api.get(url);
+            setData(response.data);
+        }else if(type==="post"){
+            const response= await api.post(url, body);
+            setData(response.data);
+        }else if(type==="put"){
+            const response= await api.put(url, body);
+            setData(response.data);
+        }else if(type==="delete"){
+            const response= await api.delete(url, body);
+            setData(response.data);
+        }else{
+            setError("your request type are not allow to fetch data from database");
+        } 
     }catch(e:any){
         console.log(e);
-    
+        setError(e.message);
+        setLoading(false);
+    }finally{
+        setLoading(false);
+        setError("");
     }
+    return {error, loading, data};
+}
+const MakeRequest= async(url:string, type:"get"|"post"|"put"|"delete", body:any)=>{
+    const [error, setError]= useState<string>("")
+    const [loading, setLoading]= useState<boolean>(false);
+    const [response, setResponse]= useState<string>("");
+    try{
+        setLoading(false);
+        if(type==="get"){
+            const response= await api.get(url);
+            setResponse(response.data);
+        }else if(type==="post"){
+            const response= await api.post(url, body);
+            setResponse(response.data);
+        }else if(type==="put"){
+            const response= await api.put(url, body);
+            setResponse(response.data);
+        }else if(type==="delete"){
+            const response= await api.delete(url, body);
+            setResponse(response.data);
+        }else{
+            setError("your request type are not allow to fetch data from database");
+        } 
+    }catch(e:any){
+        console.log(e);
+        setError(e.message);
+        setLoading(false);
+    }finally{
+        setLoading(false);
+        setError("");
+    }
+    return {error, loading, response};
 }   
     

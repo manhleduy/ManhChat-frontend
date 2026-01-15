@@ -2,21 +2,12 @@ import {useState, useEffect} from 'react'
 import { useAppDispatch, useAppSelector } from '@/redux/reduxHook';
 import { selectUserInfo } from '@/redux/slice/userSlice';
 import { useNavigate } from 'react-router-dom';
-import { getAllPost } from '@/lib/services/postService';
 
 import { Tooltip, TooltipTrigger, TooltipContent } from './ui/tooltip';
 import { ArrowLeftCircle, Newspaper } from 'lucide-react';
 import Post from './Post';
-import { useForm } from 'react-hook-form';
-import { postSchema, type PostSchema } from '@/lib/inputSchema';
-import { zodResolver } from '@hookform/resolvers/zod';
 import type { PostDefaultInfo } from '@/lib/const';
 import { useFetch } from '@/hook/reacthook';
-const InputField=()=>{
-    return (
-        <div></div>
-    )
-}
 
 
 

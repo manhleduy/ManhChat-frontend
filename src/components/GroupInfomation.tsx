@@ -5,12 +5,15 @@ import { selectOnlineUserList } from '@/redux/slice/onlineUserSlice';
 import {groupChangeSchema, type GroupChangeSchema } from '@/lib/inputSchema';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useFetch } from '@/hook/reacthook';
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { PenBox } from 'lucide-react';
+
+//config
 const defaultConfig = {
     background_color: "#ffffff",
     primary_color: "#10b981",
@@ -21,13 +24,48 @@ const defaultConfig = {
     font_size: 16
 };
 
+type GroupMembers={
+  id:number,
+  name:string,
+  profilePic:string,
+}
+type GroupInfo={
+  adminName:string,
+  adminProfilePic:string,
+  detail:string,
+  groupName:string,
+  phonenumber: string,
+  email: string,
+  groupId: number,
+  adminId: number,
+  isRestricted: boolean
+}
+type GroupInfoType={
+  groupInfo:GroupInfo,
+  groupMembers:GroupMembers[]
+}
+const defaultGroupInfo: GroupInfoType={
+  groupInfo:{
+    adminName:"",
+    adminProfilePic:"",
+    detail:"",
+    groupName:"",
+    phonenumber: "",
+    email: "",
+    groupId: 0,
+    adminId: 0,
+    isRestricted: false
+  },
+  groupMembers:[]
+}
+//
 
 const GroupInfomation = ({ group, openInfoPage, setOpenInfoPage }:any) => {
   const groupId= group.id;
   const [groupInfo, setGroupInfo] = useState<any>(null);
   const [members, setMembers] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string>('');
+  const [Loading, setLoading] = useState(true);
+  const [Error, setError] = useState<string>('');
   const [changeInfo, setChangeInfo]= useState<boolean>(false);
   const currentOnlineUser = useAppSelector(selectOnlineUserList);
 
@@ -40,17 +78,15 @@ const GroupInfomation = ({ group, openInfoPage, setOpenInfoPage }:any) => {
     }
   })*/
   
+  const {data, error, loading} = useFetch<GroupInfoType>(`/api/group/info/${groupId}`,"get", defaultGroupInfo)
   
   useEffect(() => {
-    const fetchGroupInfo = async () => {
-      const data = await getGroupInfo(groupId, setError, setLoading);
-      if (data ) {
-        setGroupInfo(data.groupInfo || {});
-        setMembers(data.groupMembers || []);
-      }
-    };
-    fetchGroupInfo();
-  }, [groupId]);
+    
+    setGroupInfo(data.groupInfo || defaultGroupInfo);
+    setMembers(data.groupMembers || []);
+      
+  }, [data]);
+
   if (loading) {
     return <div className="h-full flex items-center justify-center">Loading...</div>;
   }

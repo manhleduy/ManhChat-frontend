@@ -12,7 +12,7 @@ import { useAppDispatch } from '@/redux/reduxHook';
 import { useSelector } from 'react-redux';
 import { selectUserInfo } from '@/redux/slice/userSlice';
 import type { FriendRequest, RequestType } from '@/lib/const';
-import { acceptInvitation, deleteInvitation, getAllRequest } from '@/lib/services/invitationService';
+import { acceptInvitation, deleteInvitation} from '@/lib/services/invitationService';
 import socket from '@/lib/socket';
 import { useGetSocketData } from '@/hook/reacthook';
 import toast from 'react-hot-toast';

@@ -5,7 +5,7 @@ import { useAppDispatch } from '@/redux/reduxHook';
 import { useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
 import { selectUserInfo } from '@/redux/slice/userSlice';
-import { acceptGroupRequest, deleteGroupRequest, getAllGroupRequest } from '@/lib/services/invitationService';
+import { acceptGroupRequest, deleteGroupRequest} from '@/lib/services/invitationService';
 import GroupRequestForm from './GroupRequestForm';
 import {
   Tooltip,
