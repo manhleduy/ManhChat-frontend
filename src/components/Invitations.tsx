@@ -6,16 +6,17 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { useFetch } from '@/hook/reacthook';
 import InvitationForm from './InvitationForm';
 import { useAppDispatch } from '@/redux/reduxHook';
 import { useSelector } from 'react-redux';
-import { selectFriendRequest } from '@/redux/slice/FriendRequestSlice';
 import { selectUserInfo } from '@/redux/slice/userSlice';
 import type { FriendRequest, RequestType } from '@/lib/const';
 import { acceptInvitation, deleteInvitation, getAllRequest } from '@/lib/services/invitationService';
 import socket from '@/lib/socket';
 import { useGetSocketData } from '@/hook/reacthook';
 import toast from 'react-hot-toast';
+
 
 export const Invitations =(WrappedComponent:any) => {
   const RequestTooltip=(props:any)=>{
@@ -40,17 +41,27 @@ export const Invitations =(WrappedComponent:any) => {
     sentLable:"Invitation Sent",
     receivedLabel:"Invitation Received"
   }
+  type FriendRequestType={
+    receivedRequests:FriendRequest[],
+    sentRequests:FriendRequest[]
+  }
+  const defaultFriendRequest={
+    receivedRequests:[],
+    sentRequests:[]
+  }
+
   return function EnhancedComponent(props:any){
   const currentUser= useSelector(selectUserInfo).info;
-  const dispatch= useAppDispatch();
-  const FriendRequests= useSelector(selectFriendRequest);
-  const [loading, setLoading]= useState(false);
-  const [error, setError]= useState<string>("");
+  const {error, loading, data}= useFetch<FriendRequestType>(`/api/post/friends/${currentUser.id}`, "get", defaultFriendRequest)
+  const [Loading, setLoading]= useState(false);
+  const [Error, setError]= useState<string>("");
   // request sent
-  const [sentInvitations, setSentInvitations] = useState<FriendRequest[]>(FriendRequests.sentRequests||[]);
+  const [sentInvitations, setSentInvitations] = useState<FriendRequest[]>(data.sentRequests||[]);
+  console.log(data.sentRequests, data.receivedRequests);
   // request received
-  const [receivedInvitations, setReceivedInvitations] = useState<FriendRequest[]>(FriendRequests.receivedRequests||[]);
+  const [receivedInvitations, setReceivedInvitations] = useState<FriendRequest[]>(data.receivedRequests||[]);
   
+  //socket handle
   const newRequest= useGetSocketData<FriendRequest>(socket, currentUser, "receiveRequest");
   useEffect(()=>{
     if(newRequest){
@@ -60,11 +71,9 @@ export const Invitations =(WrappedComponent:any) => {
   },[newRequest])
 
   useEffect(()=>{
-    dispatch(getAllRequest(currentUser.id));
-    setSentInvitations(FriendRequests.sentRequests);
-    setReceivedInvitations(FriendRequests.receivedRequests);
-
-  },[])
+    setSentInvitations(data.sentRequests||[]);
+    setReceivedInvitations(data.receivedRequests||[]);
+  },[data])
 
   const handleWithdraw = async(invitation: RequestType) => {
     try{  
@@ -100,7 +109,6 @@ export const Invitations =(WrappedComponent:any) => {
       toast.success("you reject this invitation")
     }
   };
-
 
   return (
      <WrappedComponent

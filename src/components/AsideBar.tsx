@@ -19,7 +19,6 @@ import {
 import { Label } from './ui/label';
 import { useAppDispatch } from '@/redux/reduxHook';
 import { logout } from '@/redux/slice/userSlice';
-import { restartList } from '@/redux/slice/ChatReceivedSlice';
 
 const AsideBar = () => {
   const dispatch= useAppDispatch();

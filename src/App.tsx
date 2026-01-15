@@ -11,35 +11,14 @@ import { selectUserInfo } from "./redux/slice/userSlice"
 import { use, useEffect } from "react"
 import socket from "./lib/socket"
 import { useGetSocketData} from "./hook/reacthook"
-import { pushFriendChat,pushGroupChat, selectChatReceivedList} from "./redux/slice/ChatReceivedSlice"
 import { addOnlineUser, removeOnlineUser, selectOnlineUserList } from "./redux/slice/onlineUserSlice"
 import type { FriendChatBlock, GroupChatBlock, FriendRequest, GroupRequest } from "./lib/const"
-import { pushFriendReceivedRequest } from "./redux/slice/FriendRequestSlice"
 import ForgotPassword from "./pages/ForgotPassword"
 
 function App() {
   const dispatch = useAppDispatch();
   const currentUser= useAppSelector(selectUserInfo).info;
-  //get message
-  const message= useGetSocketData<FriendChatBlock>(socket, currentUser, "receiveMessage");
-  const groupMessage= useGetSocketData<GroupChatBlock>(socket, currentUser, "receiveGroupMessage");
-  useEffect(()=>{
-    if(message){
-      dispatch(pushFriendChat(message));
-    }
-    if(groupMessage){
-      dispatch(pushGroupChat(groupMessage));
-    }
-  }, [message, groupMessage])
-
-  //get friend request
-  const friendRequest= useGetSocketData<FriendRequest>(socket, currentUser, "receiveRequest");
-  useEffect(()=>{
-    if(friendRequest){
-      console.log("new friend request received in app.tsx:", friendRequest);
-      dispatch(pushFriendReceivedRequest(friendRequest));
-    }
-  })
+  
   //get group request
   const groupRequest= useGetSocketData<GroupRequest>(socket, currentUser, "receiveGroupRequest");
   useEffect(()=>{
@@ -50,8 +29,6 @@ function App() {
   })
   
   
-  
-
   //user online 
   const onlineUsers= useGetSocketData<number>(socket, currentUser, "userOnline")
   useEffect(()=>{

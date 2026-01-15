@@ -26,3 +26,47 @@ export const useDebounce = <T>(value: T, delay: number): T => {
     },[value, delay])
     return debounce
 }
+
+export const useFetch=<T>(url: string, type: "get"|"post", defaultInfo: T, body?: any)=>{
+    const [error, setError]= useState<string>("");
+    const [loading, setLoading]= useState<boolean>(false);
+    const [data, setData]= useState<T>(defaultInfo);
+    useEffect(()=>{
+        const sendRequest= async()=>{
+            try{
+                setLoading(true);
+                if(type==="get"){
+                    const response= await api.get(url);
+                    setData(response.data);
+                }else if(type==="post"){
+                    const response= await api.post(url, body);
+                    setData(response.data);
+                }else{
+                    setError("Your request type are not allow to fetch data from database"),
+                    setData(defaultInfo),
+                    setLoading(false);                   
+                }
+            }catch(e:any){
+                setError(e.data);
+                setLoading(false);
+                setData(defaultInfo);
+            }finally{
+                setLoading(false);
+                setError("");
+            }
+
+        }
+        sendRequest();
+    },[])
+    return {error, loading, data};
+}
+const MakeRequest= async(url:string, type:"post"|"put"|"delete", defaultInfo:string, body:any)=>{
+    try{
+        const response= await api[type](url, body);
+        
+    }catch(e:any){
+        console.log(e);
+    
+    }
+}   
+    

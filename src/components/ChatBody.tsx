@@ -7,7 +7,6 @@ import { selectUserInfo } from '@/redux/slice/userSlice';
 import type { GroupChatBlock, FriendChatBlock,ChatBlockInfo, GroupDefaultInfo, MessageType, } from '@/lib/const';
 import { createChat, getAllGroupChat, createGroupChat } from '@/lib/services/chatService';
 import toast from 'react-hot-toast';
-import { popFriendChat, popGroupChat, selectChatReceivedList } from '@/redux/slice/ChatReceivedSlice';
 import socket from '@/lib/socket';
 import { useGetSocketData } from '@/hook/reacthook';
 import GroupInfomation from './GroupInfomation';
@@ -293,7 +292,7 @@ const GroupChatBody=(WrapppedComponent: any)=>{
     useEffect(()=>{
         if(groupMessage && groupMessage.groupId===currentChat.id){
         setMessages(messages=>[...messages, groupMessage])
-        dispatch(popGroupChat(currentChat.id)); 
+        /////////dispatch(popGroupChat(currentChat.id)); 
 
       }else{
         console.log("unkown error")
@@ -410,13 +409,13 @@ const FriendChatBody=(WrappedComponent: any)=>{
     if(message && message.senderId===currentChat.id){
       setMessages(messages=>[...messages, message]);
       
-      dispatch(popFriendChat(currentChat.id));
+      ///////dispatch(popFriendChat(currentChat.id));
       
     }else{
       console.log("unkown error")
     }
     return (()=>{
-      dispatch(popFriendChat(currentChat.id));
+      ///////dispatch(popFriendChat(currentChat.id));
       
     })
   }, [message])

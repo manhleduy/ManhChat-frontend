@@ -1,7 +1,6 @@
 import {useState, useEffect} from 'react'
 import { useAppDispatch, useAppSelector } from '@/redux/reduxHook';
 import { selectUserInfo } from '@/redux/slice/userSlice';
-import { selectUserPostList } from '@/redux/slice/PostListSlice';
 import { useNavigate } from 'react-router-dom';
 import { getAllPost } from '@/lib/services/postService';
 
@@ -11,7 +10,8 @@ import Post from './Post';
 import { useForm } from 'react-hook-form';
 import { postSchema, type PostSchema } from '@/lib/inputSchema';
 import { zodResolver } from '@hookform/resolvers/zod';
-
+import type { PostDefaultInfo } from '@/lib/const';
+import { useFetch } from '@/hook/reacthook';
 const InputField=()=>{
     return (
         <div></div>
@@ -21,23 +21,19 @@ const InputField=()=>{
 
 
 const UserPostList = ({setOpenPostList}:any) => {
-    const dispatch= useAppDispatch()
+    
     const currentUser = useAppSelector(selectUserInfo).info;
-    const currentPost= useAppSelector(selectUserPostList);
-    const [post, setPost]= useState(currentPost);
+    const {data, error, loading}= useFetch<PostDefaultInfo[]>(`/api/post/${currentUser.id}`, "get",[]);
+    const [post, setPost]= useState<PostDefaultInfo[]>(data);
     const [openPostForm, setOpenPostForm]= useState<boolean>(false);
     const navigate= useNavigate();
     useEffect(()=>{
+        setPost(data);
+    },[data])
+
+    useEffect(()=>{
         if(currentUser.id<=0) navigate('/');
-        dispatch(getAllPost(currentUser.id)) 
-    },[post, setPost])
-    const method= useForm<PostSchema>({
-        resolver: zodResolver(postSchema),
-        mode: 'onSubmit',
-        defaultValues:{
-            content:""
-        }
-    })
+    },[])
     
   return (
     <div className='w-full h-full px-10 py-5'>

@@ -5,7 +5,6 @@ import { useAppDispatch } from '@/redux/reduxHook';
 import { useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
 import { selectUserInfo } from '@/redux/slice/userSlice';
-import { selectGroupRequest } from '@/redux/slice/GroupRequestSlice';
 import { acceptGroupRequest, deleteGroupRequest, getAllGroupRequest } from '@/lib/services/invitationService';
 import GroupRequestForm from './GroupRequestForm';
 import {
@@ -13,10 +12,18 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { useFetch } from '@/hook/reacthook';
 import { UserPlus } from 'lucide-react';
 
 //tool tip
-
+type GroupRequestType={
+  receivedRequests:GroupRequest[],
+  sentRequests:GroupRequest[]
+}
+const defaultGroupRequest={
+  receivedRequests:[],
+  sentRequests:[]
+}
 export const GroupInvitation = (WrappedComponent:any) => {
   const RequestTooltip=(props: any)=>{
     const {setOpenInviteForm}= props;
@@ -41,18 +48,17 @@ const config={
     receivedLabel:"Group Invitation Received"
   }
   return function EnhancedComponent(props:any){
-    const dispatch= useAppDispatch();
+    
     const currentUser= useSelector(selectUserInfo).info;//private
-    const GroupRequests= useSelector(selectGroupRequest);//private
-    const [error, setError]= useState<string>("")//private
-    const [loading, setLoading]= useState<boolean>(false);//private
-    const [sentInvitations, setSentInvitations] = useState<GroupRequest[]>(GroupRequests.sentRequests||[]);
-    const [receivedInvitations, setReceivedInvitations] = useState<GroupRequest[]>(GroupRequests.receivedRequests||[]);
+    const {error, loading, data}= useFetch<GroupRequestType>(`/api/invitation/group/${currentUser.id}`, "get", defaultGroupRequest)
+    const [Error, setError]= useState<string>("")//private
+    const [Loading, setLoading]= useState<boolean>(false);//private
+    const [sentInvitations, setSentInvitations] = useState<GroupRequest[]>(data.sentRequests||[]);
+    const [receivedInvitations, setReceivedInvitations] = useState<GroupRequest[]>(data.receivedRequests||[]);
 
   useEffect(()=>{
-    dispatch(getAllGroupRequest(currentUser.id));//private
-    setSentInvitations(GroupRequests.sentRequests);//public
-    setReceivedInvitations(GroupRequests.receivedRequests);//public
+    setSentInvitations(data.sentRequests||[]);//public
+    setReceivedInvitations(data.receivedRequests||[]);//public
   },[])
   
   const handleWithdraw = async(invitation: any) => {
