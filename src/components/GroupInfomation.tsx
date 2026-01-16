@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getGroupInfo } from '@/lib/services/groupService';
+
 import { useAppSelector } from '@/redux/reduxHook';
 import { selectOnlineUserList } from '@/redux/slice/onlineUserSlice';
 import {groupChangeSchema, type GroupChangeSchema } from '@/lib/inputSchema';

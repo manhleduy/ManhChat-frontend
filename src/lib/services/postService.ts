@@ -21,11 +21,3 @@ export const createPost= async(
         setError(e.response?.data || e.message || "An error occured")
     }
 }
-export const deletePost= async(data:number)=>{
-    try{
-        await api.delete(`/api/post/${data}`);
-    }catch(e:any){
-        console.log(e);
-
-    }
-}

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import InvitationCard from './InvitationCard';
+import { motion } from "framer-motion";
 
 const BaseInvitations =(props:any) => {
     const {
@@ -18,7 +19,7 @@ const BaseInvitations =(props:any) => {
   return (
     <>
     {openInviteForm? <RequestForm setOpenInviteForm={setOpenInviteForm}/> : null}
-    <div className="bg-gray-100 p-4 h-full overflow-scroll sm:p-6 md:p-8 ">
+    <motion.div initial={{opacity:0, y:20}} animate={{opacity:1, y:0}} transition={{duration:0.5}} className="bg-gray-100 p-4 h-full overflow-scroll sm:p-6 md:p-8 ">
       <div className="max-w-full">
         {/* Sent Section */}
         <div className="mb-10 sm:mb-12">
@@ -64,7 +65,7 @@ const BaseInvitations =(props:any) => {
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
     </>
   );
 };

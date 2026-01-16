@@ -3,6 +3,7 @@ import { Search } from 'lucide-react';
 
 import type { GroupDefaultInfo, UserDefaultInfo } from '@/lib/const';
 import { useDebounce } from '@/hook/reacthook';
+import { motion } from "framer-motion";
 
 
 const COLORS = [
@@ -54,7 +55,7 @@ const BaseContactList= (props:any) => {
 
 
   return (
-    <main className="flex-1 bg-white h-full flex flex-col overflow-hidden">
+    <motion.main initial={{opacity:0, y:20}} animate={{opacity:1, y:0}} transition={{duration:0.5}} className="flex-1 bg-white h-full flex flex-col overflow-hidden">
       {/* Header */}
       <div className="px-8 py-6 border-b-2 border-gray-200 bg-white">
         <h1 className="text-3xl font-semibold text-gray-800 mb-5">{config.page_title}</h1>
@@ -118,7 +119,7 @@ const BaseContactList= (props:any) => {
           ))
         )}
       </div>
-    </main>
+    </motion.main>
   );
 };
 

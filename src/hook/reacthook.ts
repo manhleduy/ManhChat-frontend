@@ -1,10 +1,12 @@
-import type { ChatBlockInfo, FriendChatBlock, GroupChatBlock, GroupDefaultInfo, UserDefaultInfo } from "@/lib/const";
+import type { ChatBlockInfo, FriendChatBlock, GroupChatBlock, GroupDefaultInfo, socketEventType, UserDefaultInfo } from "@/lib/const";
 
 import { useState, useEffect } from "react";
 import { api } from "@/lib/axios";
+import { current } from "@reduxjs/toolkit";
+import toast from "react-hot-toast";
 
 
-export const useGetSocketData=<T>(socket: any, currentUser: UserDefaultInfo, emitEvent: string)=>{
+export const useGetSocketData=<T>(socket: any, currentUser: UserDefaultInfo, emitEvent: socketEventType)=>{
     const [socketData, setSocketData]= useState<T>();
     
     useEffect(()=>{
@@ -60,66 +62,15 @@ export const useFetch=<T>(url: string, type: "get"|"post", defaultInfo: T, body?
     },[])
     return {error, loading, data};
 }
-const FetchData= async(url:string, type:"get"|"post"|"put"|"delete", defaultInfo:string, body:any)=>{
-    const [error, setError]= useState<string>("")
-    const [loading, setLoading]= useState<boolean>(false);
-    const [data, setData]= useState<string>("");
-     try{
-        setLoading(false);
-        if(type==="get"){
-            const response= await api.get(url);
-            setData(response.data);
-        }else if(type==="post"){
-            const response= await api.post(url, body);
-            setData(response.data);
-        }else if(type==="put"){
-            const response= await api.put(url, body);
-            setData(response.data);
-        }else if(type==="delete"){
-            const response= await api.delete(url, body);
-            setData(response.data);
-        }else{
-            setError("your request type are not allow to fetch data from database");
-        } 
-    }catch(e:any){
-        console.log(e);
-        setError(e.message);
-        setLoading(false);
-    }finally{
-        setLoading(false);
-        setError("");
-    }
-    return {error, loading, data};
-}
-const MakeRequest= async(url:string, type:"get"|"post"|"put"|"delete", body:any)=>{
-    const [error, setError]= useState<string>("")
-    const [loading, setLoading]= useState<boolean>(false);
-    const [response, setResponse]= useState<string>("");
-    try{
-        setLoading(false);
-        if(type==="get"){
-            const response= await api.get(url);
-            setResponse(response.data);
-        }else if(type==="post"){
-            const response= await api.post(url, body);
-            setResponse(response.data);
-        }else if(type==="put"){
-            const response= await api.put(url, body);
-            setResponse(response.data);
-        }else if(type==="delete"){
-            const response= await api.delete(url, body);
-            setResponse(response.data);
-        }else{
-            setError("your request type are not allow to fetch data from database");
-        } 
-    }catch(e:any){
-        console.log(e);
-        setError(e.message);
-        setLoading(false);
-    }finally{
-        setLoading(false);
-        setError("");
-    }
-    return {error, loading, response};
-}   
+
+export const SocketNotification=async<T>(socket: any, currentUser: UserDefaultInfo, emitEvent: socketEventType, notification: string)=>{
     
+  const data= useGetSocketData<T>(socket, currentUser, emitEvent);
+   useEffect(()=>{
+    if(data){
+        toast(notification,{
+            icon:'💬',
+        })
+    }
+   },[data])
+}

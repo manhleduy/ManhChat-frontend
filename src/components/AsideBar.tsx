@@ -1,4 +1,5 @@
 import {User, Settings,BookUser, MessageCircle, LogOut, NewspaperIcon } from 'lucide-react';
+import { motion } from "framer-motion"
 import {
   Tooltip,
   TooltipContent,
@@ -23,7 +24,7 @@ import { logout } from '@/redux/slice/userSlice';
 const AsideBar = () => {
   const dispatch= useAppDispatch();
   return (
-    <div className='flex flex-col justify-between h-full w-[60px]  p-4 bg-green-400'>
+    <motion.div initial={{opacity:0, y:20}} animate={{opacity:1, y:0}} transition={{duration:0.5}} className='flex flex-col justify-between h-full w-[60px]  p-4 bg-green-400'>
       <div className='flex flex-col gap-5'>
         <a href="/profile" className='text-2xl font-bold'>
            <Tooltip>
@@ -122,7 +123,7 @@ const AsideBar = () => {
       </PopoverContent>
     </Popover>
 
-    </div>
+    </motion.div>
   )
 }
 

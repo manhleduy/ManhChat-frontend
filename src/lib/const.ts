@@ -1,5 +1,3 @@
-
-
 // chat blocks
 export interface ChatBlockInfo{
     id?:number;
@@ -20,7 +18,6 @@ export interface FriendChatBlock extends ChatBlockInfo{
 export interface GroupChatBlock extends ChatBlockInfo{
     groupId:number; 
 }
-
 //individual interfaces 
 export interface UserDefaultInfo{
     id:number;
@@ -109,10 +106,15 @@ export interface GroupRequest extends InvitationDefaultInfo{
 }
 
 //group invitation interfaces
-
 export type MessageType= FriendChatBlock | GroupChatBlock
 
 export type RequestType= FriendRequest | GroupRequest
+//SOCKET EVENT TYPE;
+export type socketEventType="receiveMessage"|"withdrawMessage"|"receiveGroupMessage"
+|"withdrawGroupMessage"|"receiveFriendRequest"
+|"rejectFriendREquest"|"withdrawFriendRequest"|"receiveGroupRequest"
+|"rejectGroupRequest"|"withdrawGroupRequest"|"receivePost"|"joinGroup"
+|"userOnline"| "userOffline"
 
 
 
@@ -163,5 +165,5 @@ export const THEMES = [
   "light",
   "dark"
 ];
-export const SocketEmitEvent=["joinGroup"]
+
 export type TypeEquality<T,U>= keyof T extends keyof U ? (keyof U extends keyof T ? true : false) : false;

@@ -22,7 +22,6 @@ const GroupChatBody=(WrapppedComponent: any)=>{
   
   return function EnhancedComponent(props:any){
     const {currentUser, setLoading, setError, currentChat}= props;
-    const dispatch= useAppDispatch()
     const [messages, setMessages] = useState<MessageType[]>([]);
     const [response, setResponse]= useState<Response>({message:"", status:0});
     const [inputValue, setInputValue] = useState<string>('');
@@ -87,7 +86,7 @@ const GroupChatBody=(WrapppedComponent: any)=>{
     }
   };
   //handle the fetching the messages in chat 
-  const {data, error, loading}= useFetch<MessageType[]>(`/api/chat/${currentChat.id}`, "post", messages, {memberId: currentUser.id})
+  const {data, error, loading}= useFetch<MessageType[]>(`/api/chat/group/${currentChat.id}`, "post", messages, {memberId: currentUser.id})
   useEffect(() => {
     setMessages(data)
   }, [currentUser.id, currentChat.groupId, data])
@@ -96,7 +95,6 @@ const GroupChatBody=(WrapppedComponent: any)=>{
     useEffect(()=>{
         if(groupMessage && groupMessage.groupId===currentChat.id){
         setMessages(messages=>[...messages, groupMessage])
-        /////////dispatch(popGroupChat(currentChat.id)); 
 
       }else{
         console.log("unkown error")
@@ -130,11 +128,13 @@ const GroupChatBody=(WrapppedComponent: any)=>{
 //FRIEND CHAT BODY
 const FriendChatBody=(WrappedComponent: any)=>{
   return function EnhancedComponent(props:any){
+  
     const {currentUser, setLoading, setError, currentChat}= props;
     const [messages, setMessages] = useState<MessageType[]>([]);
     const [response, setResponse]= useState<Response>({message:"", status:0});
     const [inputValue, setInputValue] = useState<string>('');
     const [openInfoPage, setOpenInfoPage]= useState(false);
+    
     const [attachedFile, setAttachedFile] = useState<File | null>(null);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>, type: 'file' | 'image') => {
@@ -176,12 +176,12 @@ const FriendChatBody=(WrappedComponent: any)=>{
         }
     }
 
-      const newMessage: FriendChatBlock = {
-        content: inputValue || attachedFile?.name || '',
-        senderId: currentUser.id,
-        receiverId: currentChat.id,
-        file: fileUrl ||""
-      };
+    const newMessage: FriendChatBlock = {
+      content: inputValue || attachedFile?.name || '',
+      senderId: currentUser.id,
+      receiverId: currentChat.id,
+      file: fileUrl ||""
+    };
       console.log(newMessage)
       await createChat(newMessage, setResponse, setLoading);
       setMessages(messages => [...messages, newMessage]);
@@ -202,32 +202,25 @@ const FriendChatBody=(WrappedComponent: any)=>{
   useEffect(()=>{
     if(message && message.senderId===currentChat.id){
       setMessages(messages=>[...messages, message]);
-      
-      ///////dispatch(popFriendChat(currentChat.id));
-      
     }else{
       console.log("unkown error")
     }
-    return (()=>{
-      ///////dispatch(popFriendChat(currentChat.id));
-      
-    })
   }, [message])
 
   // change the isread state of the chat block
   useEffect(()=>{
-    const markRead=async()=>{
+     const markRead=async()=>{
       try{
-      
-       await markAsRead({receiverId:currentUser.id, senderId:currentChat.id},setError,setLoading)
-      }
-      catch(e){
-        toast.error("error");
+        await markAsRead({receiverId:currentUser.id, senderId:currentChat.id})
+      }catch(e:any){
+        toast.error(error);
       }
     }
-    markRead()
-
-  },[])
+    markRead() 
+  
+  },[error, loading])
+  
+  //allow open information card
   const InfoButton=()=>{
     return(
     <button  onClick={()=>{setOpenInfoPage(true)}}>

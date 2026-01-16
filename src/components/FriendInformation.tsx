@@ -3,9 +3,9 @@ import { User, ArrowLeftCircle, UserRoundX } from 'lucide-react';
 import type { UserDefaultInfo } from '@/lib/const';
 import ConfirmButton from './Confirmbutton';
 import toast from 'react-hot-toast';
-import { unFriend } from '@/lib/services/friendService';
 import { selectUserInfo } from '@/redux/slice/userSlice';
 import { useAppSelector } from '@/redux/reduxHook';
+import { MakeRequest } from '@/lib/services/services';
 
 interface FriendInformationProps {
   userInfo: UserDefaultInfo;
@@ -21,7 +21,8 @@ const FriendInformation: React.FC<FriendInformationProps> = ({ userInfo, setOpen
 
   const handleDeleteFriend=async()=>{
     try{
-      await unFriend({userId: currentUser.id, friendId: userInfo.id}, setError, setLoading)
+      //handle unfriend with other 
+      await MakeRequest(`/api/friend/${currentUser.id}`, "delete", setError, setLoading,{userId: currentUser.id, friendId: userInfo.id})
       toast.success("your have delete your friend");
       setOpenInfoPage(false);
 

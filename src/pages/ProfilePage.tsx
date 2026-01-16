@@ -5,7 +5,7 @@ import { Camera, User, Home, Calendar, Phone, Edit2, X, Check,ArrowRightCircle, 
 import { useAppDispatch, useAppSelector } from '@/redux/reduxHook';
 import { selectUserInfo } from '@/redux/slice/userSlice';
 import { useNavigate } from 'react-router-dom';
-import { deleteUser, updateUserInfo, updateUserProfilePic } from '@/lib/services/userService';
+import { deleteUser} from '@/lib/services/userService';
 import toast from 'react-hot-toast';
 // Form Imports
 import { useForm, FormProvider, Controller } from 'react-hook-form';
@@ -18,6 +18,7 @@ import AsideBar from '@/components/AsideBar';
 import UserPostList from '@/components/UserPostList';
 import ConfirmButton from '@/components/Confirmbutton';
 import { useFetch } from '@/hook/reacthook';
+import { MakeRequest } from '@/lib/services/services';
 type FieldDef = {
   name: keyof ProfileChangeSchema;
   id: string;
@@ -106,12 +107,16 @@ const ProfilePage: React.FC = () => {
   
    
 
-  // Form Submit Handler
+  // Form Submit Handler/ UPDATE USER INFOMATION
   const onSubmit =async (data: ProfileChangeSchema) => {
     if(!isEditing)return;
     try{
-      await updateUserInfo(currentUser.id, data, setError, setLoading);
-      
+      const {birthday, name, phonenumber, address}= data;
+      if(!birthday){
+        return;
+      }
+      const normalizeDate:string= birthday.getFullYear()+"-"+ (birthday.getMonth()+1)+"-"+birthday.getDate();
+      await MakeRequest(`/api/user/updateInfo/${currentUser.id}`, "put", setError, setLoading,  {birthday:normalizeDate, name, phonenumber, address})      
     }
     catch(e){
       console.log(e);
@@ -149,8 +154,7 @@ const ProfilePage: React.FC = () => {
       reader.readAsDataURL(file[0]);
       reader.onload= async()=>{
         const base64Image= reader.result;
-        await updateUserProfilePic(currentUser.id, base64Image, setError, setLoading)
-        
+        await MakeRequest(`/api/user/updateAvatar/${currentUser.id}`, "put", setError, setLoading, {avatar:base64Image})
       }
       
     }catch(e:any){

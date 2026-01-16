@@ -10,6 +10,7 @@ import { Eye, EyeOff } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { selectUserInfo } from '@/redux/slice/userSlice';
+import { motion } from "framer-motion"
 const defaultConfig = {
   page_title: 'Welcome Back',
   name_label: inputFormConfig.name_label,
@@ -132,7 +133,7 @@ const Login: React.FC = () => {
 
 
   return (
-    <div className="min-h-screen w-full bg-white flex items-center justify-center px-5">
+    <motion.div initial={{opacity:0, y:20}} animate={{opacity:1, y:0}} transition={{duration:0.5}} className="min-h-screen w-full bg-white flex items-center justify-center px-5">
       <main className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-10">
@@ -184,7 +185,7 @@ const Login: React.FC = () => {
           </div>
         </div>
       </main>
-    </div>
+    </motion.div>
   );
 };
 

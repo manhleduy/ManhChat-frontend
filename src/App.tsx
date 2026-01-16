@@ -1,5 +1,6 @@
 import {Toaster} from "react-hot-toast"
 import {Routes, Route} from "react-router-dom"
+import { motion } from "framer-motion"
 import ChatPage from "./pages/ChatPage"
 import ProfilePage from "./pages/ProfilePage"
 import Contacts from "./pages/Contacts"
@@ -10,7 +11,7 @@ import { useAppDispatch, useAppSelector } from "./redux/reduxHook"
 import { selectUserInfo } from "./redux/slice/userSlice"
 import { use, useEffect } from "react"
 import socket from "./lib/socket"
-import { useGetSocketData} from "./hook/reacthook"
+import { SocketNotification, useGetSocketData} from "./hook/reacthook"
 import { addOnlineUser, removeOnlineUser, selectOnlineUserList } from "./redux/slice/onlineUserSlice"
 import type { FriendChatBlock, GroupChatBlock, FriendRequest, GroupRequest } from "./lib/const"
 import ForgotPassword from "./pages/ForgotPassword"
@@ -19,17 +20,10 @@ function App() {
   const dispatch = useAppDispatch();
   const currentUser= useAppSelector(selectUserInfo).info;
   
-  //get group request
-  const groupRequest= useGetSocketData<GroupRequest>(socket, currentUser, "receiveGroupRequest");
-  useEffect(()=>{
-    if(groupRequest){
-      console.log("new group request received in app.tsx:", groupRequest);
-      //dispatch()
-    }
-  })
+  //notification
   
-  
-  //user online 
+  SocketNotification<GroupRequest>(socket, currentUser, "receiveGroupRequest","your group are chat")
+  //USER ONLINE 
   const onlineUsers= useGetSocketData<number>(socket, currentUser, "userOnline")
   useEffect(()=>{
     if(onlineUsers!==undefined && onlineUsers){
@@ -37,8 +31,7 @@ function App() {
       dispatch(addOnlineUser(onlineUsers));
     }
   }, [onlineUsers])
-
-  //user offline
+  //USER OFFLINE
   const offlineUsers= useGetSocketData<number>(socket, currentUser, "userOffline")
   useEffect(()=>{
     if(offlineUsers!==undefined && offlineUsers){
@@ -46,7 +39,7 @@ function App() {
     }
   }, [offlineUsers])
     
-  //socket connection effect
+  //SOCKET CONNECTION EFFECT
   useEffect(() => {
   if (currentUser?.id>0) {
     dispatch({ type: "SOCKET_CONNECT", payload: currentUser.id.toString() });
@@ -60,7 +53,7 @@ function App() {
   
 
   return (
-    <main className="flex gap-1 h-screen w-screen" > 
+    <motion.main initial={{opacity:0, y:20}} animate={{opacity:1, y:0}} transition={{duration:0.5}} className="flex gap-1 h-screen w-screen" > 
       <Toaster position="top-center" />
       <div className="w-full h-full">
       <Routes>
@@ -75,7 +68,7 @@ function App() {
       </Routes>
       </div>
       
-    </main>
+    </motion.main>
   )
 }
 

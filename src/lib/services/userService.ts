@@ -71,27 +71,6 @@ export const deleteUser= async(setError:any, setLoading:any, id: number)=>{
 
 
 
-export const updateUserInfo = async (
-    id: number,
-    data: Partial<UserDefaultInfo>,
-    setError: any,
-    setLoading: any
-) => {
-    try {
-        const {birthday, name, phonenumber, address}= data;
-        if(!birthday){
-            return;
-        }
-        const normalizeDate:string= birthday.getFullYear()+"-"+ (birthday.getMonth()+1)+"-"+birthday.getDate();
-        setLoading(true);
-        const res = await api.put(`/api/user/updateInfo/${id}`, {birthday:normalizeDate, name, phonenumber, address});
-        setLoading(false);
-        return res.data;
-    } catch (e: any) {
-        setLoading(false);
-        setError(e.response?.data?.message || e.message || 'An error occurred');
-    }
-};
 
 export const updateUserPassword = async (
     email: string,
@@ -111,23 +90,6 @@ export const updateUserPassword = async (
     }
 };
 
-export const updateUserProfilePic = async (
-    id: number,
-    avatar: any,
-    setError: any,
-    setLoading: any
-) => {
-    try {
-        setLoading(true);
-        const res = await api.put(`/api/user/updateAvatar/${id}`,{avatar:avatar});
-        console.log(avatar.name);
-        setLoading(false);
-    } catch (e: any) {
-        setLoading(false);
-        console.log(e);
-        setError(e.response?.data?.message || e.message || 'An error occurred');
-    }
-};
 
 export const createUserConnect = async (
     userId: number,

@@ -1,31 +1,31 @@
 import type { PostDefaultInfo } from "@/lib/const"
-import { likePost } from "@/lib/services/postService";
 import { Heart } from "lucide-react";
 import toast from "react-hot-toast";
 import ConfirmButton from "./Confirmbutton";
 import { Trash } from "lucide-react";
 import { useState } from "react";
-import { deletePost } from "@/lib/services/postService";
 import { useAppSelector } from "@/redux/reduxHook";
 import { selectUserInfo } from "@/redux/slice/userSlice";
+import { MakeRequest } from "@/lib/services/services";
 const Post = ({props}: {props: PostDefaultInfo}) => {
     const {postId, userId, content, name, createdAt, profilePic, likeNum, image}= props;
     const [openConfirm, setOpenConfirm]= useState(false);
+    const [error, setError]= useState<string>("")
+    const [loading, setLoading]= useState<boolean>(false);
     const currentUser= useAppSelector(selectUserInfo).info;
+    //LIKE POST
     const handleLike=async()=>{
         try{
-            
-            await likePost(postId);
-            
+            await MakeRequest(`/api/post/${postId}`, "put",setError, setLoading)            
         }catch(e:any){
             console.log(e);
             toast.error(e.message);
         }
     }
+    //DELETE POST
     const handleDeletePost= async()=>{
         try{
-            await deletePost(postId);
-
+            await MakeRequest(`/api/post/${postId}`,"delete", setError, setLoading)
         }catch(e:any){
             console.log(e);
             toast.error(e.message);

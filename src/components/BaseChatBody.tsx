@@ -2,6 +2,7 @@ import ChatBlock from './ChatBlock';
 import { ChevronLeft, InfoIcon, XIcon } from 'lucide-react';
 
 import type {ChatBlockInfo} from '@/lib/const';
+import { motion } from "framer-motion";
 
 const BaseChatBody=(props:any)=>{
     const {
@@ -22,7 +23,7 @@ const BaseChatBody=(props:any)=>{
         setOpenInfoPage,
       }= props;
     return (
-      <div className={`w-full h-full flex flex-col  overflow-hidden max-lg:${openInfoPage? "hidden": ""}`} >
+      <motion.div initial={{opacity:0, y:20}} animate={{opacity:1, y:0}} transition={{duration:0.5}} className={`w-full h-full flex flex-col  overflow-hidden max-lg:${openInfoPage? "hidden": ""}`} >
       {/* Header */}
       <header className="px-6 py-6 border-b border-gray-200 bg-gray-50">
         <h1 className=" flex text-2xl font-semibold text-gray-900" id="chatTitle">
@@ -189,7 +190,7 @@ const BaseChatBody=(props:any)=>{
           
         </form>
       </div> 
-    </div>
+    </motion.div>
     )
 }
 export default BaseChatBody
