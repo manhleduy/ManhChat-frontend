@@ -6,15 +6,13 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { useFetch } from '@/hook/reacthook';
+import { useFetch, useListenSocket } from '@/hook/reacthook';
 import InvitationForm from './InvitationForm';
-import { useAppDispatch } from '@/redux/reduxHook';
 import { useSelector } from 'react-redux';
 import { selectUserInfo } from '@/redux/slice/userSlice';
 import type { FriendRequest, RequestType } from '@/lib/const';
 import { acceptInvitation} from '@/lib/services/invitationService';
 import socket from '@/lib/socket';
-import { useGetSocketData } from '@/hook/reacthook';
 import toast from 'react-hot-toast';
 import { MakeRequest } from '@/lib/services/services';
 
@@ -58,19 +56,37 @@ export const Invitations =(WrappedComponent:any) => {
   const [Error, setError]= useState<string>("");
   // request sent
   const [sentInvitations, setSentInvitations] = useState<FriendRequest[]>(data.sentRequests||[]);
-  console.log(data.sentRequests, data.receivedRequests);
   // request received
   const [receivedInvitations, setReceivedInvitations] = useState<FriendRequest[]>(data.receivedRequests||[]);
-  
-  //socket handle
-  const newRequest= useGetSocketData<FriendRequest>(socket, currentUser, "receiveFriendRequest");
-  useEffect(()=>{
-    if(newRequest){
-    setSentInvitations(a=>[...a, newRequest]);
-    toast.success("get a request ")
+
+  //Socket: receive requset
+  useListenSocket(
+    socket,
+    currentUser,
+    "receiveFriendRequest",
+    (data: FriendRequest)=>{
+      if(data && data.id===currentUser.id){
+        setReceivedInvitations(prev=>[...prev, data])
+      }else{
+        console.log("unkown error");
+      }
+    },
+    "you receive an request"
+  )
+  //Socket: request rejected 
+  useListenSocket(
+    socket,
+    currentUser,
+    "rejectFriendRequest",
+    (data: {senderId:number, receiverId:number})=>{
+      if(data && data.receiverId===currentUser.id){
+        setReceivedInvitations(prev=>prev.filter(item=>item.id!==data.senderId))
+      }else{
+        console.log("unkown error");
+      }
     }
-  },[newRequest])
-  ////
+    ,"your request is rejected"
+  )
   useEffect(()=>{
     setSentInvitations(data.sentRequests||[]);
     setReceivedInvitations(data.receivedRequests||[]);

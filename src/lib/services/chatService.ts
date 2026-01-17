@@ -46,9 +46,6 @@ export const createGroupChat= async(
   }
 }
 
-
-
-
 export const markAsRead=async(data:{receiverId: number, senderId: number})=>{
   try{
     if(!data) return;
@@ -59,9 +56,3 @@ export const markAsRead=async(data:{receiverId: number, senderId: number})=>{
 }
 
 
-export const recallGroupChat= async()=>{
-
-}
-export const likeGroupChat= async()=>{
-  
-}

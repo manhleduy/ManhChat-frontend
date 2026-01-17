@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 
 import { useAppSelector } from '@/redux/reduxHook';
 import { selectOnlineUserList } from '@/redux/slice/onlineUserSlice';
-import { useFetch } from '@/hook/reacthook';
+import { useFetch, useListenSocket } from '@/hook/reacthook';
 import {
   Tooltip,
   TooltipContent,
@@ -13,7 +13,7 @@ import { motion } from "framer-motion"
 import ConfirmButton from './Confirmbutton';
 import { selectUserInfo } from '@/redux/slice/userSlice';
 import { MakeRequest } from '@/lib/services/services';
-
+import socket from '@/lib/socket';
 //config
 const defaultConfig = {
     background_color: "#ffffff",
@@ -65,17 +65,44 @@ const GroupInfomation = ({ group, openInfoPage, setOpenInfoPage }:any) => {
   const groupId= group.id;
   const currentUser= useAppSelector(selectUserInfo).info;
   const [groupInfo, setGroupInfo] = useState<any>(null);
-  const [members, setMembers] = useState<any[]>([]);
+  const [members, setMembers] = useState<GroupMembers[]>([]);
   const [Loading, setLoading] = useState(true);
   const [Error, setError] = useState<string>('');
   const [changeInfo, setChangeInfo]= useState<boolean>(false);
   const [openConfirm, setOpenConfirm]= useState(false);
   const currentOnlineUser = useAppSelector(selectOnlineUserList);
 
+  //SOCKET: new user joined
+  useListenSocket<{member: GroupMembers, adminId: number, groupId: number}>(
+    socket, 
+    currentUser, 
+    "newGroupMember",
+    (data: {member: GroupMembers, adminId:number, groupId:number})=>{
+      if(data && data.groupId===groupId){
+        setMembers(prev=>[...prev, data.member])
+      }else{
+        console.log("unkown error")
+      }
+    },
+    "new user joined"
+  )
+  //SOCKET: user left group
+  useListenSocket(
+    socket,
+    currentUser,
+    "userLeaveGroup",
+    (data: {memberId:number, groupId:number})=>{
+      if(data && data.groupId===groupId){
+        setMembers(prev=>prev.filter(item=>item.id!==data.memberId))
+      }else{
+        console.log("unkown error")
+      }
+    },
+    "an user leave your group"
+  )
   
   //FETCH GROUP INFO
   const {data, error, loading} = useFetch<GroupInfoType>(`/api/group/info/${groupId}`,"get", defaultGroupInfo)
-  
   useEffect(() => {
     setGroupInfo(data.groupInfo || defaultGroupInfo);
     setMembers(data.groupMembers || []);

@@ -110,10 +110,12 @@ export type MessageType= FriendChatBlock | GroupChatBlock
 
 export type RequestType= FriendRequest | GroupRequest
 //SOCKET EVENT TYPE;
-export type socketEventType="receiveMessage"|"withdrawMessage"|"receiveGroupMessage"
-|"withdrawGroupMessage"|"receiveFriendRequest"
-|"rejectFriendREquest"|"withdrawFriendRequest"|"receiveGroupRequest"
-|"rejectGroupRequest"|"withdrawGroupRequest"|"receivePost"|"joinGroup"
+export type socketEventType=
+"receiveMessage"|"recallMessage"|
+"receiveGroupMessage"|"recallGroupMessage"|
+"receiveFriendRequest"|"rejectFriendRequest"|
+"receiveGroupRequest"|"rejectGroupRequest"|
+"joinGroup"|"newGroupMember"|"userLeaveGroup"
 |"userOnline"| "userOffline"
 
 

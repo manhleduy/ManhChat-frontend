@@ -11,7 +11,7 @@ import { useAppDispatch, useAppSelector } from "./redux/reduxHook"
 import { selectUserInfo } from "./redux/slice/userSlice"
 import { use, useEffect } from "react"
 import socket from "./lib/socket"
-import { SocketNotification, useGetSocketData} from "./hook/reacthook"
+import { SocketNotification, useGetSocketData, useListenSocket} from "./hook/reacthook"
 import { addOnlineUser, removeOnlineUser, selectOnlineUserList } from "./redux/slice/onlineUserSlice"
 import type { FriendChatBlock, GroupChatBlock, FriendRequest, GroupRequest } from "./lib/const"
 import ForgotPassword from "./pages/ForgotPassword"
@@ -19,26 +19,33 @@ import ForgotPassword from "./pages/ForgotPassword"
 function App() {
   const dispatch = useAppDispatch();
   const currentUser= useAppSelector(selectUserInfo).info;
-  
-  //notification
-  
-  SocketNotification<GroupRequest>(socket, currentUser, "receiveGroupRequest","your group are chat")
-  //USER ONLINE 
-  const onlineUsers= useGetSocketData<number>(socket, currentUser, "userOnline")
-  useEffect(()=>{
-    if(onlineUsers!==undefined && onlineUsers){
-      
-      dispatch(addOnlineUser(onlineUsers));
-    }
-  }, [onlineUsers])
-  //USER OFFLINE
-  const offlineUsers= useGetSocketData<number>(socket, currentUser, "userOffline")
-  useEffect(()=>{
-    if(offlineUsers!==undefined && offlineUsers){
-      dispatch(removeOnlineUser(offlineUsers));
-    }
-  }, [offlineUsers])
     
+  //SOCKET: USER ONLINE 
+  useListenSocket(
+    socket,
+    currentUser,
+    "userOnline",
+    (data: number)=>{
+       if(data!==undefined && data){
+        dispatch(addOnlineUser(data));
+      }else{
+        console.log("unkown error")
+      }
+    }
+  )
+  //USER OFFLINE
+  useListenSocket(
+    socket,
+    currentUser,
+    "userOffline",
+    (data: number)=>{
+      if(data!==undefined && data){
+        dispatch(removeOnlineUser(data));
+      }else{
+        console.log("unkown error")
+      }
+    }
+  )
   //SOCKET CONNECTION EFFECT
   useEffect(() => {
   if (currentUser?.id>0) {

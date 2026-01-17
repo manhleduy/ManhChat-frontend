@@ -6,12 +6,13 @@ import toast from 'react-hot-toast';
 import { selectUserInfo } from '@/redux/slice/userSlice';
 import { acceptGroupRequest} from '@/lib/services/invitationService';
 import GroupRequestForm from './GroupRequestForm';
+import socket from '@/lib/socket';
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { useFetch } from '@/hook/reacthook';
+import { useFetch, useListenSocket } from '@/hook/reacthook';
 import { UserPlus } from 'lucide-react';
 import { MakeRequest } from '@/lib/services/services';
 
@@ -54,7 +55,28 @@ const config={
     const [Loading, setLoading]= useState<boolean>(false);//private
     const [sentRequests, setSentRequests] = useState<GroupRequest[]>([]);
     const [receivedRequests, setReceivedRequests] = useState<GroupRequest[]>([]);
-
+    //SOCKET: get new group proposal
+    useListenSocket(
+      socket,
+      currentUser,
+      "receiveGroupRequest",
+      (data: GroupRequest)=>{
+        if(data && data.id===currentUser.id){
+          setReceivedRequests(prev=>[...prev, data])
+        }
+      })
+    
+    //SOCKET: reject new group proposal
+    useListenSocket(
+      socket,
+      currentUser,
+      "rejectGroupRequest",
+      (data: {senderId:number, receiverId:number})=>{
+        if(data && data.receiverId===currentUser.id){
+          setReceivedRequests(prev=>prev.filter(item=>item.id!==data.senderId))
+        }
+      }
+    )
     const {error, loading, data}= useFetch<GroupRequestType>(`/api/invitation/group/${currentUser.id}`, "get", defaultGroupRequest)
     console.log(data)
     useEffect(()=>{

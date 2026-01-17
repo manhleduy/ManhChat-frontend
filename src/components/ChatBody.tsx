@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import ChatBlock from './ChatBlock';
-import { ChevronLeft, InfoIcon, XIcon } from 'lucide-react';
-import { useAppDispatch, useAppSelector } from '@/redux/reduxHook';
+import React, { useEffect, useState, useRef } from 'react';
+import { InfoIcon } from 'lucide-react';
+import { useAppSelector } from '@/redux/reduxHook';
 import { markAsRead, createChat,createGroupChat } from '@/lib/services/chatService';
 import { selectUserInfo } from '@/redux/slice/userSlice';
-import type { GroupChatBlock, FriendChatBlock,ChatBlockInfo, GroupDefaultInfo, MessageType, } from '@/lib/const';
+import type { GroupChatBlock, FriendChatBlock, GroupDefaultInfo } from '@/lib/const';
 import toast from 'react-hot-toast';
 import socket from '@/lib/socket';
-import { useFetch, useGetSocketData } from '@/hook/reacthook';
+import { useListenSocket, useFetch } from '@/hook/reacthook';
 import GroupInfomation from './GroupInfomation';
 import FriendInformation from './FriendInformation';
-import { clearAllListeners } from '@reduxjs/toolkit';
 import BaseChatBody from './BaseChatBody';
+import type { MessageType } from '@/lib/const';
+import type { Message } from 'react-hook-form';
 interface Response{
   message:string,
   status: number
@@ -22,11 +22,37 @@ const GroupChatBody=(WrapppedComponent: any)=>{
   
   return function EnhancedComponent(props:any){
     const {currentUser, setLoading, setError, currentChat}= props;
-    const [messages, setMessages] = useState<MessageType[]>([]);
+    const [messages, setMessages]= useState<MessageType[]>([]);
     const [response, setResponse]= useState<Response>({message:"", status:0});
     const [inputValue, setInputValue] = useState<string>('');
     const [openInfoPage, setOpenInfoPage]= useState(false);
     const [attachedFile, setAttachedFile] = useState<File | null>(null);
+
+    useListenSocket<GroupChatBlock>(
+      socket, 
+      currentUser, 
+      "receiveGroupMessage",
+      (data: GroupChatBlock)=>{
+          if(data && data.groupId===currentChat.id){
+            setMessages(prev=>[...prev, data])
+          }else{
+            console.log("unkown error")
+          }
+      }
+    );
+    //SOCKET: deleted handle
+    useListenSocket<{chatblockId:number, groupId: number}>(
+      socket,
+      currentUser,
+      "recallGroupMessage",
+      (data: {chatblockId:number, groupId: number})=>{
+        if(data && data.groupId===currentChat.id){
+          setMessages(prev=>prev.filter(item=>item.id!=data.chatblockId))
+        }else{
+          console.log("unkown error")
+        }
+      }
+    );
     //handle the type of file selected between the image and the regular file 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>, type: 'file' | 'image') => {
     const file = e.target.files?.[0];
@@ -78,7 +104,7 @@ const GroupChatBody=(WrapppedComponent: any)=>{
         file: fileUrl
       };
       await createGroupChat(newMessage, setResponse, setLoading);
-      setMessages(messages => [...messages, newMessage]);
+      setMessages(prev=>[...prev, newMessage])
       setInputValue('');
       setAttachedFile(null);
     } catch (error) {
@@ -90,16 +116,7 @@ const GroupChatBody=(WrapppedComponent: any)=>{
   useEffect(() => {
     setMessages(data)
   }, [currentUser.id, currentChat.groupId, data])
-    //socket handle
-    const groupMessage= useGetSocketData<GroupChatBlock>(socket, currentUser, "receiveGroupMessage");
-    useEffect(()=>{
-        if(groupMessage && groupMessage.groupId===currentChat.id){
-        setMessages(messages=>[...messages, groupMessage])
-
-      }else{
-        console.log("unkown error")
-      }
-    }, [groupMessage])
+    //SOCKET: created handle
     
     return(
       <>
@@ -116,6 +133,7 @@ const GroupChatBody=(WrapppedComponent: any)=>{
       attachedFile={attachedFile}
       setAttachedFile={setAttachedFile}
       handleFileSelect={handleFileSelect}
+    
       />
       <div className=' w-1/3 max-lg:hidden h-full'><GroupInfomation group={currentChat} setOpenInfoPage={setOpenInfoPage} openInfoPage={openInfoPage}/></div>
       {openInfoPage
@@ -130,12 +148,13 @@ const FriendChatBody=(WrappedComponent: any)=>{
   return function EnhancedComponent(props:any){
   
     const {currentUser, setLoading, setError, currentChat}= props;
-    const [messages, setMessages] = useState<MessageType[]>([]);
     const [response, setResponse]= useState<Response>({message:"", status:0});
     const [inputValue, setInputValue] = useState<string>('');
     const [openInfoPage, setOpenInfoPage]= useState(false);
-    
+    const [messages, setMessages]= useState<MessageType[]>([]);
     const [attachedFile, setAttachedFile] = useState<File | null>(null);
+
+    
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>, type: 'file' | 'image') => {
     const file = e.target.files?.[0];
@@ -148,7 +167,32 @@ const FriendChatBody=(WrappedComponent: any)=>{
       setInputValue(''); // Clear text input
     }
   };
-  
+  //SOCKET :receive message
+  useListenSocket<FriendChatBlock>(
+    socket,
+    currentUser,
+    "receiveMessage",
+    (data: FriendChatBlock)=>{
+        if(data && data.senderId===currentChat.id){
+          setMessages(prev=>[...prev, data])
+        }else{
+          console.log("unkown error")
+        }
+    }
+  )
+  //SOCKET: recall message
+  useListenSocket<{chatBlockId:number, senderId:number}>(
+    socket,
+    currentUser,
+    "recallMessage",
+    (data: {chatBlockId:number, senderId:number})=>{
+      if(data && data.senderId===currentChat.id){
+        setMessages(prev=>prev.filter(item=>item.id!=data.chatBlockId))
+      }else{
+        console.log("unkown error");
+      }
+    }
+  )
   const handleSubmit =async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputValue && !attachedFile) {
@@ -175,16 +219,17 @@ const FriendChatBody=(WrappedComponent: any)=>{
 
         }
     }
-
+    
     const newMessage: FriendChatBlock = {
       content: inputValue || attachedFile?.name || '',
       senderId: currentUser.id,
       receiverId: currentChat.id,
       file: fileUrl ||""
     };
-      console.log(newMessage)
+      
       await createChat(newMessage, setResponse, setLoading);
-      setMessages(messages => [...messages, newMessage]);
+      setMessages(prev=>[...prev, newMessage])
+      //
       setInputValue('');
       setAttachedFile(null);
     } catch (error) {
@@ -195,17 +240,8 @@ const FriendChatBody=(WrappedComponent: any)=>{
   const {data, error, loading}= useFetch<MessageType[]>(`/api/chat/${currentUser.id}`, "post", messages, {receiverId: currentChat.id})
 
   useEffect(() => {
-    setMessages(data||[]);
+     setMessages(data||[]);
   }, [currentChat.id, currentUser.id, currentChat.id, data])
-  //handle socket send message
-  const message= useGetSocketData<FriendChatBlock>(socket, currentUser, "receiveMessage");
-  useEffect(()=>{
-    if(message && message.senderId===currentChat.id){
-      setMessages(messages=>[...messages, message]);
-    }else{
-      console.log("unkown error")
-    }
-  }, [message])
 
   // change the isread state of the chat block
   useEffect(()=>{
@@ -242,6 +278,7 @@ const FriendChatBody=(WrappedComponent: any)=>{
       attachedFile={attachedFile}
       setAttachedFile={setAttachedFile}
       handleFileSelect={handleFileSelect}
+
       />
       {
       openInfoPage&& 
