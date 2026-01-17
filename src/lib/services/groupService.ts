@@ -13,21 +13,7 @@ export const getAllGroup= createAsyncThunk(
         }
     }
 )
-export const createGroup = async (
-    data: { detail: string; adminId: number; groupName: string; isRestricted: boolean },
-    setError: (error: string) => void,
-    setLoading: (loading: boolean) => void
-) => {
-    try {
-        setLoading(true);
-        const res = await api.post('/api/group/create', data);
-        setLoading(false);
-        return res.data;
-    } catch (e: any) {
-        setLoading(false);
-        setError(e.response?.data?.message || e.message || 'An error occurred');
-    }
-};
+
 export const createGroupConnect = async (
     data: { groupId: number; adminId: number; memberId: number},
     setError: (error: string) => void,
@@ -42,39 +28,10 @@ export const createGroupConnect = async (
         setError(e.response?.data?.message || e.message || 'An error occurred');
     }
 };
-export const deleteGroup = async (
-    data: { groupId: number; adminId: number },
-    setError:any,
-    setLoading:any
-)=>{
-    try{
-        setLoading(true);
-        await api.delete(`/api/group`, {data});
-        setLoading(false);
-
-    }catch(e:any){
-        console.log(e);
-        setError(e.message);
-        setLoading(false);
-    }
-}
 
 
-export const updateGroup = async (
-    data: { detail: string; groupName: string; groupId: string; adminId: string; isRestricted: boolean },
-    setError: (error: string) => void,
-    setLoading: (loading: boolean) => void
-) => {
-    try {
-        setLoading(true);
-        const res = await api.put(`/api/group/update/${data.groupId}`, data);
-        setLoading(false);
-        return res.data;
-    } catch (e: any) {
-        setLoading(false);
-        setError(e.response?.data?.message || e.message || 'An error occurred');
-    }
-};
+
+
 export const findGroup= async(
     data:{groupName:string, groupId: number, adminName:string},
     setError:(error:string)=>void,

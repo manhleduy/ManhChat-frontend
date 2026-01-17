@@ -2,7 +2,6 @@ import React from 'react';
 import { MessageCircle } from 'lucide-react';
 import type { FriendRequest, RequestType } from '@/lib/const';
 import { AVATAR_GRADIENT } from '@/lib/const';
-import { deleteInvitation } from '@/lib/services/invitationService';
 
 type InvitationType = 'sent' | 'received';
 

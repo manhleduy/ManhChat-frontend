@@ -6,9 +6,9 @@ import ManhChatImage from '../assets/ManhChat.png';
 import { XIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAppSelector } from '@/redux/reduxHook';
-import { createGroup } from '@/lib/services/groupService';
 import { selectUserInfo } from '@/redux/slice/userSlice';
 import { motion } from "framer-motion"
+import { MakeRequest } from '@/lib/services/services';
 const CreateGroupForm= ({setOpenCreateForm}:any) => {
   const curretUser= useAppSelector(selectUserInfo).info
   const [error, setError]= useState<string>("");
@@ -23,7 +23,7 @@ const CreateGroupForm= ({setOpenCreateForm}:any) => {
 
   const onSubmit =async (data: CreateGroupSchema) => {  
     try{
-        const response = await createGroup({adminId: curretUser.id, ...data}, setError, setLoading)
+        await MakeRequest(`/api/group/create`, "post", setError, setLoading, {adminId: curretUser.id, ...data})
         toast.success("Group created successfully!");
         toast.success("successful create a new group with admin is you")
     }catch(e:any){

@@ -12,10 +12,11 @@ import { useAppDispatch } from '@/redux/reduxHook';
 import { useSelector } from 'react-redux';
 import { selectUserInfo } from '@/redux/slice/userSlice';
 import type { FriendRequest, RequestType } from '@/lib/const';
-import { acceptInvitation, deleteInvitation} from '@/lib/services/invitationService';
+import { acceptInvitation} from '@/lib/services/invitationService';
 import socket from '@/lib/socket';
 import { useGetSocketData } from '@/hook/reacthook';
 import toast from 'react-hot-toast';
+import { MakeRequest } from '@/lib/services/services';
 
 
 export const Invitations =(WrappedComponent:any) => {
@@ -78,7 +79,7 @@ export const Invitations =(WrappedComponent:any) => {
   const handleWithdraw = async(invitation: RequestType) => {
     try{  
       setSentInvitations(sentInvitations.filter(item=>item.id!=invitation.id));
-      await deleteInvitation({userId:currentUser.id,friendId: invitation.id}, setError, setLoading)
+      await MakeRequest(`/api/invitation/${currentUser.id}`, "delete", setError, setLoading, {friendId:invitation.id, userId: currentUser.id})
     }catch(e:any){
       console.log(e);
       toast.error(e.message);
@@ -100,8 +101,7 @@ export const Invitations =(WrappedComponent:any) => {
   const handleReject = async(invitation: RequestType) => {
      try{
       setReceivedInvitations(receivedInvitations.filter(item=>item.id!=invitation.id));
-      await deleteInvitation({userId:invitation.id,friendId: currentUser.id}, setError, setLoading)
-
+      await MakeRequest(`/api/invitation/${invitation.id}`, "delete", setError, setLoading, {friendId:currentUser.id, userId: invitation.id})
     }catch(e:any){
       console.log(e);
       toast.error(e.message);

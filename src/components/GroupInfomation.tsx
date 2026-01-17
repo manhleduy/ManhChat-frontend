@@ -82,9 +82,10 @@ const GroupInfomation = ({ group, openInfoPage, setOpenInfoPage }:any) => {
     
   }, [data]);
   //
-  const kickUser=async()=>{
+  const kickUser=async(memberId: number)=>{
     try{
-      await MakeRequest(`/api/group/connect/${groupId}`, "delete", setError, setLoading, {memberId: currentUser.id} )
+      console.log("ccc")
+      await MakeRequest(`/api/group/connect/${groupId}`, "delete", setError, setLoading, {memberId: memberId} )
     }catch(e:any){
       console.log(e);
     }
@@ -280,7 +281,7 @@ const GroupInfomation = ({ group, openInfoPage, setOpenInfoPage }:any) => {
                   </div>
                   {groupInfo.adminId===currentUser.id&&
                     <ConfirmButton
-                    acceptFunc={kickUser}
+                    acceptFunc={()=>kickUser(member.id)}
                     cancelFunc={()=>setOpenConfirm(false)}
                     size={8}
                     icon={<UserXIcon width={15} height={15}/>}

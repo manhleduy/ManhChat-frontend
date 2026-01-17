@@ -6,10 +6,9 @@ import ManhChatImage from '../assets/ManhChat.png';
 import { XIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAppSelector } from '@/redux/reduxHook';
-import { createGroup } from '@/lib/services/groupService';
 import { selectUserInfo } from '@/redux/slice/userSlice';
-import { createPost } from '@/lib/services/postService';
 import { motion } from "framer-motion"
+import { MakeRequest } from '@/lib/services/services';
 
 
 const CreatePostForm= ({setOpenCreateForm}:any) => {
@@ -32,7 +31,7 @@ const CreatePostForm= ({setOpenCreateForm}:any) => {
       reader.readAsDataURL(file[0]);
       reader.onload= async()=>{
         const base64Image= reader.result;
-        await createPost({userId: curretUser.id, content: data.content, file: base64Image}, setError, setLoading)
+        await MakeRequest(`/api/post/create/${curretUser.id}`, "post", setError, setLoading, {content: data.content, file: base64Image})
       }
     }catch(e:any){
       console.log(e);
