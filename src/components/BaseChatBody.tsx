@@ -1,6 +1,6 @@
 import ChatBlock from './ChatBlock';
 import { ChevronLeft, InfoIcon, XIcon } from 'lucide-react';
-
+import { useEffect, useRef, useLayoutEffect, useState } from 'react';
 import type {ChatBlockInfo} from '@/lib/const';
 import { motion } from "framer-motion";
 
@@ -21,7 +21,47 @@ const BaseChatBody=(props:any)=>{
         setAttachedFile,
         handleFileSelect,
         setOpenInfoPage,
+        onLoadMore,
+        loadingMore,
+        prevScrollHeight,
+        setPrevScrollHeight,
       }= props;
+
+      const scrollRef = useRef<HTMLDivElement>(null);
+
+      // Handle the "Stay in place" logic - maintain scroll position when messages are added to top
+      useLayoutEffect(() => {
+        const container = scrollRef.current;
+        if (container && prevScrollHeight > 0) {
+          // Calculate how much height was added to the top
+          const heightAdded = container.scrollHeight - prevScrollHeight;
+          // Offset the scroll so the user doesn't move
+          container.scrollTop = heightAdded;
+        }
+      }, [messages]); // Runs every time messages are added
+
+      const handleScroll = () => {
+        const container = scrollRef.current;
+
+        // Detect when user hits the top
+        if (container && container.scrollTop === 0 && onLoadMore) {
+          // Store current scroll height before adding messages
+          setPrevScrollHeight(container.scrollHeight);
+          onLoadMore();
+        }
+      };
+
+      // Auto-scroll to bottom for new messages (only when user is already at bottom)
+      useEffect(() => {
+        const container = scrollRef.current;
+        if (container) {
+          const isAtBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 100;
+          if (isAtBottom) {
+            container.scrollTop = container.scrollHeight;
+          }
+        }
+      }, [messages]);
+      
     return (
       <motion.div initial={{opacity:0, y:20}} animate={{opacity:1, y:0}} transition={{duration:0.5}} className={`w-full h-full flex flex-col  overflow-hidden max-lg:${openInfoPage? "hidden": ""}`} >
       {/* Header */}
@@ -45,6 +85,8 @@ const BaseChatBody=(props:any)=>{
 
       {/* Messages Container */}
       <main
+        ref={scrollRef}
+        onScroll={handleScroll}
         id="chatMessages"
         className="flex-1 overflow-y-auto px-6 py-6 flex flex-col gap-4 scroll-smooth"
       >
@@ -72,9 +114,17 @@ const BaseChatBody=(props:any)=>{
             </div>
           </div>
         ) : (
-          messages.map((msg: ChatBlockInfo, index: number) => (
-          <ChatBlock chatBlockInfo={msg} key={index} />
-          ))
+          <div className="space-y-3 sm:space-y-4">
+            {loadingMore && (
+              <div className="flex items-center justify-center py-2">
+                <div className="animate-spin text-xl sm:text-2xl">⏳</div>
+                <span className="ml-2 text-sm sm:text-base text-gray-500">Loading older messages...</span>
+              </div>
+            )}
+            {messages.map((msg: ChatBlockInfo, index: number) => (
+              <ChatBlock chatBlockInfo={msg} key={msg.id || `msg-${index}`} />
+            ))}
+          </div>
         )}
       </main>
 

@@ -6,12 +6,13 @@ import { selectUserInfo } from '@/redux/slice/userSlice';
 import type { GroupChatBlock, FriendChatBlock, GroupDefaultInfo } from '@/lib/const';
 import toast from 'react-hot-toast';
 import socket from '@/lib/socket';
-import { useListenSocket, useFetch } from '@/hook/reacthook';
+import { api } from '@/lib/axios';
 import GroupInfomation from './GroupInfomation';
 import FriendInformation from './FriendInformation';
 import BaseChatBody from './BaseChatBody';
 import type { MessageType } from '@/lib/const';
-import type { Message } from 'react-hook-form';
+import { useFetch, useListenSocket } from '@/hook/reacthook';
+
 interface Response{
   message:string,
   status: number
@@ -19,7 +20,7 @@ interface Response{
 
 //GROUP CHAT BODY
 const GroupChatBody=(WrapppedComponent: any)=>{
-  
+
   return function EnhancedComponent(props:any){
     const {currentUser, setLoading, setError, currentChat}= props;
     const [messages, setMessages]= useState<MessageType[]>([]);
@@ -27,6 +28,53 @@ const GroupChatBody=(WrapppedComponent: any)=>{
     const [inputValue, setInputValue] = useState<string>('');
     const [openInfoPage, setOpenInfoPage]= useState(false);
     const [attachedFile, setAttachedFile] = useState<File | null>(null);
+    const [hasMore, setHasMore] = useState(true);
+    const [loadingMore, setLoadingMore] = useState(false);
+    const [page, setPage] = useState(0);
+    const [prevScrollHeight, setPrevScrollHeight] = useState(0);
+
+    // Initial load - fetch first 20 messages
+    const {data: initialData, error: initialError, loading: initialLoading}= useFetch<MessageType[]>(
+      `/api/chat/group/${currentChat.id}`,
+      "post",
+      [],
+      {memberId: currentUser.id, limit: 20, offset: 0}
+    );
+
+    useEffect(() => {
+      if (initialData && initialData.length > 0) {
+        setMessages(initialData);
+        setHasMore(initialData.length === 20);
+        setPage(1);
+      }
+    }, [initialData]);
+
+    // Load more messages function
+    const loadMoreMessages = async () => {
+      if (loadingMore || !hasMore) return;
+
+      setLoadingMore(true);
+      try {
+        const response = await api.post(`/api/chat/group/${currentChat.id}`, {
+          memberId: currentUser.id,
+          limit: 20,
+          offset: page * 20
+        });
+
+        const olderMessages: MessageType[] = response.data;
+        if (olderMessages.length > 0) {
+          setMessages(prev => [...olderMessages, ...prev]);
+          setPage(prev => prev + 1);
+          setHasMore(olderMessages.length === 20);
+        } else {
+          setHasMore(false);
+        }
+      } catch (error) {
+        console.error('Failed to load more messages:', error);
+      } finally {
+        setLoadingMore(false);
+      }
+    };
 
     useListenSocket<GroupChatBlock>(
       socket, 
@@ -53,6 +101,7 @@ const GroupChatBody=(WrapppedComponent: any)=>{
         }
       }
     );
+    
     //handle the type of file selected between the image and the regular file 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>, type: 'file' | 'image') => {
     const file = e.target.files?.[0];
@@ -111,12 +160,6 @@ const GroupChatBody=(WrapppedComponent: any)=>{
       toast.error('Failed to send message');
     }
   };
-  //handle the fetching the messages in chat 
-  const {data, error, loading}= useFetch<MessageType[]>(`/api/chat/group/${currentChat.id}`, "post", messages, {memberId: currentUser.id})
-  useEffect(() => {
-    setMessages(data)
-  }, [currentUser.id, currentChat.groupId, data])
-    //SOCKET: created handle
     
     return(
       <>
@@ -133,6 +176,10 @@ const GroupChatBody=(WrapppedComponent: any)=>{
       attachedFile={attachedFile}
       setAttachedFile={setAttachedFile}
       handleFileSelect={handleFileSelect}
+      onLoadMore={loadMoreMessages}
+      loading={initialLoading}
+      prevScrollHeight={prevScrollHeight}
+      setPrevScrollHeight={setPrevScrollHeight}
     
       />
       <div className=' w-1/3 max-lg:hidden h-full'><GroupInfomation group={currentChat} setOpenInfoPage={setOpenInfoPage} openInfoPage={openInfoPage}/></div>
@@ -146,28 +193,62 @@ const GroupChatBody=(WrapppedComponent: any)=>{
 //FRIEND CHAT BODY
 const FriendChatBody=(WrappedComponent: any)=>{
   return function EnhancedComponent(props:any){
-  
+
     const {currentUser, setLoading, setError, currentChat}= props;
     const [response, setResponse]= useState<Response>({message:"", status:0});
     const [inputValue, setInputValue] = useState<string>('');
     const [openInfoPage, setOpenInfoPage]= useState(false);
     const [messages, setMessages]= useState<MessageType[]>([]);
     const [attachedFile, setAttachedFile] = useState<File | null>(null);
+    const [hasMore, setHasMore] = useState(true);
+    const [loadingMore, setLoadingMore] = useState(false);
+    const [page, setPage] = useState(0);
+    const [prevScrollHeight, setPrevScrollHeight] = useState(0);
 
-    
+    // Initial load - fetch first 20 messages
+    const {data: initialData, error: initialError, loading: initialLoading}= useFetch<MessageType[]>(
+      `/api/chat/${currentUser.id}`,
+      "post",
+      [],
+      {receiverId: currentChat.id, limit: 20, offset: 0}
+    );
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>, type: 'file' | 'image') => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 10 * 1024 * 1024) { // 10MB
-        toast.error('File size must be less than 10MB');
-        return;
+    useEffect(() => {
+      if (initialData && initialData.length > 0) {
+        setMessages(initialData);
+        setHasMore(initialData.length === 20);
+        setPage(1);
       }
-      setAttachedFile(file);
-      setInputValue(''); // Clear text input
-    }
-  };
-  //SOCKET :receive message
+    }, [initialData]);
+
+    // Load more messages function
+    const loadMoreMessages = async () => {
+      if (loadingMore || !hasMore) return;
+
+      setLoadingMore(true);
+      try {
+        const response = await api.post(`/api/chat/${currentUser.id}`, {
+          receiverId: currentChat.id,
+          limit: 20,
+          offset: page * 20
+        });
+
+        const olderMessages: MessageType[] = response.data;
+        if (olderMessages.length > 0) {
+          setMessages(prev => [...olderMessages, ...prev]);
+          setPage(prev => prev + 1);
+          setHasMore(olderMessages.length === 20);
+        } else {
+          setHasMore(false);
+        }
+      } catch (error) {
+        console.error('Failed to load more messages:', error);
+      } finally {
+        setLoadingMore(false);
+      }
+    };
+
+    //SOCKET :receive message
   useListenSocket<FriendChatBlock>(
     socket,
     currentUser,
@@ -193,6 +274,17 @@ const FriendChatBody=(WrappedComponent: any)=>{
       }
     }
   )
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>, type: 'file' | 'image') => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 10 * 1024 * 1024) { // 10MB
+        toast.error('File size must be less than 10MB');
+        return;
+      }
+      setAttachedFile(file);
+      setInputValue(''); // Clear text input
+    }
+  };
   const handleSubmit =async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputValue && !attachedFile) {
@@ -236,25 +328,6 @@ const FriendChatBody=(WrappedComponent: any)=>{
       toast.error('Failed to send message');
     }
   };
-  //handle the fetching the messages in chat 
-  const {data, error, loading}= useFetch<MessageType[]>(`/api/chat/${currentUser.id}`, "post", messages, {receiverId: currentChat.id})
-
-  useEffect(() => {
-     setMessages(data||[]);
-  }, [currentChat.id, currentUser.id, currentChat.id, data])
-
-  // change the isread state of the chat block
-  useEffect(()=>{
-     const markRead=async()=>{
-      try{
-        await markAsRead({receiverId:currentUser.id, senderId:currentChat.id})
-      }catch(e:any){
-        toast.error(error);
-      }
-    }
-    markRead() 
-  
-  },[error, loading])
   
   //allow open information card
   const InfoButton=()=>{
@@ -278,6 +351,10 @@ const FriendChatBody=(WrappedComponent: any)=>{
       attachedFile={attachedFile}
       setAttachedFile={setAttachedFile}
       handleFileSelect={handleFileSelect}
+      onLoadMore={loadMoreMessages}
+      loading={initialLoading}
+      prevScrollHeight={prevScrollHeight}
+      setPrevScrollHeight={setPrevScrollHeight}
 
       />
       {
@@ -286,10 +363,9 @@ const FriendChatBody=(WrappedComponent: any)=>{
       }
     </>
   )
-  }
-    
-
 }
+}
+
 //CHAT BODY
 const ChatBody = (
   
