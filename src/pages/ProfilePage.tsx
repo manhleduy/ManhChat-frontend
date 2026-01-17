@@ -135,13 +135,16 @@ const ProfilePage: React.FC = () => {
   //delte user account
   const handleDelete= async()=>{
     try{
-      //await deleteUser(setError, setLoading, currentUser.id);
+      await MakeRequest(`/api/user/${currentUser.id}`, "delete", setError, setLoading);
       
     }catch(e:any){
       console.log(e);
       toast.error(e.message);
     }finally{
       toast.success("Account deleted successfully, good bye!");
+      setTimeout(()=>{
+        navigate("/login");
+      }, 1000)
     }
   }
   //upload user profile image

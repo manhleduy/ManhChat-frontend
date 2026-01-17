@@ -59,7 +59,6 @@ const InvitationCard: React.FC<InvitationCardProps> = ({
         {type === 'sent' ? (
           <button
             onClick={() => {
-              
               onWithdraw?.(card)
             }
             }

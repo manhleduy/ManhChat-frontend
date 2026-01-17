@@ -52,7 +52,7 @@ export const Invitations =(WrappedComponent:any) => {
 
   return function EnhancedComponent(props:any){
   const currentUser= useSelector(selectUserInfo).info;
-  const {error, loading, data}= useFetch<FriendRequestType>(`/api/post/friends/${currentUser.id}`, "get", defaultFriendRequest)
+  const {error, loading, data}= useFetch<FriendRequestType>(`/api/invitation/${currentUser.id}`, "get", defaultFriendRequest)
   const [Loading, setLoading]= useState(false);
   const [Error, setError]= useState<string>("");
   // request sent
@@ -62,14 +62,14 @@ export const Invitations =(WrappedComponent:any) => {
   const [receivedInvitations, setReceivedInvitations] = useState<FriendRequest[]>(data.receivedRequests||[]);
   
   //socket handle
-  const newRequest= useGetSocketData<FriendRequest>(socket, currentUser, "receiveRequest");
+  const newRequest= useGetSocketData<FriendRequest>(socket, currentUser, "receiveFriendRequest");
   useEffect(()=>{
     if(newRequest){
     setSentInvitations(a=>[...a, newRequest]);
     toast.success("get a request ")
     }
   },[newRequest])
-
+  ////
   useEffect(()=>{
     setSentInvitations(data.sentRequests||[]);
     setReceivedInvitations(data.receivedRequests||[]);

@@ -47,8 +47,7 @@ const BaseList=(props: any)=>{
             
             <motion.div
               key={item.id}
-              variants={item}
-              role="button"
+              variants={item}              whileHover={{scale: 1.02}}              role="button"
               tabIndex={0}
               aria-label={`${item.name}, ${item.unread > 0 ? `${item.unread} unread messages` : 'no unread messages'}`}
               onClick={() =>{

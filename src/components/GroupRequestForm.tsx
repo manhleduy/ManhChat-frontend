@@ -54,6 +54,7 @@ const GroupRequestForm = ({setOpenInviteForm}:any) => {
     const [foundGroups, setFoundGroups]= useState<GroupDefaultInfo[]>([]);
     const [error, setError]= useState<string>("");
     const [loading, setLoading]= useState<boolean>(false);
+    //FROM CONFIGURATION
     const methods = useForm<GroupRequestSchema>({
         mode: 'onSubmit',
         resolver:zodResolver(groupRequestSchema),
@@ -64,8 +65,6 @@ const GroupRequestForm = ({setOpenInviteForm}:any) => {
           content:"Hello i want to make friend with you ",
         },
     });
-    
-    
     const { handleSubmit, reset, setValue,getValues } = methods;
     useEffect(()=>{
         setValue("groupName", selectedGroup?.groupName||"");

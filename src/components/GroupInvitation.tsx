@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import InvitationCard from './InvitationCard';
 import type { GroupRequest, RequestType } from '@/lib/const';
 import { useAppDispatch } from '@/redux/reduxHook';
 import { useSelector } from 'react-redux';

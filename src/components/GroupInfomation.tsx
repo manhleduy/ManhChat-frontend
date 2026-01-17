@@ -2,16 +2,17 @@ import { useState, useEffect } from 'react';
 
 import { useAppSelector } from '@/redux/reduxHook';
 import { selectOnlineUserList } from '@/redux/slice/onlineUserSlice';
-import {groupChangeSchema, type GroupChangeSchema } from '@/lib/inputSchema';
-import { useForm, FormProvider } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useFetch } from '@/hook/reacthook';
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { PenBox } from 'lucide-react';
+import { PenBox, UserXIcon } from 'lucide-react';
+import { motion } from "framer-motion"
+import ConfirmButton from './Confirmbutton';
+import { selectUserInfo } from '@/redux/slice/userSlice';
+import { MakeRequest } from '@/lib/services/services';
 
 //config
 const defaultConfig = {
@@ -62,30 +63,32 @@ const defaultGroupInfo: GroupInfoType={
 
 const GroupInfomation = ({ group, openInfoPage, setOpenInfoPage }:any) => {
   const groupId= group.id;
+  const currentUser= useAppSelector(selectUserInfo).info;
   const [groupInfo, setGroupInfo] = useState<any>(null);
   const [members, setMembers] = useState<any[]>([]);
   const [Loading, setLoading] = useState(true);
   const [Error, setError] = useState<string>('');
   const [changeInfo, setChangeInfo]= useState<boolean>(false);
+  const [openConfirm, setOpenConfirm]= useState(false);
   const currentOnlineUser = useAppSelector(selectOnlineUserList);
 
-  /*const methods= useForm<GroupChangeSchema>({
-    mode: 'onSubmit',
-    resolver:zodResolver(groupChangeSchema),
-    defaultValues:{
-      groupName:"",
-      detail:""
-    }
-  })*/
   
+  //FETCH GROUP INFO
   const {data, error, loading} = useFetch<GroupInfoType>(`/api/group/info/${groupId}`,"get", defaultGroupInfo)
   
   useEffect(() => {
-    
     setGroupInfo(data.groupInfo || defaultGroupInfo);
     setMembers(data.groupMembers || []);
-      
+    
   }, [data]);
+  //
+  const kickUser=async()=>{
+    try{
+      await MakeRequest(`/api/group/connect/${groupId}`, "delete", setError, setLoading, {memberId: currentUser.id} )
+    }catch(e:any){
+      console.log(e);
+    }
+  }
 
   if (loading) {
     return <div className="h-full flex items-center justify-center">Loading...</div>;
@@ -135,7 +138,7 @@ const GroupInfomation = ({ group, openInfoPage, setOpenInfoPage }:any) => {
           }
         `}
       </style>
-      <aside className={`h-full flex flex-col w-full`}>
+      <motion.aside initial={{opacity:0, x:100}} animate={{opacity:1, x:0}} transition={{duration:0.5}} className={`h-full flex flex-col w-full`}>
           <div className="p-4 flex items-center">
             <button
               onClick={() => {
@@ -235,50 +238,62 @@ const GroupInfomation = ({ group, openInfoPage, setOpenInfoPage }:any) => {
               return (
                 <div
                   key={member.id || index}
-                  className="member-item flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 hover:translate-x-1"
+                  className="member-item flex justify-between items-center gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 hover:translate-x-1"
                   style={{ backgroundColor: defaultConfig.surface_color }}
                 >
-                  <div className="relative">
-                    <div
-                      className="w-10 h-10 rounded-full flex items-center justify-center text-xl overflow-hidden"
-                      style={{ backgroundColor: `${defaultConfig.primary_color}33` }}
-                    >
-                      {member.profilePic ? (
-                        <img src={member.profilePic} alt={member.name} className="w-full h-full object-cover" />
-                      ) : (
-                        '👤'
+                  <div className='flex gap-3 '>
+                    <div className="relative">
+                      <div
+                        className="w-10 h-10 rounded-full flex items-center justify-center text-xl overflow-hidden"
+                        style={{ backgroundColor: `${defaultConfig.primary_color}33` }}
+                      >
+                        {member.profilePic ? (
+                          <img src={member.profilePic} alt={member.name} className="w-full h-full object-cover" />
+                        ) : (
+                          '👤'
+                        )}
+                      </div>
+                      {isOnline && (
+                        <div
+                          className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 online-indicator"
+                          style={{
+                            backgroundColor: defaultConfig.primary_color,
+                            borderColor: defaultConfig.background_color
+                          }}
+                        ></div>
                       )}
                     </div>
-                    {isOnline && (
+                    <div className="flex-1 min-w-0">
                       <div
-                        className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 online-indicator"
-                        style={{
-                          backgroundColor: defaultConfig.primary_color,
-                          borderColor: defaultConfig.background_color
-                        }}
-                      ></div>
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div
-                      className="font-medium text-sm truncate"
-                      style={{ color: defaultConfig.text_color }}
-                    >
-                      {member.name}
-                    </div>
-                    <div
-                      className="text-xs opacity-60"
-                      style={{ color: defaultConfig.text_color }}
-                    >
-                      {isOnline ? 'Online' : 'Offline'}
+                        className="font-medium text-sm truncate"
+                        style={{ color: defaultConfig.text_color }}
+                      >
+                        {member.name}
+                      </div>
+                      <div
+                        className="text-xs opacity-60"
+                        style={{ color: defaultConfig.text_color }}
+                      >
+                        {isOnline ? 'Online' : 'Offline'}
+                      </div>
                     </div>
                   </div>
+                  {groupInfo.adminId===currentUser.id&&
+                    <ConfirmButton
+                    acceptFunc={kickUser}
+                    cancelFunc={()=>setOpenConfirm(false)}
+                    size={8}
+                    icon={<UserXIcon width={15} height={15}/>}
+                    setOpenConfirm={setOpenConfirm}
+                    openConfirm={openConfirm}
+                    />
+                  }
                 </div>
               );
             })}
           </div>
         </div>
-      </aside>
+      </motion.aside>
     </>
   );
 };

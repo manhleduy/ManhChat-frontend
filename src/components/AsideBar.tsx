@@ -26,7 +26,7 @@ const AsideBar = () => {
   return (
     <motion.div initial={{opacity:0, y:20}} animate={{opacity:1, y:0}} transition={{duration:0.5}} className='flex flex-col justify-between h-full w-[60px]  p-4 bg-green-400'>
       <div className='flex flex-col gap-5'>
-        <a href="/profile" className='text-2xl font-bold'>
+        <motion.a whileHover={{scale: 1.1}} href="/profile" className='text-2xl font-bold'>
            <Tooltip>
             <TooltipTrigger asChild>
               <User width={30} height={30}/>
@@ -35,8 +35,8 @@ const AsideBar = () => {
               <p>User</p>
             </TooltipContent>
           </Tooltip>
-        </a>
-        <a href="/" className='text-2xl font-bold'>
+        </motion.a>
+        <motion.a whileHover={{scale: 1.1}} href="/" className='text-2xl font-bold'>
            <Tooltip>
             <TooltipTrigger asChild>
               <MessageCircle width={30} height={30}/>
@@ -45,8 +45,8 @@ const AsideBar = () => {
               <p>Chat</p>
             </TooltipContent>
           </Tooltip>
-        </a>
-        <a href="/contacts" className='text-2xl font-bold'>
+        </motion.a>
+        <motion.a whileHover={{scale: 1.1}} href="/contacts" className='text-2xl font-bold'>
            <Tooltip>
             <TooltipTrigger asChild>
               <BookUser width={30} height={30}/>
@@ -55,8 +55,8 @@ const AsideBar = () => {
               <p>Contacts</p>
             </TooltipContent>
           </Tooltip>
-        </a>
-        <a href="/post" className='text-2xl font-bold'>
+        </motion.a>
+        <motion.a whileHover={{scale: 1.1}} href="/post" className='text-2xl font-bold'>
            <Tooltip>
             <TooltipTrigger asChild>
               <NewspaperIcon width={30} height={30}/>
@@ -65,7 +65,7 @@ const AsideBar = () => {
               <p>News</p>
             </TooltipContent>
           </Tooltip>
-        </a>
+        </motion.a>
       </div>
     <Popover>
       <PopoverTrigger asChild>
@@ -107,7 +107,9 @@ const AsideBar = () => {
               </Select>
             </div>
             
-            <button
+            <motion.button
+            whileHover={{scale: 1.05}}
+            whileTap={{scale: 0.95}}
             onClick={()=>{
               dispatch(logout())
               dispatch({type:"SOCKET_DISCONNECT"})
@@ -116,7 +118,7 @@ const AsideBar = () => {
             className='flex items-center gap-x-2 font-semibold'>
               <LogOut width={20} height={20} color='red'/>
               Logout
-            </button>
+            </motion.button>
             
           </div>
         </div>

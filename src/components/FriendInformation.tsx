@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import { selectUserInfo } from '@/redux/slice/userSlice';
 import { useAppSelector } from '@/redux/reduxHook';
 import { MakeRequest } from '@/lib/services/services';
+import { useNavigate } from 'react-router-dom';
 
 interface FriendInformationProps {
   userInfo: UserDefaultInfo;
@@ -14,6 +15,7 @@ interface FriendInformationProps {
 
 
 const FriendInformation: React.FC<FriendInformationProps> = ({ userInfo, setOpenInfoPage }) => {
+  const navigate= useNavigate();
   const [openConfirm, setOpenConfirm]= useState(false);
   const [error, setError]= useState<string>("");
   const [loading, setLoading]= useState<boolean>(false);
@@ -22,13 +24,17 @@ const FriendInformation: React.FC<FriendInformationProps> = ({ userInfo, setOpen
   const handleDeleteFriend=async()=>{
     try{
       //handle unfriend with other 
-      await MakeRequest(`/api/friend/${currentUser.id}`, "delete", setError, setLoading,{userId: currentUser.id, friendId: userInfo.id})
+      await MakeRequest(`/api/user/friend/${currentUser.id}`, "delete", setError, setLoading,{userId: currentUser.id, friendId: userInfo.id})
       toast.success("your have delete your friend");
       setOpenInfoPage(false);
 
     }catch(e:any){
       console.log(e);
       toast.error(e.message);
+    }finally{
+      setTimeout(()=>{
+        navigate('/')
+      }, 10000)
     }
   }
   return (
