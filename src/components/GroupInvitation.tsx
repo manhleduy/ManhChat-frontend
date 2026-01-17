@@ -1,22 +1,30 @@
 import { useEffect, useState } from 'react';
-import InvitationCard from './InvitationCard';
 import type { GroupRequest, RequestType } from '@/lib/const';
 import { useAppDispatch } from '@/redux/reduxHook';
 import { useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
 import { selectUserInfo } from '@/redux/slice/userSlice';
-import { selectGroupRequest } from '@/redux/slice/GroupRequestSlice';
-import { acceptGroupRequest, deleteGroupRequest, getAllGroupRequest } from '@/lib/services/invitationService';
+import { acceptGroupRequest} from '@/lib/services/invitationService';
 import GroupRequestForm from './GroupRequestForm';
+import socket from '@/lib/socket';
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { useFetch, useListenSocket } from '@/hook/reacthook';
 import { UserPlus } from 'lucide-react';
+import { MakeRequest } from '@/lib/services/services';
 
 //tool tip
-
+type GroupRequestType={
+  receivedRequests:GroupRequest[],
+  sentRequests:GroupRequest[]
+}
+const defaultGroupRequest={
+  receivedRequests:[],
+  sentRequests:[]
+}
 export const GroupInvitation = (WrappedComponent:any) => {
   const RequestTooltip=(props: any)=>{
     const {setOpenInviteForm}= props;
@@ -41,25 +49,47 @@ const config={
     receivedLabel:"Group Invitation Received"
   }
   return function EnhancedComponent(props:any){
-    const dispatch= useAppDispatch();
+    
     const currentUser= useSelector(selectUserInfo).info;//private
-    const GroupRequests= useSelector(selectGroupRequest);//private
-    const [error, setError]= useState<string>("")//private
-    const [loading, setLoading]= useState<boolean>(false);//private
-    const [sentInvitations, setSentInvitations] = useState<GroupRequest[]>(GroupRequests.sentRequests||[]);
-    const [receivedInvitations, setReceivedInvitations] = useState<GroupRequest[]>(GroupRequests.receivedRequests||[]);
-
-  useEffect(()=>{
-    dispatch(getAllGroupRequest(currentUser.id));//private
-    setSentInvitations(GroupRequests.sentRequests);//public
-    setReceivedInvitations(GroupRequests.receivedRequests);//public
-  },[])
+    const [Error, setError]= useState<string>("")//private
+    const [Loading, setLoading]= useState<boolean>(false);//private
+    const [sentRequests, setSentRequests] = useState<GroupRequest[]>([]);
+    const [receivedRequests, setReceivedRequests] = useState<GroupRequest[]>([]);
+    //SOCKET: get new group proposal
+    useListenSocket(
+      socket,
+      currentUser,
+      "receiveGroupRequest",
+      (data: GroupRequest)=>{
+        if(data && data.id===currentUser.id){
+          setReceivedRequests(prev=>[...prev, data])
+        }
+      })
+    
+    //SOCKET: reject new group proposal
+    useListenSocket(
+      socket,
+      currentUser,
+      "rejectGroupRequest",
+      (data: {senderId:number, receiverId:number})=>{
+        if(data && data.receiverId===currentUser.id){
+          setReceivedRequests(prev=>prev.filter(item=>item.id!==data.senderId))
+        }
+      }
+    )
+    const {error, loading, data}= useFetch<GroupRequestType>(`/api/invitation/group/${currentUser.id}`, "get", defaultGroupRequest)
+    console.log(data)
+    useEffect(()=>{
+      setSentRequests(data.sentRequests||[]);//public
+      setReceivedRequests(data.receivedRequests||[]);//public
+    },[data])
   
   const handleWithdraw = async(invitation: any) => {
     try{
       const {id, adminId, groupId}= invitation;
-      setSentInvitations(sentInvitations.filter(item=>item.id!=invitation.id));
-      await deleteGroupRequest({memberId: id, adminId:adminId, groupId:groupId}, setError,setLoading)
+      setSentRequests(sentRequests.filter(item=>item.id!=invitation.id));
+      await MakeRequest(`/api/invitation/group/${id}`, "delete", setError, setLoading, {memberId: id, adminId:adminId, groupId:groupId})
+      
     }
     catch(e:any){
       console.log(e);
@@ -70,7 +100,7 @@ const config={
   const handleAccept =async (invitation: any) => {
     try{
       const {id, adminId, groupId}= invitation;
-      setSentInvitations(sentInvitations.filter(item=>item.id!=invitation.id));
+      setReceivedRequests(receivedRequests.filter(item=>item.id!=invitation.id));
       await acceptGroupRequest({memberId: id, adminId: adminId, groupId:groupId}, setError, setLoading)
     }catch(e:any){
       console.log(e);
@@ -82,8 +112,9 @@ const config={
   const handleReject =async (invitation: any) => {
     try{
       const {id, adminId, groupId}= invitation;
-      setSentInvitations(sentInvitations.filter(item=>item.id!=invitation.id));
-      await deleteGroupRequest({memberId: id, adminId:adminId, groupId:groupId}, setError,setLoading)
+      
+      setReceivedRequests(receivedRequests.filter(item=>item.id!=invitation.id));
+      await MakeRequest(`/api/invitation/group/${id}`, "delete", setError, setLoading, {memberId: id, adminId:adminId, groupId:groupId})
       
     }catch(e:any){
       console.log(e);
@@ -97,8 +128,8 @@ const config={
         handleReject={handleReject}
         handleAccept={handleAccept}
         handleWithdraw={handleWithdraw}
-        sentInvitations={sentInvitations}
-        receivedInvitations={receivedInvitations}
+        sentInvitations={sentRequests}
+        receivedInvitations={receivedRequests}
         config={config}
         RequestTooltip={RequestTooltip}
         RequestForm={GroupRequestForm}

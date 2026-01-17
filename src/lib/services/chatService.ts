@@ -1,35 +1,7 @@
 
 import { api } from "../axios";
 
-export const getAllChat = async (
-  senderId: number,
-  receiverId: number,
-  setError?: (error: any) => void,
-  setLoading?: (loading: boolean) => void
-) => {
-  try {
-    setLoading?.(true);
-    const res = await api.post(`/api/chat/${senderId}`, {receiverId:receiverId});
-    setLoading?.(false);
-    return res.data.chatblocks;
-  } catch (e: any) {
-    setLoading?.(false);
-    setError?.(e.response?.data?.message || e.message || 'An error occurred');
-    throw e;
-  }
-};
 
-export const getAllGroupChat=async(groupId:number, userId:number, setError:any, setLoading:any)=>{
-  try{
-    setLoading(true);
-    const res= await api.post(`/api/chat/group/${groupId}`,{memberId:userId});
-    setLoading(false);
-    return res.data.chatblocks;
-  }catch(e:any){
-    console.log(e)
-    setError(e.response?.data?.message || e.message || 'An error occurred')
-  }
-}
 export const createChat = async (
   data: { content: string; file?: string; senderId: number; receiverId: number },
   setResponse: (error: any) => void,
@@ -74,83 +46,13 @@ export const createGroupChat= async(
   }
 }
 
-export const recallChat = async (
-  data: { userId: number; chatblockId: number},
-  setError: any,
-  setLoading: (loading: boolean) => void
-) => {
-  try {
-    setLoading(true);
-    await api.delete(`/api/chat/recall/${data.userId}`, { data });
-    setError(null)
-    setLoading(false)
-    
-  } catch (e: any) {
-    setLoading(false);
-    setError(e.response?.data?.message || e.message || 'An error occurred',);
-  }
-};
- 
-export const likeChat = async (
-  chatblockId: number,
-  setError: (error: any) => void,
-  setLoading: (loading: boolean) => void
-) => {
-  try {
-    setLoading(true);
-    await api.put(`/api/chat/like/${chatblockId}`);
-    setError(null)
-    setLoading(false);
-    
-    
-  } catch (e: any) {
-    setLoading(false);
-  
-    setError(e.response?.data?.message || e.message || 'An error occurred')
-
-  }
-};
-
-export const markAsRead=async(
-  data:{receiverId: number, senderId: number},
-  setError:(error:any)=>void,
-  setLoading: (loading: boolean)=>void
-)=>{
+export const markAsRead=async(data:{receiverId: number, senderId: number})=>{
   try{
-    setLoading(true);
-    setError(null);
     if(!data) return;
     await api.put(`/api/chat/read`, data);
-    setLoading(false);
   }catch(e:any){
-    setLoading(false);
-    setError(e.message);
     console.log(e);
-
   }
 }
 
-export const markAsGroupRead= async(
-  data:{groupId: number},
-  setError:(error:any)=>void,
-  setLoading: (loading: boolean)=>void
-)=>{
-  try{
-    setLoading(true);
-    if(data) return;
-    await api.put(`/api/chat/group/read`, data);
-    setLoading(false);
-  }catch(e:any){
-    setLoading(false);
-    setError(e.message);
-    console.log(e);
 
-  }
-}
-
-export const recallGroupChat= async()=>{
-
-}
-export const likeGroupChat= async()=>{
-  
-}

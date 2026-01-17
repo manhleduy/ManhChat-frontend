@@ -1,5 +1,3 @@
-import { selectFriendPostList } from "@/redux/slice/PostListSlice";
-import { getAllFriendPost } from "@/lib/services/postService";
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/redux/reduxHook";
 import { useNavigate } from "react-router-dom";
@@ -8,20 +6,24 @@ import Post from "@/components/Post";
 import AsideBar from "@/components/AsideBar";
 import { Pen } from "lucide-react";
 import CreatePostForm from "@/components/CreatePostForm";
+import type { PostDefaultInfo } from "@/lib/const";
+import { useFetch } from "@/hook/reacthook";
 const PostPage = () => {
-    const dispatch= useAppDispatch()
     const navigate= useNavigate();
     const currentUser= useAppSelector(selectUserInfo).info;
-    const currentPost= useAppSelector(selectFriendPostList);
-    const [friendPosts, useFriendPosts]= useState(currentPost)
+    const [friendPosts, setFriendPosts]= useState<PostDefaultInfo[]>([])
     const [openCreateForm, setOpenCreateForm]= useState(false);
+    const {error, loading, data}= useFetch<PostDefaultInfo[]>(`/api/post/friends/${currentUser.id}`, "get",[]);
+    
     useEffect(()=>{
-        if(currentUser.id<0)navigate('/')
-        dispatch(getAllFriendPost(currentUser.id));
+        setFriendPosts(data);
+    },[data])
+    //
+    useEffect(()=>{
+        if(currentUser.id<=0) navigate('/');
+    },[])
+    
 
-
-    },[friendPosts, useFriendPosts]);
-    console.log(currentPost);
   return (
         <div className="flex h-full w-full">
             {openCreateForm? <CreatePostForm setOpenCreateForm={setOpenCreateForm}/> : null}

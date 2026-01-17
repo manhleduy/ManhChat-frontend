@@ -10,9 +10,9 @@ import type { GroupDefaultInfo } from '@/lib/const';
 import { SearchIcon } from 'lucide-react';
 import FoundList from './FoundList';
 import { findGroup } from '@/lib/services/groupService';
-import { sendGroupRequest } from '@/lib/services/invitationService';
 import { useAppSelector } from '@/redux/reduxHook';
 import { selectUserInfo } from '@/redux/slice/userSlice';
+import { MakeRequest } from '@/lib/services/services';
 type FieldDef = {
     name: keyof GroupRequestSchema
     id: string;
@@ -54,6 +54,7 @@ const GroupRequestForm = ({setOpenInviteForm}:any) => {
     const [foundGroups, setFoundGroups]= useState<GroupDefaultInfo[]>([]);
     const [error, setError]= useState<string>("");
     const [loading, setLoading]= useState<boolean>(false);
+    //FORM CONFIGURATION
     const methods = useForm<GroupRequestSchema>({
         mode: 'onSubmit',
         resolver:zodResolver(groupRequestSchema),
@@ -64,8 +65,6 @@ const GroupRequestForm = ({setOpenInviteForm}:any) => {
           content:"Hello i want to make friend with you ",
         },
     });
-    
-    
     const { handleSubmit, reset, setValue,getValues } = methods;
     useEffect(()=>{
         setValue("groupName", selectedGroup?.groupName||"");
@@ -84,10 +83,15 @@ const GroupRequestForm = ({setOpenInviteForm}:any) => {
         toast.error(e.message);
       }
     }
-      const onSubmit =async (data: GroupRequestSchema) => {
+    //make a request to join a group
+    const onSubmit =async (data: GroupRequestSchema) => {
         try{
         const {groupId, adminName, content}= getValues()
-        await sendGroupRequest({groupId: groupId, adminName: adminName, content:content, userId: currentUser.id}, setError, setLoading);
+        await MakeRequest(`/api/invitation/group/create/${currentUser.id}`
+          , "post"
+          , setError
+          , setLoading
+          , {groupId:groupId, adminName:adminName, content:content, userId:currentUser.id })
        reset();
       }catch(e:any){
         console.log(e);

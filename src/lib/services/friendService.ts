@@ -13,19 +13,3 @@ export const getFriendList=createAsyncThunk(
     }
 )
 
-export const unFriend= async(
-    data:{userId:number, friendId:number},
-    setError:(error:string)=>void,
-    setLoading:(loading:boolean)=>void
-)=>{
-    try{
-        setLoading(true);
-        const res= await api.delete(`/api/friend/${data.userId}`, {data});
-        setLoading(false);
-        return res.data;
-    }catch(e:any){
-        console.log(e);
-        setError(e.message);
-        setLoading(false);
-    }
-}

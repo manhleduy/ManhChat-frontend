@@ -18,7 +18,12 @@ const FoundList: React.FC<UserListProps> = ({ onSelect,List }) => {
             className="bg-white border border-gray-200 rounded-lg p-4 shadow-md hover:shadow-lg transition-shadow duration-200 cursor-pointer"
             onClick={() => onSelect(item)}
           >
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">{item.name? item.name: item.groupName}</h3>
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">{item.name? item.name: item.groupName}
+              {item.isRestricted!==null
+                ?!item.isRestricted
+                  ?<div className='border-green-500 text-green-500 rounded'>Public</div>
+                  :<div className='border-red-500 text-red-500 rounded'>Restricted</div>
+              :null}</h3>
             <p className="text-sm text-gray-600 mb-1">
               <span className="font-medium">{item.phonenumber?"Phone:": "Admin Name:"}</span> {item.phonenumber? item.phonenumber: item.adminName}
             </p>

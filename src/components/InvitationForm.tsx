@@ -5,13 +5,13 @@ import {zodResolver} from "@hookform/resolvers/zod"
 import { inputFormConfig } from '@/lib/const';
 import { XIcon, SearchIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { sendInvitation } from '@/lib/services/invitationService';
 import FoundList from './FoundList';
 import { findUsers } from '@/lib/services/userService';
 import type { UserDefaultInfo } from '@/lib/const';
 import { useFieldArray } from 'react-hook-form';
 import { useAppSelector } from '@/redux/reduxHook';
 import { selectUserInfo } from '@/redux/slice/userSlice';
+import {MakeRequest} from '@/lib/services/services';
 // Define the User interface
 
 type FieldDef = {
@@ -88,7 +88,11 @@ const InvitationForm = ({setOpenInviteForm}:any) => {
     const onSubmit =async (data: FriendInviteSchema) => {
       try{
         const {name, email, phonenumber, content}= getValues()
-        await sendInvitation({name:name,email:email, phonenumber:phonenumber, content:content, senderId:currentUser.id }, setError, setLoading);
+        await MakeRequest(`/api/invitation/create/${currentUser.id}`
+          , "post"
+          , setError
+          , setLoading
+          , {name:name,email:email, phonenumber:phonenumber, content:content, senderId:currentUser.id })
        reset();
       }catch(e:any){
         console.log(e);

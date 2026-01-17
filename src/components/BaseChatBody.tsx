@@ -1,7 +1,7 @@
 import ChatBlock from './ChatBlock';
 import { ChevronLeft, InfoIcon, XIcon } from 'lucide-react';
 import { useEffect, useRef, useLayoutEffect, useState } from 'react';
-import type { ChatBlockInfo } from '@/lib/const';
+import type {ChatBlockInfo} from '@/lib/const';
 import { motion } from "framer-motion";
 
 const BaseChatBody=(props:any)=>{
