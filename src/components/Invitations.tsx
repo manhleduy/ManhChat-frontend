@@ -6,16 +6,16 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { useFetch, useListenSocket } from '@/hook/reacthook';
 import InvitationForm from './InvitationForm';
-import { useAppDispatch } from '@/redux/reduxHook';
 import { useSelector } from 'react-redux';
-import { selectFriendRequest } from '@/redux/slice/FriendRequestSlice';
 import { selectUserInfo } from '@/redux/slice/userSlice';
 import type { FriendRequest, RequestType } from '@/lib/const';
-import { acceptInvitation, deleteInvitation, getAllRequest } from '@/lib/services/invitationService';
+import { acceptInvitation} from '@/lib/services/invitationService';
 import socket from '@/lib/socket';
-import { useGetSocketData } from '@/hook/reacthook';
 import toast from 'react-hot-toast';
+import { MakeRequest } from '@/lib/services/services';
+
 
 export const Invitations =(WrappedComponent:any) => {
   const RequestTooltip=(props:any)=>{
@@ -40,36 +40,62 @@ export const Invitations =(WrappedComponent:any) => {
     sentLable:"Invitation Sent",
     receivedLabel:"Invitation Received"
   }
+  type FriendRequestType={
+    receivedRequests:FriendRequest[],
+    sentRequests:FriendRequest[]
+  }
+  const defaultFriendRequest={
+    receivedRequests:[],
+    sentRequests:[]
+  }
+
   return function EnhancedComponent(props:any){
   const currentUser= useSelector(selectUserInfo).info;
-  const dispatch= useAppDispatch();
-  const FriendRequests= useSelector(selectFriendRequest);
-  const [loading, setLoading]= useState(false);
-  const [error, setError]= useState<string>("");
+  const {error, loading, data}= useFetch<FriendRequestType>(`/api/invitation/${currentUser.id}`, "get", defaultFriendRequest)
+  const [Loading, setLoading]= useState(false);
+  const [Error, setError]= useState<string>("");
   // request sent
-  const [sentInvitations, setSentInvitations] = useState<FriendRequest[]>(FriendRequests.sentRequests||[]);
+  const [sentInvitations, setSentInvitations] = useState<FriendRequest[]>(data.sentRequests||[]);
   // request received
-  const [receivedInvitations, setReceivedInvitations] = useState<FriendRequest[]>(FriendRequests.receivedRequests||[]);
-  
-  const newRequest= useGetSocketData<FriendRequest>(socket, currentUser, "receiveRequest");
-  useEffect(()=>{
-    if(newRequest){
-    setSentInvitations(a=>[...a, newRequest]);
-    toast.success("get a request ")
+  const [receivedInvitations, setReceivedInvitations] = useState<FriendRequest[]>(data.receivedRequests||[]);
+
+  //Socket: receive requset
+  useListenSocket(
+    socket,
+    currentUser,
+    "receiveFriendRequest",
+    (data: FriendRequest)=>{
+      if(data && data.id===currentUser.id){
+        setReceivedInvitations(prev=>[...prev, data])
+      }else{
+        console.log("unkown error");
+      }
+    },
+    "you receive an request"
+  )
+  //Socket: request rejected 
+  useListenSocket(
+    socket,
+    currentUser,
+    "rejectFriendRequest",
+    (data: {senderId:number, receiverId:number})=>{
+      if(data && data.receiverId===currentUser.id){
+        setReceivedInvitations(prev=>prev.filter(item=>item.id!==data.senderId))
+      }else{
+        console.log("unkown error");
+      }
     }
-  },[newRequest])
-
+    ,"your request is rejected"
+  )
   useEffect(()=>{
-    dispatch(getAllRequest(currentUser.id));
-    setSentInvitations(FriendRequests.sentRequests);
-    setReceivedInvitations(FriendRequests.receivedRequests);
-
-  },[])
+    setSentInvitations(data.sentRequests||[]);
+    setReceivedInvitations(data.receivedRequests||[]);
+  },[data])
 
   const handleWithdraw = async(invitation: RequestType) => {
     try{  
       setSentInvitations(sentInvitations.filter(item=>item.id!=invitation.id));
-      await deleteInvitation({userId:currentUser.id,friendId: invitation.id}, setError, setLoading)
+      await MakeRequest(`/api/invitation/${currentUser.id}`, "delete", setError, setLoading, {friendId:invitation.id, userId: currentUser.id})
     }catch(e:any){
       console.log(e);
       toast.error(e.message);
@@ -91,8 +117,7 @@ export const Invitations =(WrappedComponent:any) => {
   const handleReject = async(invitation: RequestType) => {
      try{
       setReceivedInvitations(receivedInvitations.filter(item=>item.id!=invitation.id));
-      await deleteInvitation({userId:invitation.id,friendId: currentUser.id}, setError, setLoading)
-
+      await MakeRequest(`/api/invitation/${invitation.id}`, "delete", setError, setLoading, {friendId:currentUser.id, userId: invitation.id})
     }catch(e:any){
       console.log(e);
       toast.error(e.message);
@@ -100,7 +125,6 @@ export const Invitations =(WrappedComponent:any) => {
       toast.success("you reject this invitation")
     }
   };
-
 
   return (
      <WrappedComponent

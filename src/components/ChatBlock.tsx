@@ -11,8 +11,8 @@ import {
   DropdownMenuGroup,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {  likeChat, recallChat } from '@/lib/services/chatService';
 import React, { useEffect, useState, type JSX, type ReactElement, type ReactNode } from 'react';
+import { MakeRequest } from '@/lib/services/services';
 //chat drop down 
 const SenderDropDown=(props:any)=>{
   const DeleteMessage=props.DeleteMessage;
@@ -54,7 +54,7 @@ const BaseChatBlock=(props:any)=>{
   //like the message
   const LikeMessage= async()=>{
     try{
-      await likeChat(id||0, setError, setLoading)
+      await MakeRequest(`/api/chat/like/${id}`, "put", setError, setLoading)
     }catch(e:any){
       toast.error(e.message);
     }finally{
@@ -64,8 +64,7 @@ const BaseChatBlock=(props:any)=>{
   //delete the message
   const DeleteMessage=async()=>{
       try{
-      await recallChat({chatblockId:id||0, userId:currentUser.id},setError,setLoading );
-    
+        await MakeRequest(`/api/chat/recall/${currentUser.id}`,"delete",setError,setLoading, {chatblockId:id||0, userId:currentUser.id} );
       } catch(e:any){
         toast.error(e.message);
       } finally{

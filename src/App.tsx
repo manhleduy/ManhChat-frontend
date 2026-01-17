@@ -1,5 +1,6 @@
 import {Toaster} from "react-hot-toast"
 import {Routes, Route} from "react-router-dom"
+import { motion } from "framer-motion"
 import ChatPage from "./pages/ChatPage"
 import ProfilePage from "./pages/ProfilePage"
 import Contacts from "./pages/Contacts"
@@ -10,66 +11,42 @@ import { useAppDispatch, useAppSelector } from "./redux/reduxHook"
 import { selectUserInfo } from "./redux/slice/userSlice"
 import { use, useEffect } from "react"
 import socket from "./lib/socket"
-import { useGetSocketData} from "./hook/reacthook"
-import { pushFriendChat,pushGroupChat, selectChatReceivedList} from "./redux/slice/ChatReceivedSlice"
+import { SocketNotification, useGetSocketData, useListenSocket} from "./hook/reacthook"
 import { addOnlineUser, removeOnlineUser, selectOnlineUserList } from "./redux/slice/onlineUserSlice"
 import type { FriendChatBlock, GroupChatBlock, FriendRequest, GroupRequest } from "./lib/const"
-import { pushFriendReceivedRequest } from "./redux/slice/FriendRequestSlice"
 import ForgotPassword from "./pages/ForgotPassword"
 
 function App() {
   const dispatch = useAppDispatch();
   const currentUser= useAppSelector(selectUserInfo).info;
-  //get message
-  const message= useGetSocketData<FriendChatBlock>(socket, currentUser, "receiveMessage");
-  const groupMessage= useGetSocketData<GroupChatBlock>(socket, currentUser, "receiveGroupMessage");
-  useEffect(()=>{
-    if(message){
-      dispatch(pushFriendChat(message));
-    }
-    if(groupMessage){
-      dispatch(pushGroupChat(groupMessage));
-    }
-  }, [message, groupMessage])
-
-  //get friend request
-  const friendRequest= useGetSocketData<FriendRequest>(socket, currentUser, "receiveRequest");
-  useEffect(()=>{
-    if(friendRequest){
-      console.log("new friend request received in app.tsx:", friendRequest);
-      dispatch(pushFriendReceivedRequest(friendRequest));
-    }
-  })
-  //get group request
-  const groupRequest= useGetSocketData<GroupRequest>(socket, currentUser, "receiveGroupRequest");
-  useEffect(()=>{
-    if(groupRequest){
-      console.log("new group request received in app.tsx:", groupRequest);
-      //dispatch()
-    }
-  })
-  
-  
-  
-
-  //user online 
-  const onlineUsers= useGetSocketData<number>(socket, currentUser, "userOnline")
-  useEffect(()=>{
-    if(onlineUsers!==undefined && onlineUsers){
-      
-      dispatch(addOnlineUser(onlineUsers));
-    }
-  }, [onlineUsers])
-
-  //user offline
-  const offlineUsers= useGetSocketData<number>(socket, currentUser, "userOffline")
-  useEffect(()=>{
-    if(offlineUsers!==undefined && offlineUsers){
-      dispatch(removeOnlineUser(offlineUsers));
-    }
-  }, [offlineUsers])
     
-  //socket connection effect
+  //SOCKET: USER ONLINE 
+  useListenSocket(
+    socket,
+    currentUser,
+    "userOnline",
+    (data: number)=>{
+       if(data!==undefined && data){
+        dispatch(addOnlineUser(data));
+      }else{
+        console.log("unkown error")
+      }
+    }
+  )
+  //USER OFFLINE
+  useListenSocket(
+    socket,
+    currentUser,
+    "userOffline",
+    (data: number)=>{
+      if(data!==undefined && data){
+        dispatch(removeOnlineUser(data));
+      }else{
+        console.log("unkown error")
+      }
+    }
+  )
+  //SOCKET CONNECTION EFFECT
   useEffect(() => {
   if (currentUser?.id>0) {
     dispatch({ type: "SOCKET_CONNECT", payload: currentUser.id.toString() });
@@ -83,7 +60,7 @@ function App() {
   
 
   return (
-    <main className="flex gap-1 h-screen w-screen" > 
+    <motion.main initial={{opacity:0, y:20}} animate={{opacity:1, y:0}} transition={{duration:0.5}} className="flex gap-1 h-screen w-screen" > 
       <Toaster position="top-center" />
       <div className="w-full h-full">
       <Routes>
@@ -98,7 +75,7 @@ function App() {
       </Routes>
       </div>
       
-    </main>
+    </motion.main>
   )
 }
 

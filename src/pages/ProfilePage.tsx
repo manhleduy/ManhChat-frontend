@@ -5,7 +5,7 @@ import { Camera, User, Home, Calendar, Phone, Edit2, X, Check,ArrowRightCircle, 
 import { useAppDispatch, useAppSelector } from '@/redux/reduxHook';
 import { selectUserInfo } from '@/redux/slice/userSlice';
 import { useNavigate } from 'react-router-dom';
-import { deleteUser, getUserInfo, updateUserInfo, updateUserProfilePic } from '@/lib/services/userService';
+import { deleteUser} from '@/lib/services/userService';
 import toast from 'react-hot-toast';
 // Form Imports
 import { useForm, FormProvider, Controller } from 'react-hook-form';
@@ -17,6 +17,8 @@ import { useFormContext } from 'react-hook-form';
 import AsideBar from '@/components/AsideBar';
 import UserPostList from '@/components/UserPostList';
 import ConfirmButton from '@/components/Confirmbutton';
+import { useFetch } from '@/hook/reacthook';
+import { MakeRequest } from '@/lib/services/services';
 type FieldDef = {
   name: keyof ProfileChangeSchema;
   id: string;
@@ -26,7 +28,12 @@ type FieldDef = {
   icon: React.ReactNode;
 };
 
-
+const defaulValues={
+      name: '',
+      address: '',
+      birthday: new Date(),
+      phonenumber: '',
+    }
 const InputField: React.FC<{ field: FieldDef, isEditing:boolean, value:any }> = ({ field, isEditing, value }) => {
   const { register , formState: { errors } } = useFormContext<ProfileChangeSchema>();
   const error = errors[field.name as keyof typeof errors] as any | undefined;
@@ -63,8 +70,8 @@ const fields: FieldDef[] = [
 const ProfilePage: React.FC = () => {
   const navigate = useNavigate();
 
-  const [error, setError] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
+  const [Error, setError] = useState<string>("");
+  const [Loading, setLoading] = useState<boolean>(false);
   const [isEditing, setIsEditing] = useState(false);
   const currentUser = useAppSelector(selectUserInfo).info;
   const  [image, setImage]= useState<any>(currentUser.profilePic);
@@ -75,12 +82,7 @@ const ProfilePage: React.FC = () => {
   const methods = useForm<ProfileChangeSchema>({
     resolver: zodResolver(profileChangeSchema),
     mode: "onSubmit",
-    defaultValues: {
-      name: '',
-      address: '',
-      birthday: new Date(),
-      phonenumber: '',
-    }
+    defaultValues: defaulValues
   });
   const { handleSubmit, control, reset, setValue, getValues } = methods;
   
@@ -91,33 +93,30 @@ const ProfilePage: React.FC = () => {
     }
   }, [currentUser.id, navigate]);
   // Fetch Data and Populate Form
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const userinfo = await getUserInfo(currentUser.id, setError, setLoading);
-        // Map API response to Form Schema
-        const fetchedData = {
-          name: userinfo.name,
-          address: userinfo.address,
+  const {data, error, loading}= useFetch(`/api/user/${currentUser.id}`, "get", defaulValues);
+  useEffect(()=>{
+    const fetchedData = {
+          name: data.name,
+          address: data.address,
           // Ensure birthday is a Date object for the DatePicker
-          birthday: new Date(userinfo.birthday), 
-          phonenumber: userinfo.phonenumber,
+          birthday: new Date(data.birthday), 
+          phonenumber: data.phonenumber,
         };
         reset(fetchedData);
-      } catch (e) {
-        toast.error("Failed to get your information");
-      }
-    };
-    if (currentUser.id > 0) fetchData();
-  }, [currentUser.id, reset]);
+  }, [data])
+  
    
 
-  // Form Submit Handler
+  // Form Submit Handler/ UPDATE USER INFOMATION
   const onSubmit =async (data: ProfileChangeSchema) => {
     if(!isEditing)return;
     try{
-      await updateUserInfo(currentUser.id, data, setError, setLoading);
-      
+      const {birthday, name, phonenumber, address}= data;
+      if(!birthday){
+        return;
+      }
+      const normalizeDate:string= birthday.getFullYear()+"-"+ (birthday.getMonth()+1)+"-"+birthday.getDate();
+      await MakeRequest(`/api/user/updateInfo/${currentUser.id}`, "put", setError, setLoading,  {birthday:normalizeDate, name, phonenumber, address})      
     }
     catch(e){
       console.log(e);
@@ -136,13 +135,16 @@ const ProfilePage: React.FC = () => {
   //delte user account
   const handleDelete= async()=>{
     try{
-      //await deleteUser(setError, setLoading, currentUser.id);
+      await MakeRequest(`/api/user/${currentUser.id}`, "delete", setError, setLoading);
       
     }catch(e:any){
       console.log(e);
       toast.error(e.message);
     }finally{
       toast.success("Account deleted successfully, good bye!");
+      setTimeout(()=>{
+        navigate("/login");
+      }, 1000)
     }
   }
   //upload user profile image
@@ -155,8 +157,7 @@ const ProfilePage: React.FC = () => {
       reader.readAsDataURL(file[0]);
       reader.onload= async()=>{
         const base64Image= reader.result;
-        await updateUserProfilePic(currentUser.id, base64Image, setError, setLoading)
-        
+        await MakeRequest(`/api/user/updateAvatar/${currentUser.id}`, "put", setError, setLoading, {avatar:base64Image})
       }
       
     }catch(e:any){

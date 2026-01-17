@@ -1,31 +1,32 @@
 import type { PostDefaultInfo } from "@/lib/const"
-import { likePost } from "@/lib/services/postService";
 import { Heart } from "lucide-react";
 import toast from "react-hot-toast";
 import ConfirmButton from "./Confirmbutton";
 import { Trash } from "lucide-react";
 import { useState } from "react";
-import { deletePost } from "@/lib/services/postService";
 import { useAppSelector } from "@/redux/reduxHook";
 import { selectUserInfo } from "@/redux/slice/userSlice";
+import { MakeRequest } from "@/lib/services/services";
+import { motion } from "framer-motion"
 const Post = ({props}: {props: PostDefaultInfo}) => {
     const {postId, userId, content, name, createdAt, profilePic, likeNum, image}= props;
     const [openConfirm, setOpenConfirm]= useState(false);
+    const [error, setError]= useState<string>("")
+    const [loading, setLoading]= useState<boolean>(false);
     const currentUser= useAppSelector(selectUserInfo).info;
+    //LIKE POST
     const handleLike=async()=>{
         try{
-            
-            await likePost(postId);
-            
+            await MakeRequest(`/api/post/${postId}`, "put",setError, setLoading)            
         }catch(e:any){
             console.log(e);
             toast.error(e.message);
         }
     }
+    //DELETE POST
     const handleDeletePost= async()=>{
         try{
-            await deletePost(postId);
-
+            await MakeRequest(`/api/post/${postId}`,"delete", setError, setLoading)
         }catch(e:any){
             console.log(e);
             toast.error(e.message);
@@ -39,7 +40,7 @@ const Post = ({props}: {props: PostDefaultInfo}) => {
     };
 
   return (
-    <div className="p-4 bg-white border-2 border-green-200 hover:border-green-400 hover:-translate-y-1 transition duration-300 rounded-lg shadow-lg shadow-green-100/50 w-full min-w-80">
+    <motion.div whileHover={{scale: 1.02, y: -4}} transition={{duration: 0.2}} className="p-4 bg-white border-2 border-green-200 hover:border-green-400 transition duration-300 rounded-lg shadow-lg shadow-green-100/50 w-full min-w-80">
             {image?<img className="rounded-md max-h-40 w-full object-cover" src={image} alt="picture"/>:null}
             <p className="text-gray-900 text-xl font-semibold ml-2 mt-4" style={{ color: defaultConfig.text_color }}>
                 {name}
@@ -66,7 +67,7 @@ const Post = ({props}: {props: PostDefaultInfo}) => {
                 icon={<Trash height={20} width={10} fill="red"/>}
             />
             }
-        </div>
+        </motion.div>
   )
 }
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { FriendListConfig } from '@/lib/const';
+import { FriendListConfig, type socketEventType } from '@/lib/const';
 import { useAppDispatch, useAppSelector } from '@/redux/reduxHook';
 import { getFriendList } from '@/lib/services/friendService';
 import { selectFriendList } from '@/redux/slice/FriendListSlice';
@@ -11,6 +11,7 @@ import { selectOnlineUserList } from '@/redux/slice/onlineUserSlice';
 import socket from '@/lib/socket';
 import { useDebounce } from '@/hook/reacthook';
 import CreateGroupForm from './CreateGroupForm';
+import { motion } from "framer-motion"
 
 
 const COLOR=['#ff6b9d', '#4a90e2', '#f39c12', '#9b59b6', '#e74c3c', '#1abc9c', '#34495e', '#e67e22', "#2ecc71", "#8e44ad"];
@@ -30,6 +31,8 @@ const BaseList=(props: any)=>{
     handleSelect,
     setCurrentChat,
     }= props;
+  const container = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.1 } } };
+  const item = { hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } };
   return(
     <>   
           <button 
@@ -40,17 +43,17 @@ const BaseList=(props: any)=>{
 
             {openList?<ArrowUp height={15} width={15}/>:<ArrowDown height={15} width={15}/>}
           </button>
-          {openList? displayList?.filter((item:any)=>item.name.toLowerCase().includes(query.toLowerCase())).map((item:any,index:number) => (
+          {openList? <motion.div variants={container} initial="hidden" animate="show"> {displayList?.filter((item:any)=>item.name.toLowerCase().includes(query.toLowerCase())).map((item:any,index:number) => (
             
-            <div
+            <motion.div
               key={item.id}
-              role="button"
+              variants={item}              whileHover={{scale: 1.02}}              role="button"
               tabIndex={0}
               aria-label={`${item.name}, ${item.unread > 0 ? `${item.unread} unread messages` : 'no unread messages'}`}
               onClick={() =>{
                 if(onlyMode){
                   setOpenPage("ChatBody")
-                  console.log("chat body");
+                  
                 }
                 handleSelect(item.id);
                 setCurrentChat(item)
@@ -79,8 +82,8 @@ const BaseList=(props: any)=>{
                   <span className="w-5 h-5 rounded-full text-xs font-bold flex items-center justify-center ml-2 text-white" style={{ background: FriendListConfig.primary_color }}>{item.unread}</span>
                 )}
               </div>
-            </div>
-          )): null}
+            </motion.div>
+          ))} </motion.div> : null}
         
     </>
   )
@@ -158,7 +161,8 @@ const GetGroupList=(WrappedComponent:any)=>{
 
     //socket join group
     useEffect(()=>{
-        socket.emit("joinGroup", groupList.map((item)=>{
+        const socketAction: socketEventType= "joinGroup";
+        socket.emit(socketAction, groupList.map((item)=>{
           return {groupName: item.groupName, groupId: item.id}
         }));
         return()=> socket.off("joinGroup");
@@ -194,7 +198,7 @@ const ChatList= ({onlyMode, setOpenPage, setCurrentChat}:{onlyMode:boolean, setO
   
   return (
     //query to find the group and friend
-    <div className={`min-w-[300px] h-full  flex flex-col ${onlyMode? "w-full ":"w-2/12"}`} style={{ background: FriendListConfig.background_color }}>
+    <motion.div initial={{opacity:0, y:20}} animate={{opacity:1, y:0}} transition={{duration:0.5}} className={`min-w-[300px] h-full  flex flex-col ${onlyMode? "w-full ":"w-2/12"}`} style={{ background: FriendListConfig.background_color }}>
       <header className="px-5 py-4 border-b border-gray-200" role="banner">
         <h1 className="text-2xl font-extrabold text-gray-900 mb-3" id="sidebarTitle">{FriendListConfig.sidebar_title}</h1>
 
@@ -253,7 +257,7 @@ const ChatList= ({onlyMode, setOpenPage, setCurrentChat}:{onlyMode:boolean, setO
           
         </div>
       </main>
-    </div>
+    </motion.div>
   );
 };
 

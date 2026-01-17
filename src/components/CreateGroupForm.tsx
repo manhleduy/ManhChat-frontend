@@ -6,8 +6,9 @@ import ManhChatImage from '../assets/ManhChat.png';
 import { XIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAppSelector } from '@/redux/reduxHook';
-import { createGroup } from '@/lib/services/groupService';
 import { selectUserInfo } from '@/redux/slice/userSlice';
+import { motion } from "framer-motion"
+import { MakeRequest } from '@/lib/services/services';
 const CreateGroupForm= ({setOpenCreateForm}:any) => {
   const curretUser= useAppSelector(selectUserInfo).info
   const [error, setError]= useState<string>("");
@@ -22,7 +23,7 @@ const CreateGroupForm= ({setOpenCreateForm}:any) => {
 
   const onSubmit =async (data: CreateGroupSchema) => {  
     try{
-        const response = await createGroup({adminId: curretUser.id, ...data}, setError, setLoading)
+        await MakeRequest(`/api/group/create`, "post", setError, setLoading, {adminId: curretUser.id, ...data})
         toast.success("Group created successfully!");
         toast.success("successful create a new group with admin is you")
     }catch(e:any){
@@ -80,7 +81,7 @@ const CreateGroupForm= ({setOpenCreateForm}:any) => {
   ];
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <motion.div initial={{opacity:0, x:100}} animate={{opacity:1, x:0}} transition={{duration:0.5}} className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
 
       <div className="w-full max-w-md bg-white rounded-2xl shadow-lg">
         <button className='relative left-5 top-5'
@@ -121,17 +122,19 @@ const CreateGroupForm= ({setOpenCreateForm}:any) => {
                 </label>
               </div>
 
-              <button
+              <motion.button
+                whileHover={{scale: 1.02}}
+                whileTap={{scale: 0.98}}
                 type="submit"
                 className="w-full py-3.5 bg-green-500 text-white rounded-lg text-base font-semibold cursor-pointer border-none transition-all hover:bg-green-600 hover:-translate-y-px hover:shadow-lg active:translate-y-0 disabled:bg-green-300 disabled:cursor-not-allowed disabled:shadow-none"
               >
                 Create Group
-              </button>
+              </motion.button>
             </form>
           </FormProvider>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

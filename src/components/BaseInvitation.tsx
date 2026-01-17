@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import InvitationCard from './InvitationCard';
+import { motion } from "framer-motion";
 
 const BaseInvitations =(props:any) => {
     const {
@@ -14,21 +15,17 @@ const BaseInvitations =(props:any) => {
     }= props 
 
   const [openInviteForm, setOpenInviteForm]=useState(false);
-    
-
-  
   
   return (
     <>
     {openInviteForm? <RequestForm setOpenInviteForm={setOpenInviteForm}/> : null}
-    <div className="bg-gray-100 p-4 h-full overflow-scroll sm:p-6 md:p-8 ">
+    <motion.div initial={{opacity:0, y:20}} animate={{opacity:1, y:0}} transition={{duration:0.5}} className="bg-gray-100 p-4 h-full overflow-scroll sm:p-6 md:p-8 ">
       <div className="max-w-full">
         {/* Sent Section */}
         <div className="mb-10 sm:mb-12">
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 mb-4 sm:mb-6 pb-3 border-b-4 border-green-500 flex items-center">
             Request Received
-            <RequestTooltip setOpenInviteForm={setOpenInviteForm}/>    
-        
+            <RequestTooltip setOpenInviteForm={setOpenInviteForm}/>
           </h2>
           <div className="grid  grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-20 sm:gap-6">
             {sentInvitations.length > 0 ? (
@@ -68,7 +65,7 @@ const BaseInvitations =(props:any) => {
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
     </>
   );
 };

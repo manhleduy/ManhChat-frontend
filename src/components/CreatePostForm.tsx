@@ -6,9 +6,9 @@ import ManhChatImage from '../assets/ManhChat.png';
 import { XIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAppSelector } from '@/redux/reduxHook';
-import { createGroup } from '@/lib/services/groupService';
 import { selectUserInfo } from '@/redux/slice/userSlice';
-import { createPost } from '@/lib/services/postService';
+import { motion } from "framer-motion"
+import { MakeRequest } from '@/lib/services/services';
 
 
 const CreatePostForm= ({setOpenCreateForm}:any) => {
@@ -31,7 +31,7 @@ const CreatePostForm= ({setOpenCreateForm}:any) => {
       reader.readAsDataURL(file[0]);
       reader.onload= async()=>{
         const base64Image= reader.result;
-        await createPost({userId: curretUser.id, content: data.content, file: base64Image}, setError, setLoading)
+        await MakeRequest(`/api/post/create/${curretUser.id}`, "post", setError, setLoading, {content: data.content, file: base64Image})
       }
     }catch(e:any){
       console.log(e);
@@ -90,7 +90,7 @@ const CreatePostForm= ({setOpenCreateForm}:any) => {
   ];
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <motion.div initial={{opacity:0, x:100}} animate={{opacity:1, x:0}} transition={{duration:0.5}} className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
 
       <div className="w-full max-w-md bg-white rounded-2xl shadow-lg">
         <button className='relative left-5 top-5'
@@ -119,17 +119,19 @@ const CreatePostForm= ({setOpenCreateForm}:any) => {
               {fields.map(f => (
                 <InputField key={String(f.name)} field={f} />
               ))}
-              <button
+              <motion.button
+                whileHover={{scale: 1.02}}
+                whileTap={{scale: 0.98}}
                 type="submit"
                 className="w-full py-3.5 bg-green-500 text-white rounded-lg text-base font-semibold cursor-pointer border-none transition-all hover:bg-green-600 hover:-translate-y-px hover:shadow-lg active:translate-y-0 disabled:bg-green-300 disabled:cursor-not-allowed disabled:shadow-none"
               >
                 Create Post
-              </button>
+              </motion.button>
             </form>
           </FormProvider>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

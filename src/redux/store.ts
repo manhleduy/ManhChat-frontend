@@ -7,19 +7,11 @@ import socketMiddleware from "./middleware/socketMiddleware"
 import usersReducer from './slice/userSlice'
 import friendListReducer from './slice/FriendListSlice'
 import groupListReducer from './slice/GroupListSlice'
-import FriendRequestReducer from './slice/FriendRequestSlice'
-import GroupRequestReducer from './slice/GroupRequestSlice'
-import PostListReducer from './slice/PostListSlice'
-import ChatReceivedReducer from './slice/ChatReceivedSlice'
 import onlineUserReducer from './slice/onlineUserSlice'
 const rootReducer= combineReducers({
     users: usersReducer,
     friendList: friendListReducer,
     groupList: groupListReducer,
-    friendRequest: FriendRequestReducer,
-    groupRequest: GroupRequestReducer,
-    postList: PostListReducer,
-    ChatReceivedList: ChatReceivedReducer,
     onlineUserList: onlineUserReducer
 })
 const persistConfig={

@@ -3,9 +3,10 @@ import { User, ArrowLeftCircle, UserRoundX } from 'lucide-react';
 import type { UserDefaultInfo } from '@/lib/const';
 import ConfirmButton from './Confirmbutton';
 import toast from 'react-hot-toast';
-import { unFriend } from '@/lib/services/friendService';
 import { selectUserInfo } from '@/redux/slice/userSlice';
 import { useAppSelector } from '@/redux/reduxHook';
+import { MakeRequest } from '@/lib/services/services';
+import { useNavigate } from 'react-router-dom';
 
 interface FriendInformationProps {
   userInfo: UserDefaultInfo;
@@ -14,23 +15,29 @@ interface FriendInformationProps {
 
 
 const FriendInformation: React.FC<FriendInformationProps> = ({ userInfo, setOpenInfoPage }) => {
+  const navigate= useNavigate();
   const [openConfirm, setOpenConfirm]= useState(false);
   const [error, setError]= useState<string>("");
   const [loading, setLoading]= useState<boolean>(false);
-  const currentUser= useAppSelector(selectUserInfo).info
+  const currentUser= useAppSelector(selectUserInfo).info;
+
   const handleDeleteFriend=async()=>{
     try{
-      await unFriend({userId: currentUser.id, friendId: userInfo.id}, setError, setLoading)
+      //handle unfriend with other 
+      await MakeRequest(`/api/user/friend/${currentUser.id}`, "delete", setError, setLoading,{userId: currentUser.id, friendId: userInfo.id})
       toast.success("your have delete your friend");
       setOpenInfoPage(false);
 
     }catch(e:any){
       console.log(e);
       toast.error(e.message);
+    }finally{
+      setTimeout(()=>{
+        navigate('/')
+      }, 10000)
     }
   }
   return (
-    
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
       <div className="bg-green-200 absolute rounded-lg shadow-lg p-6  max-w-md w-full mx-4">
         <div className='absolute top-1 right-1 cursor-pointer'>
